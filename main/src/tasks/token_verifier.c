@@ -55,13 +55,16 @@ static int token_verifier_parse_data(struct http2c_handle *handle, const char *d
                 ESP_LOGW(TAG, "authentication success");
                 oled_display_show_image(2);
                 mp3_player_play_file(1);
+                vTaskDelay(3000 / portTICK_RATE_MS);
             } else {
                 ESP_LOGE(TAG, "authentication failed");
                 mp3_player_play_file(2);
             }
         } else {
-                ESP_LOGE(TAG, "invalid response");
+            ESP_LOGE(TAG, "invalid response");
+            mp3_player_play_file(6);
         }
+        oled_display_show_image(3);
         cJSON_Delete(root);
     }
     if (flags == DATA_RECV_FRAME_COMPLETE || flags == DATA_RECV_RST_STREAM) {

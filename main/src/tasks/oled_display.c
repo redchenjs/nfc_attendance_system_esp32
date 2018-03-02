@@ -42,7 +42,10 @@ void oled_display_show_image(uint8_t filename_index)
 }
 
 void oled_display_task(void *pvParameter)
-{   
+{
+    FILE *fp = NULL;
+    char *img_file_ptr = NULL;
+
 	gfxInit();
 
     while (1) {
@@ -51,7 +54,7 @@ void oled_display_task(void *pvParameter)
             oled_display_status = OLED_DISPLAY_RUNNING;
         } else {
             const char *filename = img_file_name[oled_display_image];
-            FILE *fp = fopen(filename, "rb");
+            fp = fopen(filename, "rb");
             if (fp == NULL) {
                 ESP_LOGE(TAG, "failed to open file for reading");
                 goto err3;
@@ -61,7 +64,7 @@ void oled_display_task(void *pvParameter)
                 ESP_LOGE(TAG, "file is empty");
                 goto err2;
             }
-            char *img_file_ptr = malloc(sizeof(char) * st.st_size);
+            img_file_ptr = malloc(sizeof(char) * st.st_size);
             if (img_file_ptr == NULL) {
                 ESP_LOGE(TAG, "no enough memory");
                 goto err2;
@@ -88,15 +91,15 @@ void oled_display_task(void *pvParameter)
                 }
                 gdispImageClose(&gfx_image);
             }
-        err1:
             free(img_file_ptr);
-        err2:
             fclose(fp);
-        err3:
-            continue;
         }
     }
-
+err1:
+    free(img_file_ptr);
+err2:
+    fclose(fp);
+err3:    
     ESP_LOGE(TAG, "task failed");
 
     oled_display_status = OLED_DISPLAY_STOPPED;

@@ -56,7 +56,9 @@ void nfc_initiator_task(void *pvParameter)
         .nbr = NBR_106
     };
     
-    while (sntp_client_status != SNTP_TIME_SET);
+    while (sntp_client_status == SNTP_TIME_NOT_SET) {
+        vTaskDelay(2 / portTICK_RATE_MS);
+    };
 
     while (1) {
         nfc_device *pnd = nfc_open(&emdev);
@@ -69,14 +71,13 @@ void nfc_initiator_task(void *pvParameter)
                     abtRx[res] = 0;
 
                     if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
+                        
                         if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                             oled_display_show_image(1);
                             token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
                             mp3_player_play_file(0);
                             led_indicator_set_mode(5);
                             nfc_initiator_set_mode(0);
-                            vTaskDelay(3000 / portTICK_RATE_MS);
-                            oled_display_show_image(3);
                         } else {
                             ESP_LOGW(TAG, "invalid frame data");
                         }

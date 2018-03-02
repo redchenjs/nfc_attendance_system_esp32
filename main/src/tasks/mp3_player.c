@@ -29,7 +29,8 @@ static const char mp3_file_name[][32] = {
                                             "/spiffs/snd/snd2.mp3", // "认证失败"
                                             "/spiffs/snd/snd3.mp3", // "连接失败"
                                             "/spiffs/snd/snd4.mp3", // "连接超时"
-                                            "/spiffs/snd/snd5.mp3"  // "网络故障"
+                                            "/spiffs/snd/snd5.mp3", // "网络故障"
+                                            "/spiffs/snd/snd6.mp3"  // "系统故障"
                                         };
 
 uint8_t mp3_player_status = MP3_PLAYER_STOPPED;
