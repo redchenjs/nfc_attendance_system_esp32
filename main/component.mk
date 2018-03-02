@@ -7,6 +7,5 @@
 # please read the ESP-IDF documents if you need to do this.
 #
 
-COMPONENT_SRCDIRS := src src/tasks src/system src/driver src/device src/utils
-COMPONENT_ADD_INCLUDEDIRS := .
-
+COMPONENT_SRCDIRS := src src/tasks src/system src/driver src/device
+COMPONENT_ADD_INCLUDEDIRS := inc

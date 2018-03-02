@@ -1,8 +1,8 @@
 /*
  * init.h
  *
- *  Created on: 2017-4-16
- *      Author: redchenjs
+ *  Created on: 2018-02-10 16:37
+ *      Author: Jack Chen <redchenjs@live.com>
  */
 
 #ifndef INC_SYSTEM_INIT_H_

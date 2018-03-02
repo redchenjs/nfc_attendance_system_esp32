@@ -157,7 +157,6 @@ struct nfc_driver {
 
 #define MAX_USER_DEFINED_DEVICES 4
 
-//嵌入式无OS 驱动接口
 struct  nfc_emdev{
 	void (*open)(void);
 	int (*receive) (uint8_t *pbtRx, const size_t szRx, int timeout);

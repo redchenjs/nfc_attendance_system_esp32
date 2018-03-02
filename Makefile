@@ -7,3 +7,8 @@ PROJECT_NAME := nfc_attendence_system
 
 include $(IDF_PATH)/make/project.mk
 
+spiffs_bin:
+	mkspiffs -c main/res -b 4096 -p 256 -s 0x100000 spiffs.bin
+
+spiffs_flash:
+	esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 2000000 write_flash -z 0x210000 spiffs.bin

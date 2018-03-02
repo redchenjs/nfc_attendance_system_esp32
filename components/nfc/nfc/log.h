@@ -33,7 +33,7 @@
 
 #include "nfc-internal.h"
 
-#define LOG
+//#define LOG
 //#define DEBUG
 
 #define NFC_LOG_PRIORITY_NONE   0
