@@ -14,10 +14,10 @@
 xTaskHandle led_indicator_task_handle;
 
 static const portTickType led_delay_mode[5] = {1000, 500, 250, 100, 25};
-static portTickType led_delay = 1000;
+static portTickType led_delay = 25;
 
 static const uint16_t led_count_mode[5] = {25, 50, 100};
-static uint16_t led_count = 2;
+static uint16_t led_count = 50;
 
 #define TAG "led_indicator"
 

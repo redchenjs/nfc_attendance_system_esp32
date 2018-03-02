@@ -108,6 +108,7 @@ void token_verifier_task(void *pvParameter)
             if (http2_client_execute(&hd) < 0) {
                 token_verifier_status = TOKEN_VERIFIER_STOPPING;
                 ESP_LOGE(TAG, "error in send/receive");
+                oled_display_show_image(3);
                 mp3_player_play_file(5);
                 break;
             }
@@ -115,6 +116,7 @@ void token_verifier_task(void *pvParameter)
             if (execute_cnt++ > 2500) {
                 token_verifier_status = TOKEN_VERIFIER_STOPPING;
                 ESP_LOGE(TAG, "execute timeout");
+                oled_display_show_image(3);
                 mp3_player_play_file(4);
                 break;
             } else {

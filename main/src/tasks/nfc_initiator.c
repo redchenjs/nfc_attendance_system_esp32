@@ -60,6 +60,9 @@ void nfc_initiator_task(void *pvParameter)
         vTaskDelay(2 / portTICK_RATE_MS);
     };
 
+    oled_display_show_image(3);
+    led_indicator_set_mode(1);
+
     while (1) {
         nfc_device *pnd = nfc_open(&emdev);
         if (pnd == NULL) {

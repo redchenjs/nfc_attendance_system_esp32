@@ -22,7 +22,8 @@ static const char img_file_name[][32] = {
                                             "/spiffs/ani/ani0.gif", // "WiFi"
                                             "/spiffs/ani/ani1.gif", // "Loading"
                                             "/spiffs/ani/ani2.gif", // "Success"
-                                            "/spiffs/ani/ani3.gif"  // "NFC"
+                                            "/spiffs/ani/ani3.gif", // "NFC"
+                                            "/spiffs/ani/ani4.gif"  // "PowerOff"
                                         };
 
 uint8_t oled_display_status = OLED_DISPLAY_RELOAD;

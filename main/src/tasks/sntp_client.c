@@ -39,7 +39,7 @@ void sntp_client_task(void *pvParameter)
     struct tm timeinfo = { 0 };
     char strftime_buf[64];
     int retry = 1;
-    const int retry_count = 35;
+    const int retry_count = 10;
 
     while (timeinfo.tm_year < (2018 - 1900)) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
@@ -47,14 +47,14 @@ void sntp_client_task(void *pvParameter)
         time(&now);
         localtime_r(&now, &timeinfo);
         if (++retry > retry_count) {
-            ESP_LOGW(TAG, "still waiting");
-            retry = 1;
+            ESP_LOGE(TAG, "can not wait to reboot");
+            oled_display_show_image(4);
+            vTaskDelay(6000 / portTICK_RATE_MS);
+            esp_restart();
         }
     }
 
     sntp_client_status = SNTP_TIME_SET;
-
-    oled_display_show_image(3);
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
