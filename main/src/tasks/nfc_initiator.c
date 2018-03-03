@@ -55,7 +55,7 @@ void nfc_initiator_task(void *pvParameter)
         .nmt = NMT_ISO14443A,
         .nbr = NBR_106
     };
-    
+
     while (sntp_client_status == SNTP_TIME_NOT_SET) {
         vTaskDelay(2 / portTICK_RATE_MS);
     };
@@ -72,9 +72,7 @@ void nfc_initiator_task(void *pvParameter)
             if (nfc_initiator_select_passive_target(pnd, nm, NULL, 0, &nt) >= 0) {
                 if ((res = nfc_initiator_transceive_bytes(pnd, abtTx, TX_FRAME_LEN, abtRx, RX_FRAME_LEN, -1)) >= 0) {
                     abtRx[res] = 0;
-
                     if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
-                        
                         if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                             oled_display_show_image(1);
                             token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
@@ -84,15 +82,12 @@ void nfc_initiator_task(void *pvParameter)
                         } else {
                             ESP_LOGW(TAG, "invalid frame data");
                         }
-
                     } else {
                         ESP_LOGW(TAG, "invalid frame prefix");
                     }
-
                 } else {
                     ESP_LOGW(TAG, "not a valid target");
                 }
-
                 nfc_initiator_deselect_target(pnd);
             } else {
                 ESP_LOGI(TAG, "waiting for target");
@@ -105,6 +100,8 @@ void nfc_initiator_task(void *pvParameter)
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
 
-    ESP_LOGE(TAG, "could not open nfc device, task failed");
-    vTaskDelete(NULL);
+    ESP_LOGE(TAG, "could not open nfc device, rebooting...");
+    oled_display_show_image(4);
+    vTaskDelay(5000 / portTICK_RATE_MS);
+    esp_restart();
 }

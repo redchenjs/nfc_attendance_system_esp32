@@ -45,7 +45,7 @@ void sntp_client_task(void *pvParameter)
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         if (++retry > retry_count) {
-            ESP_LOGE(TAG, "can not wait to reboot");
+            ESP_LOGE(TAG, "can not wait to reboot...");
             oled_display_show_image(4);
             vTaskDelay(5000 / portTICK_RATE_MS);
             esp_restart();
