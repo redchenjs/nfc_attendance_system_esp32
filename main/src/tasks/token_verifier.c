@@ -40,7 +40,7 @@ void token_verifier_verify_token(char *token)
         ESP_LOGW(TAG, "token verifier is running, waiting");
     }
     while (token_verifier_status != TOKEN_VERIFIER_STOPPED);
-    xTaskCreate(&token_verifier_task, "token_verifier_task", (1024 * 32), NULL, 5, NULL);
+    xTaskCreate(&token_verifier_task, "token_verifier_task", 20480, NULL, 5, NULL);
 }
 
 static int token_verifier_parse_data(struct http2c_handle *handle, const char *data, size_t len, int flags)
@@ -55,7 +55,7 @@ static int token_verifier_parse_data(struct http2c_handle *handle, const char *d
                 ESP_LOGW(TAG, "authentication success");
                 oled_display_show_image(2);
                 mp3_player_play_file(1);
-                vTaskDelay(3000 / portTICK_RATE_MS);
+                vTaskDelay(2000 / portTICK_RATE_MS);
             } else {
                 ESP_LOGE(TAG, "authentication failed");
                 mp3_player_play_file(2);
@@ -97,6 +97,7 @@ void token_verifier_task(void *pvParameter)
 
     if (http2_client_connect(&hd, HTTP2_SERVER_URI, HTTP2_CLIENT_CA_CERT) != 0) {
         ESP_LOGE(TAG, "failed to connect");
+        oled_display_show_image(3);
         mp3_player_play_file(3);
         token_verifier_status = TOKEN_VERIFIER_STOPPING;
     } else {

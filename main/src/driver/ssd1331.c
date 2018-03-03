@@ -5,6 +5,11 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include <string.h>
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_heap_caps.h"
 #include "driver/spi_master.h"
 
 #include "driver/ssd1331.h"
@@ -18,27 +23,32 @@
 #define max(a,b) ((a)>(b)?(a):(b))
 
 #define SSD1331_GPIO_PIN_DC   23
+#define SSD1331_GPIO_PIN_RST  14
 
-#define SSD1331_PIN_SET()     do { \
-                                    gpio_set_direction(SSD1331_GPIO_PIN_DC, GPIO_MODE_OUTPUT);\
-                              } while (0)
+#define SSD1331_PIN_SET()   do { \
+                                gpio_set_direction(SSD1331_GPIO_PIN_DC,  GPIO_MODE_OUTPUT);\
+                                gpio_set_direction(SSD1331_GPIO_PIN_RST, GPIO_MODE_OUTPUT);\
+                                gpio_set_level(SSD1331_GPIO_PIN_RST, 0);\
+                                vTaskDelay(100 / portTICK_PERIOD_MS);\
+                                gpio_set_level(SSD1331_GPIO_PIN_RST, 1);\
+                            } while (0)
 
-#define SSD1331_DC_SET()      do {\
-                                    spi1_t.length = 8;\
-                                    spi1_t.tx_buffer = &chData;\
-                                    spi1_t.user = (void*)1;\
-                              } while (0)
+#define SSD1331_DC_SET()    do {\
+                                spi1_t.length = 8;\
+                                spi1_t.tx_buffer = &chData;\
+                                spi1_t.user = (void*)1;\
+                            } while (0)
 
-#define SSD1331_DC_CLR()      do {\
-                                    spi1_t.length = 8;\
-                                    spi1_t.tx_buffer = &chData;\
-                                    spi1_t.user = (void*)0;\
-                              } while (0)
+#define SSD1331_DC_CLR()    do {\
+                                spi1_t.length = 8;\
+                                spi1_t.tx_buffer = &chData;\
+                                spi1_t.user = (void*)0;\
+                            } while (0)
 
 #define SSD1331_WRITE_BYTE(__DATA)  do {\
-                                            esp_err_t ret;\
-                                            ret = spi_device_transmit(spi1, &spi1_t);\
-                                            assert(ret == ESP_OK);\
+                                        esp_err_t ret;\
+                                        ret = spi_device_transmit(spi1, &spi1_t);\
+                                        assert(ret == ESP_OK);\
                                     } while (0)
     
 extern spi_device_handle_t spi1;
@@ -109,6 +119,29 @@ enum ssd1331_graphic_acceleration_command_table {
     DEACTIVATE_SCROLLING        = 0x2E,
     ACTIVATE_SCROLLING          = 0x2F
 };
+
+// uint8_t ssd1331_gram_buf[64][96][2] = {0};
+
+uint8_t *ssd1331_gram_ptr = NULL;
+spi_transaction_t spi1_trans[3];
+
+void ssd1331_gram_refresh(void)
+{
+    esp_err_t ret;
+
+    //Queue all transactions.
+    for (int x=0; x<3; x++) {
+        ret=spi_device_queue_trans(spi1, &spi1_trans[x], portMAX_DELAY);
+        assert(ret==ESP_OK);
+    }
+
+    for (int x=0; x<3; x++) {
+        spi_transaction_t* ptr;
+        ret=spi_device_get_trans_result(spi1, &ptr, portMAX_DELAY);
+        assert(ret==ESP_OK);
+        assert(ptr==spi1_trans+x);
+    }
+}
 
 void ssd1331_set_dc_line(spi_transaction_t *t)
 {
@@ -570,6 +603,31 @@ inline void ssd1331_set_gray_scale_table(void)
 
 void ssd1331_init(void)
 {
+    ssd1331_gram_ptr = heap_caps_malloc(64*96*2, MALLOC_CAP_DMA);
+    if (ssd1331_gram_ptr == NULL) {
+        return;
+    }
+
+    memset(spi1_trans, 0, sizeof(spi1_trans));
+
+    spi1_trans[0].length = 3*8;
+    spi1_trans[0].tx_data[0] = SET_COLUMN_ADDRESS;
+    spi1_trans[0].tx_data[1] = 0x00;
+    spi1_trans[0].tx_data[2] = SSD1331_WIDTH - 1;
+    spi1_trans[0].user = (void*)0;
+    spi1_trans[0].flags = SPI_TRANS_USE_TXDATA;
+
+    spi1_trans[1].length = 3*8,
+    spi1_trans[1].tx_data[0] = SET_ROW_ADDRESS;
+    spi1_trans[1].tx_data[1] = 0x00;
+    spi1_trans[1].tx_data[2] = SSD1331_HEIGHT - 1;
+    spi1_trans[1].user = (void*)0;
+    spi1_trans[1].flags = SPI_TRANS_USE_TXDATA;
+
+    spi1_trans[2].length = 4096*3*8;
+    spi1_trans[2].tx_buffer = ssd1331_gram_ptr;
+    spi1_trans[2].user = (void*)1;
+
     SSD1331_PIN_SET();
 
 	ssd1331_write_byte(SET_DISPLAY_OFF, SSD1331_CMD);           // Display Off

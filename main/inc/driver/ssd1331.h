@@ -8,6 +8,11 @@
 #ifndef SSD1331_H_
 #define SSD1331_H_
 
+#include <stdint.h>
+
+extern uint8_t *ssd1331_gram_ptr;
+extern void ssd1331_gram_refresh(void);
+
 extern void ssd1331_write_byte(unsigned char chData, unsigned char chCmd);
 
 extern void ssd1331_draw_point(unsigned char chXpos, unsigned char chYpos, unsigned int hwColor);

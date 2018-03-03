@@ -44,14 +44,14 @@ void sntp_client_task(void *pvParameter)
     while (timeinfo.tm_year < (2018 - 1900)) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
-        time(&now);
-        localtime_r(&now, &timeinfo);
         if (++retry > retry_count) {
             ESP_LOGE(TAG, "can not wait to reboot");
             oled_display_show_image(4);
-            vTaskDelay(6000 / portTICK_RATE_MS);
+            vTaskDelay(5000 / portTICK_RATE_MS);
             esp_restart();
         }
+        time(&now);
+        localtime_r(&now, &timeinfo);
     }
 
     sntp_client_status = SNTP_TIME_SET;

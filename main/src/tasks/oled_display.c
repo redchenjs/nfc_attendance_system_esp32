@@ -12,6 +12,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
+#include "driver/ssd1331.h"
 #include "tasks/oled_display.h"
 
 #include "gfx.h"
@@ -47,7 +48,7 @@ void oled_display_task(void *pvParameter)
     FILE *fp = NULL;
     char *img_file_ptr = NULL;
 
-	gfxInit();
+    gfxInit();
 
     while (1) {
         gdispImage gfx_image;
@@ -106,4 +107,13 @@ err3:
     oled_display_status = OLED_DISPLAY_STOPPED;
 
     vTaskDelete(NULL);
+}
+
+void gui_refresh_task(void *pvParameter)
+{
+    while (1) {
+        portTickType xLastWakeTime = xTaskGetTickCount();
+        ssd1331_gram_refresh();
+        vTaskDelayUntil(&xLastWakeTime, 400);
+    }
 }

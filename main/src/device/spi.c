@@ -21,13 +21,14 @@ void spi1_init(void)
         .mosi_io_num=18,
         .sclk_io_num=5,
         .quadwp_io_num=-1,
-        .quadhd_io_num=-1
+        .quadhd_io_num=-1,
+        .max_transfer_sz=4096 * 3
     };
     spi_device_interface_config_t devcfg={
         .clock_speed_hz=26000000,               //Clock out at 26 MHz
         .mode=0,                                //SPI mode 0
         .spics_io_num=27,                       //CS pin
-        .queue_size=7,                          //We want to be able to queue 7 transactions at a time
+        .queue_size=3,                          //We want to be able to queue 3 transactions at a time
         .pre_cb=spi1_pre_transfer_callback,     //Specify pre-transfer callback to handle D/C line
     };
     //Initialize the SPI bus

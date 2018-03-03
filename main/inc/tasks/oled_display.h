@@ -19,5 +19,6 @@ enum oled_display_status_table {
 extern void oled_display_show_image(uint8_t filename_index);
 
 extern void oled_display_task(void *pvParameter);
+extern void gui_refresh_task(void *pvParameter);
 
 #endif /* INC_TASKS_OLED_DISPLAY_H_ */

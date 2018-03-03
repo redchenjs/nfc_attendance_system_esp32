@@ -57,11 +57,10 @@ void led_indicator_set_mode(uint8_t mode_index)
 
 void led_indicator_task(void *pvParameter)
 {
-    portTickType xLastWakeTime = 0;  
     uint16_t i = 0;
 
     while (1) {
-        xLastWakeTime = xTaskGetTickCount();
+        portTickType xLastWakeTime = xTaskGetTickCount();
 
         if (i++ % led_count) {
             led_indicator_off();
