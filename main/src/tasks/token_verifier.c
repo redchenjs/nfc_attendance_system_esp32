@@ -37,7 +37,7 @@ void token_verifier_verify_token(char *token)
     data_ptr = token;
 
     if (token_verifier_status == TOKEN_VERIFIER_RUNNING) {
-        ESP_LOGW(TAG, "token verifier is running, waiting");
+        ESP_LOGW(TAG, "token verifier is running, waiting...");
     }
     while (token_verifier_status != TOKEN_VERIFIER_STOPPED);
     xTaskCreate(&token_verifier_task, "token_verifier_task", 20480, NULL, 5, NULL);

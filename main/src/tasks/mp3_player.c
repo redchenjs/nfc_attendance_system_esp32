@@ -38,8 +38,7 @@ uint8_t mp3_player_status = MP3_PLAYER_STOPPED;
 void mp3_player_play_file(uint8_t filename_index)
 {
     if (mp3_player_status == MP3_PLAYER_RUNNING) {
-        mp3_player_status = MP3_PLAYER_STOPPING;
-        ESP_LOGW(TAG, "mp3 player is running, now stop it");
+        ESP_LOGW(TAG, "mp3 player is running, waiting...");
     }
 
     if (filename_index >= (sizeof(mp3_file_name) / 32)) {
@@ -83,21 +82,19 @@ void mp3_player_task(void *pvParameters)
     struct mad_synth  *synth  = malloc(sizeof(struct mad_synth));
 
     if (stream == NULL) { ESP_LOGE(TAG, "malloc(stream) failed"); goto err1; }
-    if (synth  == NULL) { ESP_LOGE(TAG, "malloc(synth) failed");  goto err1; }
     if (frame  == NULL) { ESP_LOGE(TAG, "malloc(frame) failed");  goto err1; }
+    if (synth  == NULL) { ESP_LOGE(TAG, "malloc(synth) failed");  goto err1; }
 
     //Initialize mp3 parts
     mad_stream_init(stream);
     mad_frame_init(frame);
     mad_synth_init(synth);
 
-    mad_stream_buffer(stream, (unsigned char *)mp3_file_ptr, mp3_file_len);
-
     mp3_player_status = MP3_PLAYER_RUNNING;
+    mad_stream_buffer(stream, (unsigned char *)mp3_file_ptr, mp3_file_len);
     while (mp3_player_status == MP3_PLAYER_RUNNING) {
         if (mad_frame_decode(frame, stream) == -1) {
             if (!MAD_RECOVERABLE(stream->error)) {
-                mp3_player_status = MP3_PLAYER_STOPPING;
                 break;
             }
             ESP_LOGE(TAG, "dec err 0x%04x (%s)", stream->error, mad_stream_errorstr(stream));
@@ -107,6 +104,10 @@ void mp3_player_task(void *pvParameters)
     }
     // avoid noise
     i2s_zero_dma_buffer(0);
+
+    mad_synth_finish(synth);
+    mad_frame_finish(frame);
+    mad_stream_finish(stream);
 
 err1:
     free(synth);
