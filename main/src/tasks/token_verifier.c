@@ -90,9 +90,6 @@ void token_verifier_task(void *pvParameter)
 {
     struct http2c_handle hd;
 
-    xEventGroupWaitBits(wifi0_event_group, WIFI0_CONNECTED_BIT,
-                        false, true, portMAX_DELAY);
-
     token_verifier_status = TOKEN_VERIFIER_RUNNING;
 
     if (http2_client_connect(&hd, HTTP2_SERVER_URI, HTTP2_CLIENT_CA_CERT) != 0) {

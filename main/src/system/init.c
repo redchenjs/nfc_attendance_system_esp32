@@ -5,6 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include "device/event.h"
 #include "device/spi.h"
 #include "device/i2s.h"
 #include "device/gpio.h"
@@ -17,6 +18,7 @@
 
 void device_init(void)
 {
+    event0_init();
     spi1_init();
     i2s0_init();
     gpio0_init();

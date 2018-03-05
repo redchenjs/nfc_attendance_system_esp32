@@ -42,6 +42,8 @@
 	#define GDISP_INITIAL_BACKLIGHT	100
 #endif
 
+#define GDISP_FLG_NEEDFLUSH			(GDISP_FLG_DRIVER<<0)
+
 #include "SSD1331.h"
 
 /*===========================================================================*/
@@ -56,8 +58,14 @@
 /*===========================================================================*/
 
 LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
-	// No private area for this controller
-	g->priv = 0;
+	g->priv = gfxAlloc(GDISP_SCREEN_HEIGHT * GDISP_SCREEN_WIDTH * 2);
+	if (g->priv == NULL) {
+		return FALSE;
+	}
+
+	for(int i=0; i < GDISP_SCREEN_HEIGHT * GDISP_SCREEN_WIDTH * 2; i++) {
+		*((uint8_t *)g->priv + i) = 0x00;
+	}
 
 	// Initialise the board interface
 	init_board(g);
@@ -72,6 +80,16 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
 	return TRUE;
 }
 
+#if GDISP_HARDWARE_FLUSH
+	LLDSPEC void gdisp_lld_flush(GDisplay *g) {
+		if (!(g->flags & GDISP_FLG_NEEDFLUSH)) {
+			return;
+		}
+		refresh_gram(g, (uint8_t *)g->priv);
+		g->flags &= ~GDISP_FLG_NEEDFLUSH;
+	}
+#endif
+
 #if GDISP_HARDWARE_STREAM_WRITE
 	LLDSPEC	void gdisp_lld_write_start(GDisplay *g) {
 	}
@@ -79,14 +97,15 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
 		LLDSPEC	void gdisp_lld_write_color(GDisplay *g) {
 			LLDCOLOR_TYPE c;
 			c = gdispColor2Native(g->p.color);
-			*(ssd1331_gram_ptr + g->p.y * 192 + g->p.x * 2 + 0) = c >> 8;
-			*(ssd1331_gram_ptr + g->p.y * 192 + g->p.x * 2 + 1) = c;
+			*((uint8_t *)g->priv + g->p.y * 192 + g->p.x * 2 + 0) = c >> 8;
+			*((uint8_t *)g->priv + g->p.y * 192 + g->p.x * 2 + 1) = c;
 		}
 	#else
 		LLDSPEC	void gdisp_lld_write_color(GDisplay *g) {
 		}
 	#endif
 	LLDSPEC	void gdisp_lld_write_stop(GDisplay *g) {
+		g->flags |= GDISP_FLG_NEEDFLUSH;
 	}
 #endif
 
@@ -96,10 +115,28 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
 		c = gdispColor2Native(g->p.color);
 		for (int j=g->p.y; j<(g->p.y + g->p.cy); j++) {
 			for (int i=g->p.x; i<(g->p.x + g->p.cx); i++) {
-				*(ssd1331_gram_ptr + j * 192 + i * 2 + 0) = c >> 8;
-				*(ssd1331_gram_ptr + j * 192 + i * 2 + 1) = c;
+				*((uint8_t *)g->priv + j * 192 + i * 2 + 0) = c >> 8;
+				*((uint8_t *)g->priv + j * 192 + i * 2 + 1) = c;
 			}
 		}
+		g->flags |= GDISP_FLG_NEEDFLUSH;
+	}
+#endif
+
+#if GDISP_HARDWARE_DRAWPIXEL
+	LLDSPEC void gdisp_lld_draw_pixel(GDisplay *g) {
+		LLDCOLOR_TYPE c;
+		c = gdispColor2Native(g->p.color);
+		*((uint8_t *)g->priv + g->p.y * 192 + g->p.x * 2 + 0) = c >> 8;
+		*((uint8_t *)g->priv + g->p.y * 192 + g->p.x * 2 + 1) = c;
+		g->flags |= GDISP_FLG_NEEDFLUSH;
+	}
+#endif
+
+#if GDISP_HARDWARE_PIXELREAD
+	LLDSPEC color_t gdisp_lld_get_pixel_color(GDisplay *g) {
+		return (*((uint8_t *)g->priv + g->p.y * 192 + g->p.x * 2 + 0) << 8) |
+			   (*((uint8_t *)g->priv + g->p.y * 192 + g->p.x * 2 + 1));
 	}
 #endif
 
@@ -129,7 +166,6 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
 			g->g.Powermode = (powermode_t)g->p.ptr;
 			return;
 
-		/*
 		case GDISP_CONTROL_ORIENTATION:
 			if (g->g.Orientation == (orientation_t)g->p.ptr)
 				return;
@@ -155,7 +191,6 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
 			}
 			g->g.Orientation = (orientation_t)g->p.ptr;
 			return;
-		*/
 
         case GDISP_CONTROL_BACKLIGHT:
             if ((unsigned)g->p.ptr > 100)
@@ -165,7 +200,9 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
             g->g.Backlight = (unsigned)g->p.ptr;
             return;
 
-		//case GDISP_CONTROL_CONTRAST:
+		case GDISP_CONTROL_CONTRAST:
+			return;
+
         default:
             return;
 		}

@@ -49,7 +49,7 @@ void mp3_player_play_file(uint8_t filename_index)
 
     while (mp3_player_status != MP3_PLAYER_STOPPED);
 
-    xTaskCreate(&mp3_player_task, "mp3_player_task", 10240, (void * const)mp3_file_name[filename_index], 5, NULL);
+    xTaskCreate(&mp3_player_task, "mp3_player_task", 8192, (void * const)mp3_file_name[filename_index], 5, NULL);
 }
 
 void mp3_player_task(void *pvParameters)

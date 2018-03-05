@@ -70,7 +70,7 @@
 #define GFX_USE_GDISP                                TRUE
 
 // #define GDISP_NEED_AUTOFLUSH                         TRUE
-//#define GDISP_NEED_TIMERFLUSH                        FALSE
+#define GDISP_NEED_TIMERFLUSH                        50
 // #define GDISP_NEED_VALIDATION                        TRUE
 // #define GDISP_NEED_CLIP                              TRUE
 // #define GDISP_NEED_CIRCLE                            TRUE
@@ -79,19 +79,19 @@
 // #define GDISP_NEED_ARC                               TRUE
 // #define GDISP_NEED_ARCSECTORS                        TRUE
 // #define GDISP_NEED_CONVEX_POLYGON                    TRUE
-// #define GDISP_NEED_SCROLL                            TRUE
-//#define GDISP_NEED_PIXELREAD                         FALSE
+#define GDISP_NEED_SCROLL                            TRUE
+#define GDISP_NEED_PIXELREAD                         TRUE
 #define GDISP_NEED_CONTROL                           TRUE
-//#define GDISP_NEED_QUERY                             FALSE
+#define GDISP_NEED_QUERY                             TRUE
 #define GDISP_NEED_MULTITHREAD                       TRUE
-//#define GDISP_NEED_STREAMING                         FALSE
+#define GDISP_NEED_STREAMING                         TRUE
 #define GDISP_NEED_TEXT                              TRUE
-//    #define GDISP_NEED_TEXT_WORDWRAP                 FALSE
-//    #define GDISP_NEED_TEXT_BOXPADLR                 1
-//    #define GDISP_NEED_TEXT_BOXPADTB                 1
-//    #define GDISP_NEED_ANTIALIAS                     TRUE
-//    #define GDISP_NEED_UTF8                          FALSE
-//    #define GDISP_NEED_TEXT_KERNING                  FALSE
+   #define GDISP_NEED_TEXT_WORDWRAP                 TRUE
+   #define GDISP_NEED_TEXT_BOXPADLR                 1
+   #define GDISP_NEED_TEXT_BOXPADTB                 1
+   #define GDISP_NEED_ANTIALIAS                     TRUE
+   #define GDISP_NEED_UTF8                          TRUE
+   #define GDISP_NEED_TEXT_KERNING                  TRUE
    #define GDISP_INCLUDE_FONT_UI1                   TRUE
    #define GDISP_INCLUDE_FONT_UI2                   TRUE		// The smallest preferred font.
    #define GDISP_INCLUDE_FONT_LARGENUMBERS          TRUE

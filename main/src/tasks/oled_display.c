@@ -108,12 +108,3 @@ err3:
 
     vTaskDelete(NULL);
 }
-
-void gui_refresh_task(void *pvParameter)
-{
-    while (1) {
-        portTickType xLastWakeTime = xTaskGetTickCount();
-        ssd1331_gram_refresh();
-        vTaskDelayUntil(&xLastWakeTime, 400);
-    }
-}

@@ -15,6 +15,7 @@
 #include "device/wifi.h"
 #include "tasks/sntp_client.h"
 #include "tasks/oled_display.h"
+#include "tasks/nfc_initiator.h"
 
 #define TAG "sntp_client"
 
@@ -58,6 +59,8 @@ void sntp_client_task(void *pvParameter)
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
+
+    nfc_initiator_set_mode(1);
 
     vTaskDelete(NULL);
 }

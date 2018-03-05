@@ -9,12 +9,10 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_heap_caps.h"
-#include "driver/spi_master.h"
+#include "device/spi.h"
 
 #include "driver/ssd1331.h"
 #include "system/fonts.h"
-
 /*
  * --------SSD1331--------
  */
@@ -51,83 +49,34 @@
                                         assert(ret == ESP_OK);\
                                     } while (0)
     
-extern spi_device_handle_t spi1;
-extern spi_transaction_t spi1_t;
-
 void ssd1331_set_dc_line(spi_transaction_t *);
 void (*spi1_pre_transfer_callback)(spi_transaction_t *) = ssd1331_set_dc_line;
 
-enum ssd1331_panel_value {
-    SSD1331_WIDTH  = 96,
-    SSD1331_HEIGHT = 64
-};
-
-enum ssd1331_data_type {
-    SSD1331_CMD  = 0,
-    SSD1331_DATA = 1
-};
-
-enum ssd1331_fundamental_command_table {
-    SET_COLUMN_ADDRESS  = 0x15,
-    SET_ROW_ADDRESS     = 0x75,
-    
-    SET_CONTRAST_A          = 0x81,
-    SET_CONTRAST_B          = 0x82,
-    SET_CONTRAST_C          = 0x83,
-    SET_MASTER_CURRENT      = 0x87,
-    SET_PRECHARGE_SPEED_A   = 0x8A,
-    SET_PRECHARGE_SPEED_B   = 0x8B,
-    SET_PRECHARGE_SPEED_C   = 0x8C,
-
-    SET_REMAP_COLOR_DEPTH   = 0xA0,
-    SET_DISPLAY_START_LINE  = 0xA1,
-    SET_DISPLAY_OFFSET      = 0xA2,
-
-    SET_NORMAL_DISPLAY      = 0xA4,
-    SET_ENTIRE_DISPLAY_ON   = 0xA5,
-    SET_ENTIRE_DISPLAY_OFF  = 0xA6,
-    SET_INVERSE_DISPLAY     = 0xA7,
-
-    SET_MULTIPLEX_RATIO     = 0xA8,
-    SET_DIM_MODE            = 0xAB,
-    SET_MASTER_CONFIG       = 0xAD,
-
-    SET_DISPLAY_ON_DIM      = 0xAC,
-    SET_DISPLAY_OFF         = 0xAE,
-    SET_DISPLAY_ON_NORMAL   = 0xAF,
-
-    SET_POWER_SAVE_MODE     = 0xB0,
-    SET_PHASE_PERIOD_ADJ    = 0xB1,
-    SET_DISPLAY_CLOCK_DIV   = 0xB3,
-    SET_GRAY_SCALE_TABLE    = 0xB8,
-    SET_BUILTIN_LINEAR_LUT  = 0xB9,
-    SET_PRECHARGE_LEVEL     = 0xBB,
-    SET_VCOMH_VOLTAGE       = 0xBE,
-
-    SET_COMMAND_LOCK    = 0xFD
-};
-
-enum ssd1331_graphic_acceleration_command_table {
-    DRAW_LINE       = 0x21,
-    DRAW_RECTANGLE  = 0x22,
-    COPY_WINDOW     = 0x23,
-    DIM_WINDOW      = 0x24,
-    CLEAR_WINDOW    = 0x25,
-    SET_FILL_MODE   = 0x26,
-
-    CONTINUOUS_SCROLLING_SETUP  = 0x27,
-    DEACTIVATE_SCROLLING        = 0x2E,
-    ACTIVATE_SCROLLING          = 0x2F
-};
-
-// uint8_t ssd1331_gram_buf[64][96][2] = {0};
-
-uint8_t *ssd1331_gram_ptr = NULL;
 spi_transaction_t spi1_trans[3];
 
-void ssd1331_gram_refresh(void)
+void ssd1331_refresh_gram(uint8_t *gram)
 {
     esp_err_t ret;
+
+    memset(spi1_trans, 0, sizeof(spi1_trans));
+
+    spi1_trans[0].length = 3*8;
+    spi1_trans[0].tx_data[0] = SET_COLUMN_ADDRESS;
+    spi1_trans[0].tx_data[1] = 0x00;
+    spi1_trans[0].tx_data[2] = SSD1331_WIDTH - 1;
+    spi1_trans[0].user = (void*)0;
+    spi1_trans[0].flags = SPI_TRANS_USE_TXDATA;
+
+    spi1_trans[1].length = 3*8,
+    spi1_trans[1].tx_data[0] = SET_ROW_ADDRESS;
+    spi1_trans[1].tx_data[1] = 0x00;
+    spi1_trans[1].tx_data[2] = SSD1331_HEIGHT - 1;
+    spi1_trans[1].user = (void*)0;
+    spi1_trans[1].flags = SPI_TRANS_USE_TXDATA;
+
+    spi1_trans[2].length = 4096*3*8;
+    spi1_trans[2].tx_buffer = gram;
+    spi1_trans[2].user = (void*)1;
 
     //Queue all transactions.
     for (int x=0; x<3; x++) {
@@ -603,31 +552,6 @@ inline void ssd1331_set_gray_scale_table(void)
 
 void ssd1331_init(void)
 {
-    ssd1331_gram_ptr = heap_caps_malloc(64*96*2, MALLOC_CAP_DMA);
-    if (ssd1331_gram_ptr == NULL) {
-        return;
-    }
-
-    memset(spi1_trans, 0, sizeof(spi1_trans));
-
-    spi1_trans[0].length = 3*8;
-    spi1_trans[0].tx_data[0] = SET_COLUMN_ADDRESS;
-    spi1_trans[0].tx_data[1] = 0x00;
-    spi1_trans[0].tx_data[2] = SSD1331_WIDTH - 1;
-    spi1_trans[0].user = (void*)0;
-    spi1_trans[0].flags = SPI_TRANS_USE_TXDATA;
-
-    spi1_trans[1].length = 3*8,
-    spi1_trans[1].tx_data[0] = SET_ROW_ADDRESS;
-    spi1_trans[1].tx_data[1] = 0x00;
-    spi1_trans[1].tx_data[2] = SSD1331_HEIGHT - 1;
-    spi1_trans[1].user = (void*)0;
-    spi1_trans[1].flags = SPI_TRANS_USE_TXDATA;
-
-    spi1_trans[2].length = 4096*3*8;
-    spi1_trans[2].tx_buffer = ssd1331_gram_ptr;
-    spi1_trans[2].user = (void*)1;
-
     SSD1331_PIN_SET();
 
 	ssd1331_write_byte(SET_DISPLAY_OFF, SSD1331_CMD);           // Display Off

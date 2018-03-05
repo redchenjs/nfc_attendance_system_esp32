@@ -15,9 +15,8 @@
 
 void main_task(void)
 {
-    xTaskCreate(&gui_refresh_task, "gui_refresh_task", 1024, NULL, 5, NULL);
     xTaskCreate(&sntp_client_task, "sntp_client_task", 2048, NULL, 5, NULL);
-    xTaskCreate(&oled_display_task, "oled_display_task", 2048, NULL, 5, NULL);
+    xTaskCreate(&oled_display_task, "oled_display_task", 1536, NULL, 5, NULL);
     xTaskCreate(&led_indicator_task, "led_indicator_task", 1024, NULL, 5, &led_indicator_task_handle);
-    xTaskCreate(&nfc_initiator_task, "nfc_initiator_task", 4096, NULL, 5, &nfc_initiator_task_handle);
+    xTaskCreate(&nfc_initiator_task, "nfc_initiator_task", 5120, NULL, 5, &nfc_initiator_task_handle);
 }

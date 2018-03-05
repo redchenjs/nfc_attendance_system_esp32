@@ -17,6 +17,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "device/wifi.h"
+
 #include "tasks/mp3_player.h"
 #include "tasks/sntp_client.h"
 #include "tasks/oled_display.h"
@@ -56,14 +58,17 @@ void nfc_initiator_task(void *pvParameter)
         .nbr = NBR_106
     };
 
-    while (sntp_client_status == SNTP_TIME_NOT_SET) {
-        vTaskDelay(2 / portTICK_RATE_MS);
-    };
-
+    nfc_initiator_set_mode(0);
     oled_display_show_image(3);
     led_indicator_set_mode(1);
 
     while (1) {
+        EventBits_t uxBits = xEventGroupWaitBits(wifi0_event_group, WIFI0_CONNECTED_BIT, false, true, 0);
+        if ((uxBits & WIFI0_CONNECTED_BIT) != WIFI0_CONNECTED_BIT) {
+            oled_display_show_image(0);
+            led_indicator_set_mode(7);
+            nfc_initiator_set_mode(0);
+        }
         nfc_device *pnd = nfc_open(&emdev);
         if (pnd == NULL) {
             break;
@@ -75,8 +80,8 @@ void nfc_initiator_task(void *pvParameter)
                     if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
                         if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                             oled_display_show_image(1);
-                            token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
                             mp3_player_play_file(0);
+                            token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
                             led_indicator_set_mode(5);
                             nfc_initiator_set_mode(0);
                         } else {
