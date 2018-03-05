@@ -24,7 +24,8 @@ static const char img_file_name[][32] = {
                                             "/spiffs/ani/ani1.gif", // "Loading"
                                             "/spiffs/ani/ani2.gif", // "Success"
                                             "/spiffs/ani/ani3.gif", // "NFC"
-                                            "/spiffs/ani/ani4.gif"  // "PowerOff"
+                                            "/spiffs/ani/ani4.gif", // "PowerOff"
+                                            "/spiffs/ani/ani5.gif"  // "Clock"
                                         };
 
 uint8_t oled_display_status = OLED_DISPLAY_RELOAD;
@@ -102,9 +103,6 @@ err1:
 err2:
     fclose(fp);
 err3:    
-    ESP_LOGE(TAG, "task failed");
-
-    oled_display_status = OLED_DISPLAY_STOPPED;
-
-    vTaskDelete(NULL);
+    ESP_LOGE(TAG, "task failed, rebooting...");
+    esp_restart();
 }

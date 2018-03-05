@@ -32,6 +32,9 @@ esp_err_t event0_handler(void *ctx, system_event_t *event)
                 oled_display_show_image(3);
                 led_indicator_set_mode(1);
                 nfc_initiator_set_mode(1);
+            } else {
+                oled_display_show_image(5);
+                led_indicator_set_mode(2);
             }
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
