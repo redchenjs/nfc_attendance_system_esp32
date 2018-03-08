@@ -10,12 +10,7 @@
 
 #include <stdint.h>
 
-extern void led_indicator_set_mode(uint8_t led_level);
+extern void led_indicator_set_mode(uint8_t mode);
 extern void led_indicator_task(void *pvParameter);
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-extern xTaskHandle led_indicator_task_handle;
 
 #endif /* INC_LED_INDICATOR_H_ */

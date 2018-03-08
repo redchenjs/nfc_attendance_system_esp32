@@ -12,19 +12,14 @@
 
 #include "apps/sntp/sntp.h"
 
-#include "device/wifi.h"
-#include "tasks/sntp_client.h"
+#include "tasks/main_task.h"
 #include "tasks/oled_display.h"
-#include "tasks/nfc_initiator.h"
 
 #define TAG "sntp_client"
 
-uint8_t sntp_client_status = SNTP_TIME_NOT_SET;
-
 void sntp_client_task(void *pvParameter)
 {
-    xEventGroupWaitBits(wifi0_event_group, WIFI0_CONNECTED_BIT,
-                        false, true, portMAX_DELAY);
+    xEventGroupWaitBits(system_event_group, WIFI_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
     
     setenv("TZ", "CST-8", 1);
     tzset();
@@ -55,12 +50,10 @@ void sntp_client_task(void *pvParameter)
         localtime_r(&now, &timeinfo);
     }
 
-    sntp_client_status = SNTP_TIME_SET;
+    xEventGroupSetBits(system_event_group, SNTP_READY_BIT);
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
-
-    nfc_initiator_set_mode(1);
 
     vTaskDelete(NULL);
 }

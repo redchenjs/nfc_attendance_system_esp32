@@ -15,6 +15,7 @@
 
 #include "cJSON.h"
 
+#include "tasks/main_task.h"
 #include "tasks/mp3_player.h"
 #include "tasks/http2_client.h"
 #include "tasks/oled_display.h"
@@ -24,23 +25,20 @@
 
 #define TAG "token_verifier"
 
-#define HTTP2_CLIENT_CA_CERT "/spiffs/cert/cert0.pem"
+static const uint8_t *cert_file_ptr[][2] = {
+                                            {cert0_pem_ptr, cert0_pem_end}  // "DigiCert Global Root CA"
+                                        };
+uint8_t cert_file_index = 0;
+
 #define HTTP2_SERVER_URI     "https://redchenjs.vicp.net"
 #define HTTP2_POST_PATH      "/iot/"
-
-uint8_t token_verifier_status = TOKEN_VERIFIER_STOPPED;
 
 static char *data_ptr = NULL;
 
 void token_verifier_verify_token(char *token)
 {
     data_ptr = token;
-
-    if (token_verifier_status == TOKEN_VERIFIER_RUNNING) {
-        ESP_LOGW(TAG, "token verifier is running, waiting...");
-    }
-    while (token_verifier_status != TOKEN_VERIFIER_STOPPED);
-    xTaskCreate(&token_verifier_task, "token_verifier_task", 20480, NULL, 5, NULL);
+    xEventGroupSetBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
 }
 
 static int token_verifier_parse_data(struct http2c_handle *handle, const char *data, size_t len, int flags)
@@ -55,20 +53,22 @@ static int token_verifier_parse_data(struct http2c_handle *handle, const char *d
                 ESP_LOGW(TAG, "authentication success");
                 oled_display_show_image(2);
                 mp3_player_play_file(1);
-                vTaskDelay(2000 / portTICK_RATE_MS);
             } else {
                 ESP_LOGE(TAG, "authentication failed");
+                oled_display_show_image(7);
                 mp3_player_play_file(2);
             }
         } else {
             ESP_LOGE(TAG, "invalid response");
+            oled_display_show_image(6);
             mp3_player_play_file(6);
         }
-        oled_display_show_image(3);
         cJSON_Delete(root);
+        vTaskDelay(2000 / portTICK_RATE_MS);
+        oled_display_show_image(3);
     }
     if (flags == DATA_RECV_FRAME_COMPLETE || flags == DATA_RECV_RST_STREAM) {
-        token_verifier_status = TOKEN_VERIFIER_STOPPING;
+        xEventGroupClearBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
     }
     return 0;
 }
@@ -90,44 +90,45 @@ void token_verifier_task(void *pvParameter)
 {
     struct http2c_handle hd;
 
-    token_verifier_status = TOKEN_VERIFIER_RUNNING;
+    while (1) {
+        xEventGroupWaitBits(task_event_group, TOKEN_VERIFIER_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
 
-    if (http2_client_connect(&hd, HTTP2_SERVER_URI, HTTP2_CLIENT_CA_CERT) != 0) {
-        ESP_LOGE(TAG, "failed to connect");
-        oled_display_show_image(3);
-        mp3_player_play_file(3);
-        token_verifier_status = TOKEN_VERIFIER_STOPPING;
-    } else {
-        /* HTTP POST  */
-        http2_client_do_post(&hd, HTTP2_POST_PATH, token_verifier_prepare_data, token_verifier_parse_data);
+        hd.ca_file_ptr = cert_file_ptr[cert_file_index][0];
+        hd.ca_file_len = cert_file_ptr[cert_file_index][1] - cert_file_ptr[cert_file_index][0];
+        if (http2_client_connect(&hd, HTTP2_SERVER_URI) != 0) {
+            ESP_LOGE(TAG, "failed to connect");
+            oled_display_show_image(3);
+            mp3_player_play_file(3);
+        } else {
+            /* HTTP POST  */
+            http2_client_do_post(&hd, HTTP2_POST_PATH, token_verifier_prepare_data, token_verifier_parse_data);
 
-        uint16_t execute_cnt = 0;
-        while (token_verifier_status == TOKEN_VERIFIER_RUNNING) {
-            if (http2_client_execute(&hd) < 0) {
-                token_verifier_status = TOKEN_VERIFIER_STOPPING;
-                ESP_LOGE(TAG, "error in send/receive");
-                oled_display_show_image(3);
-                mp3_player_play_file(5);
-                break;
-            }
-
-            if (execute_cnt++ > 2500) {
-                token_verifier_status = TOKEN_VERIFIER_STOPPING;
-                ESP_LOGE(TAG, "execute timeout");
-                oled_display_show_image(3);
-                mp3_player_play_file(4);
-                break;
-            } else {
-                vTaskDelay(2 / portTICK_PERIOD_MS);
+            uint16_t execute_cnt = 0;
+            while (1) {
+                if (!(xEventGroupGetBits(task_event_group) & TOKEN_VERIFIER_READY_BIT)) {
+                    break;
+                }
+                if (http2_client_execute(&hd) < 0) {
+                    ESP_LOGE(TAG, "error in send/receive");
+                    oled_display_show_image(3);
+                    mp3_player_play_file(5);
+                    break;
+                }
+                if (execute_cnt++ > 2500) {
+                    ESP_LOGE(TAG, "execute timeout");
+                    oled_display_show_image(3);
+                    mp3_player_play_file(4);
+                    break;
+                } else {
+                    vTaskDelay(2 / portTICK_PERIOD_MS);
+                }
             }
         }
+        http2_client_free(&hd);
+
+        nfc_initiator_set_mode(1);
+        led_indicator_set_mode(1);
+
+        xEventGroupClearBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
     }
-    http2_client_free(&hd);
-
-    nfc_initiator_set_mode(1);
-    led_indicator_set_mode(1);
-
-    token_verifier_status = TOKEN_VERIFIER_STOPPED;
-
-    vTaskDelete(NULL);
 }

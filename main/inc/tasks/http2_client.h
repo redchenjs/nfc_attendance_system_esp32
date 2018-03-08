@@ -18,9 +18,8 @@ struct http2c_handle {
     char             host[64];
     char             port[6];
     char             path[128];
-    const char      *ca_file;
-    unsigned char    ca_buf[1536];
-    int              ca_len;
+    const uint8_t   *ca_file_ptr;
+    uint32_t         ca_file_len;
     SSL_CTX         *ssl_ctx;      /*!< Pointer to the SSL context */
     SSL             *ssl;          /*!< Pointer to the SSL handle */
     nghttp2_session *http2_sess;   /*!< Pointer to the HTTP2 session handle */
@@ -33,7 +32,7 @@ struct http2c_handle {
 typedef int (*http2c_frame_data_recv_cb_t)(struct http2c_handle *handle, const char *data, size_t len, int flags);
 typedef int (*http2c_putpost_data_cb_t)(struct http2c_handle *handle, char *data, size_t len, uint32_t *data_flags);
 
-int  http2_client_connect(struct http2c_handle *hd, const char *uri, const char *ca_file);
+int  http2_client_connect(struct http2c_handle *hd, const char *uri);
 void http2_client_free(struct http2c_handle *hd);
 
 int http2_client_do_get(struct http2c_handle *hd, const char *path, http2c_frame_data_recv_cb_t recv_cb);

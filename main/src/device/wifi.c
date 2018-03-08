@@ -17,10 +17,6 @@
 #define DEFAULT_SSID CONFIG_WIFI_SSID
 #define DEFAULT_PASS CONFIG_WIFI_PASSWORD
 
-EventGroupHandle_t wifi0_event_group;
-
-const int WIFI0_CONNECTED_BIT = BIT0;
-
 char wifi0_mac_str[13] = {0};
 uint8_t wifi0_mac[6] = {0};
 
@@ -67,7 +63,6 @@ void wifi0_init(void)
     ESP_ERROR_CHECK(ret);
 
     tcpip_adapter_init();
-    wifi0_event_group = xEventGroupCreate();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));

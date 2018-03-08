@@ -8,11 +8,9 @@
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
-
 #include "freertos/event_groups.h"
 
-#include "device/wifi.h"
-
+#include "tasks/main_task.h"
 #include "tasks/sntp_client.h"
 #include "tasks/oled_display.h"
 #include "tasks/led_indicator.h"
@@ -27,19 +25,18 @@ esp_err_t event0_handler(void *ctx, system_event_t *event)
             ESP_ERROR_CHECK(esp_wifi_connect());
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
-            xEventGroupSetBits(wifi0_event_group, WIFI0_CONNECTED_BIT);
-            if (sntp_client_status == SNTP_TIME_SET) {
-                oled_display_show_image(3);
-                led_indicator_set_mode(1);
-                nfc_initiator_set_mode(1);
-            } else {
-                oled_display_show_image(5);
-                led_indicator_set_mode(2);
-            }
+            xEventGroupSetBits(system_event_group, WIFI_READY_BIT);
+            oled_display_show_image(5);
+            led_indicator_set_mode(2);
+            xEventGroupWaitBits(system_event_group, SNTP_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+            oled_display_show_image(3);
+            led_indicator_set_mode(1);
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
             ESP_ERROR_CHECK(esp_wifi_connect());
-            xEventGroupClearBits(wifi0_event_group, WIFI0_CONNECTED_BIT);
+            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
+            oled_display_show_image(0);
+            led_indicator_set_mode(7);
             break;
         default:
             break;

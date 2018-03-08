@@ -27,7 +27,7 @@
                                 gpio_set_direction(SSD1331_GPIO_PIN_DC,  GPIO_MODE_OUTPUT);\
                                 gpio_set_direction(SSD1331_GPIO_PIN_RST, GPIO_MODE_OUTPUT);\
                                 gpio_set_level(SSD1331_GPIO_PIN_RST, 0);\
-                                vTaskDelay(100 / portTICK_PERIOD_MS);\
+                                vTaskDelay(200 / portTICK_PERIOD_MS);\
                                 gpio_set_level(SSD1331_GPIO_PIN_RST, 1);\
                             } while (0)
 

@@ -11,7 +11,6 @@
 #include "device/gpio.h"
 #include "device/uart.h"
 #include "device/wifi.h"
-#include "device/spiffs.h"
 
 #include "driver/led.h"
 #include "buses/emdev.h"
@@ -24,7 +23,6 @@ void device_init(void)
     gpio0_init();
     uart1_init();
     wifi0_init();
-    spiffs0_init();
 }
 void driver_init(void)
 {

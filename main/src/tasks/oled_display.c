@@ -13,96 +13,64 @@
 #include "esp_log.h"
 
 #include "driver/ssd1331.h"
+#include "tasks/main_task.h"
 #include "tasks/oled_display.h"
 
 #include "gfx.h"
 
 #define TAG "oled_display"
 
-static const char img_file_name[][32] = {
-                                            "/spiffs/ani/ani0.gif", // "WiFi"
-                                            "/spiffs/ani/ani1.gif", // "Loading"
-                                            "/spiffs/ani/ani2.gif", // "Success"
-                                            "/spiffs/ani/ani3.gif", // "NFC"
-                                            "/spiffs/ani/ani4.gif", // "PowerOff"
-                                            "/spiffs/ani/ani5.gif"  // "Clock"
+static const uint8_t *img_file_ptr[][2] = {
+                                            {ani0_gif_ptr, ani0_gif_end}, // "WiFi"
+                                            {ani1_gif_ptr, ani1_gif_end}, // "Loading"
+                                            {ani2_gif_ptr, ani2_gif_end}, // "Success"
+                                            {ani3_gif_ptr, ani3_gif_end}, // "NFC"
+                                            {ani4_gif_ptr, ani4_gif_end}, // "PowerOff"
+                                            {ani5_gif_ptr, ani5_gif_end}, // "Clock"
+                                            {ani6_gif_ptr, ani6_gif_end}, // "Error"
+                                            {ani7_gif_ptr, ani7_gif_end}  // "Fail"
                                         };
-
-uint8_t oled_display_status = OLED_DISPLAY_RELOAD;
-uint8_t oled_display_image  = 0;
+uint8_t img_file_index = 0;
 
 void oled_display_show_image(uint8_t filename_index)
 {
-    if (filename_index >= (sizeof(img_file_name) / 32)) {
+    if (filename_index >= (sizeof(img_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;
     }
-    oled_display_image = filename_index;
-    if (oled_display_status == OLED_DISPLAY_RUNNING) {
-        oled_display_status = OLED_DISPLAY_RELOAD;
-        ESP_LOGD(TAG, "now reload image");
-    }
+    img_file_index = filename_index;
+    xEventGroupSetBits(task_event_group, OLED_DISPLAY_RELOAD_BIT);
 }
 
 void oled_display_task(void *pvParameter)
 {
-    FILE *fp = NULL;
-    char *img_file_ptr = NULL;
-
     gfxInit();
 
     while (1) {
         gdispImage gfx_image;
-        if (oled_display_status == OLED_DISPLAY_RELOAD) {
-            oled_display_status = OLED_DISPLAY_RUNNING;
-        } else {
-            const char *filename = img_file_name[oled_display_image];
-            fp = fopen(filename, "rb");
-            if (fp == NULL) {
-                ESP_LOGE(TAG, "failed to open file for reading");
-                goto err3;
-            }
-            struct stat st;
-            if (stat(filename, &st) == -1 || st.st_size == 0) {
-                ESP_LOGE(TAG, "file is empty");
-                goto err2;
-            }
-            img_file_ptr = malloc(sizeof(char) * st.st_size);
-            if (img_file_ptr == NULL) {
-                ESP_LOGE(TAG, "no enough memory");
-                goto err2;
-            }
-            fseek(fp, 0, SEEK_SET);
-            long img_file_len = fread(img_file_ptr, sizeof(char), st.st_size, fp);
-            if (img_file_len <= 0) {
-                ESP_LOGE(TAG, "read file failed");
-                goto err1;
-            }
-            if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
-                gdispImageSetBgColor(&gfx_image, White);
-                while (oled_display_status == OLED_DISPLAY_RUNNING) {
-                    if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
-                        break;
-                    }
-                    delaytime_t delay = gdispImageNext(&gfx_image);
-                    if (delay == TIME_INFINITE) {
-                        break;
-                    }
-                    if (delay != TIME_IMMEDIATE) {
-                        gfxSleepMilliseconds(delay);
-                    }
+        if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
+            gdispImageSetBgColor(&gfx_image, White);
+            while (1) {
+                if (xEventGroupGetBits(task_event_group) & OLED_DISPLAY_RELOAD_BIT) {
+                    xEventGroupClearBits(task_event_group, OLED_DISPLAY_RELOAD_BIT);
+                    break;
                 }
-                gdispImageClose(&gfx_image);
+                if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
+                    break;
+                }
+                delaytime_t delay = gdispImageNext(&gfx_image);
+                if (delay == TIME_INFINITE) {
+                    break;
+                }
+                if (delay != TIME_IMMEDIATE) {
+                    gfxSleepMilliseconds(delay);
+                }
             }
-            free(img_file_ptr);
-            fclose(fp);
+            gdispImageClose(&gfx_image);
+        } else {
+            break;
         }
     }
-err1:
-    free(img_file_ptr);
-err2:
-    fclose(fp);
-err3:    
     ESP_LOGE(TAG, "task failed, rebooting...");
     esp_restart();
 }

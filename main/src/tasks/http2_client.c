@@ -22,31 +22,6 @@
 
 #define DBG_FRAME_SEND 1
 
-static int http2_client_load_ca_file(struct http2c_handle *hd, const char *filename)
-{
-    hd->ca_file = filename;
-    if (hd->ca_file == NULL) {
-        return 0;
-    }
-    FILE *fp = fopen(hd->ca_file, "rt");
-    if (fp == NULL) {
-        return -1;
-    }
-    struct stat st;
-    if (stat(hd->ca_file, &st) == -1 || st.st_size == 0) {
-        return -1;
-    }
-    fseek(fp, 0, SEEK_SET);
-    hd->ca_len = fread(hd->ca_buf, sizeof(char), st.st_size, fp);
-    if (hd->ca_len <= 0) {
-        return -1;
-    }
-    hd->ca_buf[hd->ca_len++] = 0;
-    fclose(fp);
-    
-    return 0;
-}
-
 static int http2_client_parse_uri(struct http2c_handle *hd, const char *uri)
 {
     /* We only interested in https */
@@ -183,8 +158,8 @@ static int http2_client_do_ssl_connect(struct http2c_handle *hd)
         return -1;
     }
 
-    if (hd->ca_file != NULL) {
-        X509 *client_ca = d2i_X509(NULL, hd->ca_buf, hd->ca_len);
+    if (hd->ca_file_ptr != NULL && hd->ca_file_len != 0) {
+        X509 *client_ca = d2i_X509(NULL, hd->ca_file_ptr, hd->ca_file_len);
         if (!client_ca) {
             return -1;
         }
@@ -430,7 +405,7 @@ static int http2_client_do_http2_connect(struct http2c_handle *hd)
     return 0;
 }
 
-int http2_client_connect(struct http2c_handle *hd, const char *uri, const char *ca_file)
+int http2_client_connect(struct http2c_handle *hd, const char *uri)
 {
     memset(hd, 0, sizeof(*hd));
 
@@ -443,12 +418,6 @@ int http2_client_connect(struct http2c_handle *hd, const char *uri, const char *
     /* TCP connection with the server */
     if (http2_client_connect_to_host(hd) < 0) {
         ESP_LOGE(TAG, "[http2_client_connect] failed to connect to %s", uri);
-        return -1;
-    }
-
-    /* Prepare CA certificate file for SSL connection*/
-    if (http2_client_load_ca_file(hd, ca_file) < 0) {
-        ESP_LOGE(TAG, "[http2_client_connect] failed to load client ca certificate");
         return -1;
     }
 
