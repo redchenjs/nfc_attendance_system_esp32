@@ -22,7 +22,7 @@ void spi1_init(void)
         .sclk_io_num=5,
         .quadwp_io_num=-1,
         .quadhd_io_num=-1,
-        .max_transfer_sz=4096 * 3
+        .max_transfer_sz=96*64*2
     };
     spi_device_interface_config_t devcfg={
         .clock_speed_hz=26000000,               //Clock out at 26 MHz

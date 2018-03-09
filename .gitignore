@@ -1,4 +1,3 @@
 build/
-spiffs.bin
 sdkconfig
 sdkconfig.old

@@ -74,7 +74,7 @@ void ssd1331_refresh_gram(uint8_t *gram)
     spi1_trans[1].user = (void*)0;
     spi1_trans[1].flags = SPI_TRANS_USE_TXDATA;
 
-    spi1_trans[2].length = 4096*3*8;
+    spi1_trans[2].length = 96*64*2*8;
     spi1_trans[2].tx_buffer = gram;
     spi1_trans[2].user = (void*)1;
 
@@ -597,11 +597,11 @@ void ssd1331_init(void)
     ssd1331_write_byte(SET_CONTRAST_C, SSD1331_CMD);            // Set Contrast Current for Color C
     ssd1331_write_byte(0x7D, SSD1331_CMD);                      // 125 0x7D
 
-    ssd1331_write_byte(SET_BUILTIN_LINEAR_LUT, SSD1331_CMD);    // Default
-    ssd1331_set_gray_scale_table();                             // Set Pulse Width for Gray Scale Table
-    
     ssd1331_write_byte(SET_FILL_MODE, SSD1331_CMD);             // Set Fill Mode
     ssd1331_write_byte(0x01, SSD1331_CMD);                      // Enable Fill for Draw Rectangle
+
+    // ssd1331_write_byte(SET_BUILTIN_LINEAR_LUT, SSD1331_CMD);    // Default
+    ssd1331_set_gray_scale_table();                             // Set Pulse Width for Gray Scale Table
 
     ssd1331_clear_gram();
 
