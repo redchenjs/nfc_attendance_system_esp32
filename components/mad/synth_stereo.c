@@ -31,10 +31,6 @@
 # include "string.h"
 //# include "lpc_io.h"
 
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "driver/i2s.h"
-
 #define TAG "libmad"
 
 // #define SAVED_SAMPLE_BUFF_LEN   240000
