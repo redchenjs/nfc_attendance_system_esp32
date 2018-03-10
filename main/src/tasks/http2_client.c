@@ -5,6 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include <string.h>
 #include <netdb.h>
 
 #include "esp_log.h"
