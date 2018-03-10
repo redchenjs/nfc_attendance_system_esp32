@@ -5,12 +5,8 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include "esp_log.h"
-
 #include "apps/sntp/sntp.h"
+#include "esp_log.h"
 
 #include "tasks/main_task.h"
 #include "tasks/oled_display.h"

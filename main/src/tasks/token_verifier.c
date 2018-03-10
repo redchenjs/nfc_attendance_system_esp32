@@ -6,15 +6,11 @@
  */
 
 #include <string.h>
-#include <stdlib.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+
+#include "cJSON.h"
 #include "esp_log.h"
 
 #include "device/wifi.h"
-
-#include "cJSON.h"
-
 #include "tasks/main_task.h"
 #include "tasks/mp3_player.h"
 #include "tasks/http2_client.h"
@@ -25,9 +21,9 @@
 
 #define TAG "token_verifier"
 
-static const uint8_t *cert_file_ptr[][2] = {
-                                            {cert0_pem_ptr, cert0_pem_end}  // "DigiCert Global Root CA"
-                                        };
+static const uint8_t *cert_file_ptr[][2] =  {
+                                                {cert0_pem_ptr, cert0_pem_end}  // "DigiCert Global Root CA"
+                                            };
 uint8_t cert_file_index = 0;
 
 #define HTTP2_SERVER_URI     "https://redchenjs.vicp.net"

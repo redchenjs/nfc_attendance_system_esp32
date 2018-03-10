@@ -5,18 +5,11 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include <stdio.h>
-#include <sys/stat.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "gfx.h"
 #include "esp_log.h"
 
-#include "driver/ssd1331.h"
 #include "tasks/main_task.h"
 #include "tasks/oled_display.h"
-
-#include "gfx.h"
 
 #define TAG "oled_display"
 

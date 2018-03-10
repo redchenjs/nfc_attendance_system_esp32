@@ -6,10 +6,8 @@
  */
 
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "freertos/event_groups.h"
 
-#include "tasks/main_task.h"
 #include "tasks/mp3_player.h"
 #include "tasks/sntp_client.h"
 #include "tasks/oled_display.h"

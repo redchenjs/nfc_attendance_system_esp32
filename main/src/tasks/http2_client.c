@@ -5,16 +5,9 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <ctype.h>
 #include <netdb.h>
-#include <esp_log.h>
+
+#include "esp_log.h"
 
 #include "tasks/http2_client.h"
 

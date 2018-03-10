@@ -5,19 +5,10 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
 
-#include "nfc/nfc.h"
 #include "buses/emdev.h"
-
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-#include "device/wifi.h"
 
 #include "tasks/main_task.h"
 #include "tasks/mp3_player.h"
