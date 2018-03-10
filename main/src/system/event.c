@@ -16,9 +16,9 @@
 #include "tasks/led_indicator.h"
 #include "tasks/nfc_initiator.h"
 
-#define TAG "event-0"
+#define TAG "event"
 
-esp_err_t event0_handler(void *ctx, system_event_t *event)
+esp_err_t system_event_handler(void *ctx, system_event_t *event)
 {
     switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
@@ -42,9 +42,4 @@ esp_err_t event0_handler(void *ctx, system_event_t *event)
             break;
     }
     return ESP_OK;
-}
-
-void event0_init(void)
-{
-    ESP_ERROR_CHECK(esp_event_loop_init(event0_handler, NULL));
 }

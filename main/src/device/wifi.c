@@ -6,12 +6,12 @@
  */
 
 #include <string.h>
-#include "esp_wifi.h"
-#include "esp_log.h"
-#include "esp_event_loop.h"
-#include "nvs_flash.h"
 
-#include "freertos/event_groups.h"
+#include "esp_wifi.h"
+#include "nvs_flash.h"
+#include "esp_log.h"
+
+#include "system/event.h"
 
 /*Set the SSID and Password via "make menuconfig"*/
 #define DEFAULT_SSID CONFIG_WIFI_SSID
@@ -61,6 +61,8 @@ void wifi0_init(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
+    ESP_ERROR_CHECK(esp_event_loop_init(system_event_handler, NULL));
 
     tcpip_adapter_init();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();

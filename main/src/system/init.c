@@ -5,26 +5,24 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "device/event.h"
-#include "device/spiffs.h"
 #include "device/spi.h"
 #include "device/i2s.h"
 #include "device/gpio.h"
 #include "device/uart.h"
 #include "device/wifi.h"
+#include "device/spiffs.h"
 
 #include "driver/led.h"
 #include "buses/emdev.h"
 
 void device_init(void)
 {
-    event0_init();
-    spiffs0_init();
     spi1_init();
     i2s0_init();
     gpio0_init();
     uart1_init();
     wifi0_init();
+    spiffs0_init();
 }
 
 void driver_init(void)
