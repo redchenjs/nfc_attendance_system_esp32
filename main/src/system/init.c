@@ -30,4 +30,3 @@ void driver_init(void)
     led_init();
     emdev_init();
 }
-

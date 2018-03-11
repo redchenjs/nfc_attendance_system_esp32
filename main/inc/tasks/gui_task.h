@@ -1,12 +1,12 @@
 /*
- * oled_display.h
+ * gui_task.h
  *
  *  Created on: 2018-02-13 22:57
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_OLED_DISPLAY_H_
-#define INC_TASKS_OLED_DISPLAY_H_
+#ifndef INC_TASKS_GUI_TASK_H_
+#define INC_TASKS_GUI_TASK_H_
 
 #include <stdint.h>
 
@@ -35,7 +35,7 @@ extern const uint8_t ani6_gif_end[] asm("_binary_ani6_gif_end");
 extern const uint8_t ani7_gif_ptr[] asm("_binary_ani7_gif_start");
 extern const uint8_t ani7_gif_end[] asm("_binary_ani7_gif_end");
 
-extern void oled_display_show_image(uint8_t filename_index);
-extern void oled_display_task(void *pvParameter);
+extern void gui_show_image(uint8_t filename_index);
+extern void gui_task(void *pvParameter);
 
-#endif /* INC_TASKS_OLED_DISPLAY_H_ */
+#endif /* INC_TASKS_GUI_TASK_H_ */

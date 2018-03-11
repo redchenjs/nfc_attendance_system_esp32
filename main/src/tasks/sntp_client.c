@@ -8,8 +8,8 @@
 #include "apps/sntp/sntp.h"
 #include "esp_log.h"
 
-#include "tasks/main_task.h"
-#include "tasks/oled_display.h"
+#include "system/event.h"
+#include "tasks/gui_task.h"
 
 #define TAG "sntp_client"
 
@@ -38,7 +38,7 @@ void sntp_client_task(void *pvParameter)
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         if (++retry > retry_count) {
             ESP_LOGE(TAG, "can not wait to reboot...");
-            oled_display_show_image(4);
+            gui_show_image(4);
             vTaskDelay(5000 / portTICK_RATE_MS);
             esp_restart();
         }
@@ -46,7 +46,7 @@ void sntp_client_task(void *pvParameter)
         localtime_r(&now, &timeinfo);
     }
 
-    xEventGroupSetBits(system_event_group, SNTP_READY_BIT);
+    xEventGroupSetBits(task_event_group, SNTP_CLIENT_READY_BIT);
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);

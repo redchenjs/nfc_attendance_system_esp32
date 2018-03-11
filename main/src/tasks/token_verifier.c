@@ -11,10 +11,10 @@
 #include "esp_log.h"
 
 #include "device/wifi.h"
-#include "tasks/main_task.h"
+#include "system/event.h"
+#include "tasks/gui_task.h"
 #include "tasks/mp3_player.h"
 #include "tasks/http2_client.h"
-#include "tasks/oled_display.h"
 #include "tasks/nfc_initiator.h"
 #include "tasks/led_indicator.h"
 #include "tasks/token_verifier.h"
@@ -47,21 +47,21 @@ static int token_verifier_parse_data(struct http2c_handle *handle, const char *d
             status = cJSON_GetObjectItemCaseSensitive(root, "status");
             if (cJSON_IsTrue(status)) {
                 ESP_LOGW(TAG, "authentication success");
-                oled_display_show_image(2);
+                gui_show_image(2);
                 mp3_player_play_file(1);
             } else {
                 ESP_LOGE(TAG, "authentication failed");
-                oled_display_show_image(7);
+                gui_show_image(7);
                 mp3_player_play_file(2);
             }
         } else {
             ESP_LOGE(TAG, "invalid response");
-            oled_display_show_image(6);
+            gui_show_image(6);
             mp3_player_play_file(6);
         }
         cJSON_Delete(root);
         vTaskDelay(2000 / portTICK_RATE_MS);
-        oled_display_show_image(3);
+        gui_show_image(3);
     }
     if (flags == DATA_RECV_FRAME_COMPLETE || flags == DATA_RECV_RST_STREAM) {
         xEventGroupClearBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
@@ -93,7 +93,7 @@ void token_verifier_task(void *pvParameter)
         hd.ca_file_len = cert_file_ptr[cert_file_index][1] - cert_file_ptr[cert_file_index][0];
         if (http2_client_connect(&hd, HTTP2_SERVER_URI) != 0) {
             ESP_LOGE(TAG, "failed to connect");
-            oled_display_show_image(3);
+            gui_show_image(3);
             mp3_player_play_file(3);
         } else {
             /* HTTP POST  */
@@ -106,13 +106,13 @@ void token_verifier_task(void *pvParameter)
                 }
                 if (http2_client_execute(&hd) < 0) {
                     ESP_LOGE(TAG, "error in send/receive");
-                    oled_display_show_image(3);
+                    gui_show_image(3);
                     mp3_player_play_file(5);
                     break;
                 }
                 if (execute_cnt++ > 2500) {
                     ESP_LOGE(TAG, "execute timeout");
-                    oled_display_show_image(3);
+                    gui_show_image(3);
                     mp3_player_play_file(4);
                     break;
                 } else {
