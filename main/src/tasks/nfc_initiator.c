@@ -81,11 +81,11 @@ void nfc_initiator_task(void *pvParameter)
         if (res > 0) {
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
                 if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
-                    token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
                     gui_show_image(1);
                     mp3_player_play_file(0);
                     led_indicator_set_mode(4);
                     nfc_initiator_set_mode(0);
+                    token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
                 } else {
                     ESP_LOGW(TAG, "invalid frame data");
                 }
