@@ -10,7 +10,6 @@
 #include "esp_event_loop.h"
 #include "freertos/event_groups.h"
 
-#include "system/task.h"
 #include "system/event.h"
 #include "tasks/gui_task.h"
 #include "tasks/sntp_client.h"
