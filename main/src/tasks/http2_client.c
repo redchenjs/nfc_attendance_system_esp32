@@ -401,8 +401,6 @@ static int http2_client_do_http2_connect(struct http2c_handle *hd)
 
 int http2_client_connect(struct http2c_handle *hd, const char *uri)
 {
-    memset(hd, 0, sizeof(*hd));
-
     /* Parse the URI */
     if (http2_client_parse_uri(hd, uri) < 0) {
         ESP_LOGE(TAG, "[http2_client_connect] failed to parse URI");

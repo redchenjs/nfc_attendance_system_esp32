@@ -89,6 +89,7 @@ void token_verifier_task(void *pvParameter)
     while (1) {
         xEventGroupWaitBits(task_event_group, TOKEN_VERIFIER_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
 
+        memset(&hd, 0, sizeof(hd));
         hd.ca_file_ptr = cert_file_ptr[cert_file_index][0];
         hd.ca_file_len = cert_file_ptr[cert_file_index][1] - cert_file_ptr[cert_file_index][0];
         if (http2_client_connect(&hd, HTTP2_SERVER_URI) != 0) {
