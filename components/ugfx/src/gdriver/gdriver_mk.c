@@ -6,3 +6,4 @@
  */
 
 #include "gdriver.c"
+#include "../../drivers/gdisp/ST7735/gdisp_lld_ST7735.c"
