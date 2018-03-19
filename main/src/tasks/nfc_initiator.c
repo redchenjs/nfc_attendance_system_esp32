@@ -94,7 +94,7 @@ void nfc_initiator_task(void *pvParameter)
             }
         }
         // Task Delay
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 
     ESP_LOGE(TAG, "could not open nfc device, rebooting...");
