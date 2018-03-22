@@ -26,8 +26,8 @@ static const uint8_t *cert_file_ptr[][2] =  {
                                             };
 uint8_t cert_file_index = 0;
 
-#define HTTP2_SERVER_URI     "https://redchenjs.vicp.net"
-#define HTTP2_POST_PATH      "/iot/"
+#define HTTP2_SERVER_URI        CONFIG_SERVER_URI
+#define HTTP2_SERVER_POST_PATH  CONFIG_SERVER_POST_PATH
 
 static char *data_ptr = NULL;
 
@@ -96,7 +96,7 @@ void token_verifier_task(void *pvParameter)
             mp3_player_play_file(3);
         } else {
             /* HTTP POST  */
-            http2_client_do_post(&hd, HTTP2_POST_PATH, token_verifier_prepare_data, token_verifier_parse_data);
+            http2_client_do_post(&hd, HTTP2_SERVER_POST_PATH, token_verifier_prepare_data, token_verifier_parse_data);
 
             uint16_t execute_cnt = 0;
             while (1) {
