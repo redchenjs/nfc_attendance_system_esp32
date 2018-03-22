@@ -10,7 +10,7 @@ config WIFI_PASSWORD
     string "WiFi Password"
     default "mypassword"
     help
-	WiFi password (WPA or WPA2) for the example to use.
+	WiFi password (WPA or WPA2) for the device to use.
 
 config SERVER_URI
     string "Server URI"
@@ -26,7 +26,7 @@ config SERVER_POST_PATH
 
 choice SCREEN_PANEL
     prompt "Screen Panel"
-    default SCREEN_PANEL_SSD1331
+    default SCREEN_PANEL_ST7735
     help
         Select to use which screen panel
 
