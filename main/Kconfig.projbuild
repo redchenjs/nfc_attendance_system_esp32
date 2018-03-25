@@ -24,28 +24,34 @@ config SERVER_POST_PATH
     help
 	Server post path.
 
+config ENABLE_VOICE_PROMPT
+    bool "Enable Voice Prompt"
+    default y
+    help
+        Select this to enable voice prompt.
+
 config ENABLE_GUI
     bool "Enable GUI"
-    default n
+    default y
     help
-        Select this to enable GUI
+        Select this to enable gui.
 
 choice SCREEN_PANEL
     prompt "Screen Panel"
-    default SCREEN_PANEL_ST7735
+    default SCREEN_PANEL_SSD1331
     depends on ENABLE_GUI
     help
-        Select to use which screen panel
+        Select to use which screen panel.
 
 config SCREEN_PANEL_SSD1331
     bool "SSD1331 96x64 OLED Panel"
     help
-        Select this to use SSD1331 96x64 OLED Panel
+        Select this to use ssd1331 96x64 oled panel.
 
 config SCREEN_PANEL_ST7735
     bool "ST7735 160x80 LCD Panel"
     help
-        Select this to use ST7735 160x80 LCD Panel
+        Select this to use st7735 160x80 lcd panel.
 
 endchoice
 

@@ -20,7 +20,9 @@ void device_init(void)
 #if defined(CONFIG_ENABLE_GUI)
     spi1_init();
 #endif
+#if defined(CONFIG_ENABLE_VOICE_PROMPT)
     i2s0_init();
+#endif
     gpio0_init();
     uart1_init();
     wifi0_init();

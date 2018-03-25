@@ -33,12 +33,14 @@ uint8_t mp3_file_index = 0;
 
 void mp3_player_play_file(uint8_t filename_index)
 {
+#if defined(CONFIG_ENABLE_VOICE_PROMPT)
     if (filename_index >= (sizeof(mp3_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;
     }
     mp3_file_index = filename_index;
     xEventGroupSetBits(task_event_group, MP3_PLAYER_READY_BIT);
+#endif
 }
 
 void mp3_player_task(void *pvParameters)
