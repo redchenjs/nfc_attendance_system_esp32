@@ -17,7 +17,9 @@
 
 void device_init(void)
 {
+#if defined(CONFIG_ENABLE_GUI)
     spi1_init();
+#endif
     i2s0_init();
     gpio0_init();
     uart1_init();

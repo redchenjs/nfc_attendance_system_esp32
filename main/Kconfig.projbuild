@@ -24,9 +24,16 @@ config SERVER_POST_PATH
     help
 	Server post path.
 
+config ENABLE_GUI
+    bool "Enable GUI"
+    default n
+    help
+        Select this to enable GUI
+
 choice SCREEN_PANEL
     prompt "Screen Panel"
     default SCREEN_PANEL_ST7735
+    depends on ENABLE_GUI
     help
         Select to use which screen panel
 

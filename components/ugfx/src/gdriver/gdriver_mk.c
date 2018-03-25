@@ -13,7 +13,7 @@
 #define GDISP_DRIVER_LIST GDISPVMT_SSD1331
 #include "../../drivers/gdisp/SSD1331/gdisp_lld_SSD1331.c"
 
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#else
 
 #undef GDISP_DRIVER_LIST
 #define GDISP_DRIVER_LIST GDISPVMT_ST7735

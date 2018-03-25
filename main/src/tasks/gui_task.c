@@ -38,12 +38,14 @@ uint8_t img_file_index = 0;
 
 void gui_show_image(uint8_t filename_index)
 {
+#if defined(CONFIG_ENABLE_GUI)
     if (filename_index >= (sizeof(img_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;
     }
     img_file_index = filename_index;
     xEventGroupSetBits(task_event_group, GUI_RELOAD_BIT);
+#endif
 }
 
 void gui_task(void *pvParameter)

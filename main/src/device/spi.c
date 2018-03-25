@@ -23,7 +23,7 @@ void spi1_init(void)
         .quadhd_io_num=-1,
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
         .max_transfer_sz=SSD1331_SCREEN_WIDTH*SSD1331_SCREEN_HEIGHT*2
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#else
         .max_transfer_sz=ST7735_SCREEN_WIDTH*ST7735_SCREEN_HEIGHT*2
 #endif
     };
@@ -34,7 +34,7 @@ void spi1_init(void)
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
         .queue_size=3,                          // We want to be able to queue 3 transactions at a time
         .pre_cb=ssd1331_setpin_dc,               // Specify pre-transfer callback to handle D/C line
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#else
         .queue_size=6,                          // We want to be able to queue 6 transactions at a time
         .pre_cb=st7735_setpin_dc,               // Specify pre-transfer callback to handle D/C line
 #endif
