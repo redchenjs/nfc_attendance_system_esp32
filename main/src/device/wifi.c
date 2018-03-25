@@ -15,41 +15,9 @@
 #define DEFAULT_SSID CONFIG_WIFI_SSID
 #define DEFAULT_PASS CONFIG_WIFI_PASSWORD
 
-char wifi0_mac_str[13] = {0};
-uint8_t wifi0_mac[6] = {0};
+char wifi0_mac_str[18] = {0};
 
 #define TAG "wifi-0"
-
-static char value_to_hex_char(const int value)
-{
-    char hex_char = '\0';
-    if (value >= 0 && value <= 9) {
-        hex_char = (char)(value + 0x30);
-    } else if (value >= 10 && value <= 15) {
-        hex_char = (char)(value - 10 + 0x61);
-    }
-    return hex_char;
-}
-
-static int str_to_hex_str(char *ori_str, char *hex_str)
-{
-    if (ori_str == NULL || hex_str == NULL) {
-        return -1;
-    }
-    if (strlen(ori_str) == 0) {
-        return -2;
-    }
-    while (*ori_str) {
-        int tmp = (int)*ori_str;
-        int high_byte = tmp >> 4;
-        int low_byte  = tmp & 15;
-        *hex_str++ = value_to_hex_char(high_byte);
-        *hex_str++ = value_to_hex_char(low_byte);
-        ori_str++;
-    }
-    *hex_str = '\0';
-    return 0;
-}
 
 void wifi0_init(void)
 {
@@ -77,7 +45,9 @@ void wifi0_init(void)
     ESP_LOGI(TAG, "setting wifi configuration, ssid: %s", wifi_config.sta.ssid);
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
-    ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi0_mac));
-    str_to_hex_str((char *)wifi0_mac, wifi0_mac_str);
     ESP_ERROR_CHECK(esp_wifi_start());
+
+    uint8_t wifi0_mac[6] = {0};
+    ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi0_mac));
+    snprintf(wifi0_mac_str, sizeof(wifi0_mac_str), MACSTR, MAC2STR(wifi0_mac));
 }
