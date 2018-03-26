@@ -28,13 +28,14 @@ void spi1_init(void)
 #endif
     };
     spi_device_interface_config_t devcfg={
-        .clock_speed_hz=20000000,               // Clock out at 20 MHz
         .mode=0,                                // SPI mode 0
         .spics_io_num=27,                       // CS pin
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
+        .clock_speed_hz=26000000,               // Clock out at 26 MHz
         .queue_size=3,                          // We want to be able to queue 3 transactions at a time
-        .pre_cb=ssd1331_setpin_dc,               // Specify pre-transfer callback to handle D/C line
+        .pre_cb=ssd1331_setpin_dc,              // Specify pre-transfer callback to handle D/C line
 #else
+        .clock_speed_hz=20000000,               // Clock out at 20 MHz
         .queue_size=6,                          // We want to be able to queue 6 transactions at a time
         .pre_cb=st7735_setpin_dc,               // Specify pre-transfer callback to handle D/C line
 #endif
