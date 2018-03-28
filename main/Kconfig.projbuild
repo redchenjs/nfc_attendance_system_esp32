@@ -12,6 +12,12 @@ config WIFI_PASSWORD
     help
 	WiFi password (WPA or WPA2) for the device to use.
 
+config WIFI_HOSTNAME
+    string "WiFi Hostname"
+    default "nas-01"
+    help
+	WiFi hostname for the device to use.
+
 config SERVER_URI
     string "Server URI"
     default "https://redchenjs.vicp.net"
