@@ -21,7 +21,11 @@
 void device_init(void)
 {
     nvs0_init();
+    wifi0_init();
+#if defined(CONFIG_ENABLE_BLUFI)
     bt0_init();
+    blufi0_init();
+#endif
 #if defined(CONFIG_ENABLE_GUI)
     spi1_init();
 #endif
@@ -30,8 +34,6 @@ void device_init(void)
 #endif
     gpio0_init();
     uart1_init();
-    wifi0_init();
-    blufi0_init();
 }
 
 void driver_init(void)

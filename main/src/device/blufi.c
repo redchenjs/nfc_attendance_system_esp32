@@ -65,7 +65,9 @@ static void blufi_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_
 
     switch (event) {
     case ESP_BLUFI_EVENT_INIT_FINISH:
+#if defined(CONFIG_ENABLE_BLUFI)
         esp_ble_gap_set_device_name(BLE_DEVICE_NAME);
+#endif
         esp_ble_gap_config_adv_data(&blufi_adv_data);
         break;
     case ESP_BLUFI_EVENT_DEINIT_FINISH:

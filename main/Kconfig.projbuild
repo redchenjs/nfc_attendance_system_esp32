@@ -18,12 +18,6 @@ config WIFI_HOSTNAME
     help
 	WiFi hostname for the device to use.
 
-config BLE_DEVICE_NAME
-    string "BLE Device Name"
-    default "nas-01"
-    help
-	BLE name for the device to use.
-
 config SERVER_URI
     string "Server URI"
     default "https://redchenjs.vicp.net"
@@ -41,6 +35,19 @@ config ENABLE_VOICE_PROMPT
     default y
     help
         Select this to enable voice prompt.
+
+config ENABLE_BLUFI
+    bool "Enable BluFi"
+    default n
+    help
+        Select this to enable blufi.
+
+config BLE_DEVICE_NAME
+    string "BLE Device Name"
+    default "nas-01"
+    depends on ENABLE_BLUFI
+    help
+	BLE name for the device to use.
 
 config ENABLE_GUI
     bool "Enable GUI"
