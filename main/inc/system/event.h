@@ -23,6 +23,13 @@ enum task_event_group_bits {
     GUI_RELOAD_BIT           = BIT4
 };
 
+#include <stdint.h>
+
+extern bool gl_sta_connected;
+extern uint8_t gl_sta_bssid[6];
+extern uint8_t gl_sta_ssid[32];
+extern int gl_sta_ssid_len;
+
 extern EventGroupHandle_t system_event_group;
 extern EventGroupHandle_t task_event_group;
 

@@ -18,6 +18,12 @@ config WIFI_HOSTNAME
     help
 	WiFi hostname for the device to use.
 
+config BLE_DEVICE_NAME
+    string "BLE Device Name"
+    default "nas-01"
+    help
+	BLE name for the device to use.
+
 config SERVER_URI
     string "Server URI"
     default "https://redchenjs.vicp.net"
