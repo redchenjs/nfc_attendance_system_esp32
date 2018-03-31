@@ -16,11 +16,13 @@ enum system_event_group_bits {
 };
 
 enum task_event_group_bits {
-    TOKEN_VERIFIER_READY_BIT = BIT0,
-    NFC_INITIATOR_READY_BIT  = BIT1,
-    SNTP_CLIENT_READY_BIT    = BIT2,
-    MP3_PLAYER_READY_BIT     = BIT3,
-    GUI_RELOAD_BIT           = BIT4
+    BLUFI_DAEMON_SEND_WIFI_REPORT_BIT = BIT0,
+    BLUFI_DAEMON_SEND_WIFI_LIST_BIT   = BIT1,
+    TOKEN_VERIFIER_READY_BIT = BIT2,
+    NFC_INITIATOR_READY_BIT  = BIT3,
+    SNTP_CLIENT_READY_BIT    = BIT4,
+    MP3_PLAYER_READY_BIT     = BIT5,
+    GUI_RELOAD_BIT           = BIT6
 };
 
 #include <stdint.h>

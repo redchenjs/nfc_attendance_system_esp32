@@ -28,3 +28,12 @@ void bt0_init(void)
     ESP_ERROR_CHECK(esp_bluedroid_enable());
     snprintf(bt0_addr_str, sizeof(bt0_addr_str), ""ESP_BD_ADDR_STR"", ESP_BD_ADDR_HEX(esp_bt_dev_get_address()));
 }
+
+void bt0_deinit(void)
+{
+    ESP_ERROR_CHECK(esp_bluedroid_disable());
+    ESP_ERROR_CHECK(esp_bluedroid_deinit());
+    ESP_ERROR_CHECK(esp_bt_controller_disable());
+    ESP_ERROR_CHECK(esp_bt_controller_deinit());
+    ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BTDM));
+}

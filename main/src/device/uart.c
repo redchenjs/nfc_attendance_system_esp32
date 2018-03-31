@@ -12,7 +12,7 @@
 #define EX_UART_TXD  (16)
 #define EX_UART_RXD  (17)
 
-#define BUF_SIZE (1024)
+#define BUF_SIZE (128)
 
 static const char *TAG = "uart-1";
 
@@ -24,7 +24,7 @@ void uart1_init()
        .parity = UART_PARITY_DISABLE,
        .stop_bits = UART_STOP_BITS_1,
        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-       .rx_flow_ctrl_thresh = 122,
+       .rx_flow_ctrl_thresh = 16,
     };
     //Set UART parameters
     uart_param_config(EX_UART_NUM, &uart_config);

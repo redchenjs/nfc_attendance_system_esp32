@@ -38,7 +38,7 @@ config ENABLE_VOICE_PROMPT
 
 config ENABLE_BLUFI
     bool "Enable BluFi"
-    default n
+    default y
     help
         Select this to enable blufi.
 

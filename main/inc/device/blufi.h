@@ -18,5 +18,6 @@ enum blufi_status_table {
 extern uint8_t blufi0_status;
 
 extern void blufi0_init(void);
+extern void blufi0_deinit(void);
 
 #endif /* DEVICE_BLUFI_C_ */

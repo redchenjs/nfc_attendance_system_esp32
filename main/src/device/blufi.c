@@ -199,8 +199,14 @@ static esp_blufi_callbacks_t blufi_callbacks = {
 
 void blufi0_init(void)
 {
-    ESP_LOGI(TAG, "start blufi version %04x", esp_blufi_get_version());
+    ESP_LOGD(TAG, "start blufi version %04x", esp_blufi_get_version());
     ESP_ERROR_CHECK(esp_ble_gap_register_callback(blufi_gap_event_handler));
     ESP_ERROR_CHECK(esp_blufi_register_callbacks(&blufi_callbacks));
     esp_blufi_profile_init();
+}
+
+void blufi0_deinit(void)
+{
+    ESP_LOGD(TAG, "stop blufi");
+    esp_blufi_profile_deinit();
 }
