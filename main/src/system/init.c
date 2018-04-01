@@ -12,11 +12,8 @@
 #include "device/gpio.h"
 #include "device/uart.h"
 #include "device/wifi.h"
-#include "device/blufi.h"
-#include "device/spiffs.h"
 
 #include "driver/led.h"
-#include "buses/emdev.h"
 
 void device_init(void)
 {
@@ -24,7 +21,6 @@ void device_init(void)
     wifi0_init();
 #if defined(CONFIG_ENABLE_BLUFI)
     bt0_init();
-    blufi0_init();
 #endif
 #if defined(CONFIG_ENABLE_GUI)
     spi1_init();
@@ -39,5 +35,4 @@ void device_init(void)
 void driver_init(void)
 {
     led_init();
-    emdev_init();
 }

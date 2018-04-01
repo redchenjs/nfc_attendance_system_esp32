@@ -48,18 +48,18 @@ extern void btc_blufi_report_error(esp_blufi_error_state_t state);
 
 #define TAG "blufi_security"
 
-static int blufi_rand(void *rng_state, unsigned char *output, size_t len)
+static int blufi_security_rand(void *rng_state, unsigned char *output, size_t len)
 {
     size_t i;
 
-    for(i=0; i<len; i++) {
+    for (i=0; i<len; i++) {
         output[i] = esp_random();
     }
 
-    return( 0 );
+    return 0;
 }
 
-void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_data, int *output_len, bool *need_free)
+void blufi_security_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_data, int *output_len, bool *need_free)
 {
     int ret;
     uint8_t type = data[0];
@@ -100,18 +100,21 @@ void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_da
         }
         free(blufi_sec->dh_param);
         blufi_sec->dh_param = NULL;
-        ret = mbedtls_dhm_make_public(&blufi_sec->dhm, (int) mbedtls_mpi_size( &blufi_sec->dhm.P ), blufi_sec->self_public_key, blufi_sec->dhm.len, blufi_rand, NULL);
+        ret = mbedtls_dhm_make_public(&blufi_sec->dhm, (int) mbedtls_mpi_size( &blufi_sec->dhm.P ), blufi_sec->self_public_key, blufi_sec->dhm.len, blufi_security_rand, NULL);
         if (ret) {
             ESP_LOGE(TAG, "%s make public failed %d\n", __func__, ret);
             btc_blufi_report_error(ESP_BLUFI_MAKE_PUBLIC_ERROR);
             return;
         }
 
-        mbedtls_dhm_calc_secret( &blufi_sec->dhm,
-                blufi_sec->share_key,
-                SHARE_KEY_BIT_LEN,
-                &blufi_sec->share_len,
-                NULL, NULL);
+        mbedtls_dhm_calc_secret(
+            &blufi_sec->dhm,
+            blufi_sec->share_key,
+            SHARE_KEY_BIT_LEN,
+            &blufi_sec->share_len,
+            NULL,
+            NULL
+        );
 
         mbedtls_md5(blufi_sec->share_key, blufi_sec->share_len, blufi_sec->psk);
 
@@ -131,7 +134,7 @@ void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_da
     }
 }
 
-int blufi_aes_encrypt(uint8_t iv8, uint8_t *crypt_data, int crypt_len)
+int blufi_security_aes_encrypt(uint8_t iv8, uint8_t *crypt_data, int crypt_len)
 {
     int ret;
     size_t iv_offset = 0;
@@ -148,7 +151,7 @@ int blufi_aes_encrypt(uint8_t iv8, uint8_t *crypt_data, int crypt_len)
     return crypt_len;
 }
 
-int blufi_aes_decrypt(uint8_t iv8, uint8_t *crypt_data, int crypt_len)
+int blufi_security_aes_decrypt(uint8_t iv8, uint8_t *crypt_data, int crypt_len)
 {
     int ret;
     size_t iv_offset = 0;
@@ -165,7 +168,7 @@ int blufi_aes_decrypt(uint8_t iv8, uint8_t *crypt_data, int crypt_len)
     return crypt_len;
 }
 
-uint16_t blufi_crc_checksum(uint8_t iv8, uint8_t *data, int len)
+uint16_t blufi_security_crc_checksum(uint8_t iv8, uint8_t *data, int len)
 {
     /* This iv8 ignore, not used */
     return crc16_be(0, data, len);
