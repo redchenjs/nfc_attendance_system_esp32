@@ -9,7 +9,7 @@
 #include "esp_log.h"
 
 #include "system/event.h"
-#include "tasks/gui_task.h"
+#include "tasks/gui_daemon.h"
 
 #define TAG "sntp_client"
 
@@ -28,22 +28,25 @@ void sntp_client_task(void *pvParameter)
     sntp_init();
 
     time_t now = 0;
-    struct tm timeinfo = { 0 };
+    struct tm timeinfo = {0};
     char strftime_buf[64];
     int retry = 1;
     const int retry_count = 10;
 
-    while (timeinfo.tm_year < (2018 - 1900)) {
+    while (1) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
+        time(&now);
+        localtime_r(&now, &timeinfo);
+        if (timeinfo.tm_year >= (2018 - 1900)) {
+            break;
+        }
         if (++retry > retry_count) {
             ESP_LOGE(TAG, "can not wait to reboot...");
-            gui_show_image(4);
+            gui_daemon_show_image(4);
             vTaskDelay(5000 / portTICK_RATE_MS);
             esp_restart();
         }
-        time(&now);
-        localtime_r(&now, &timeinfo);
     }
 
     xEventGroupSetBits(task_event_group, SNTP_CLIENT_READY_BIT);
