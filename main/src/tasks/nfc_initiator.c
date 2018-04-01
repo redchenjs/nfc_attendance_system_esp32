@@ -7,11 +7,11 @@
 
 #include <string.h>
 
-#include "buses/emdev.h"
 #include "esp_log.h"
+#include "buses/emdev.h"
 
 #include "system/event.h"
-#include "tasks/gui_task.h"
+#include "tasks/gui_daemon.h"
 #include "tasks/mp3_player.h"
 #include "tasks/sntp_client.h"
 #include "tasks/led_indicator.h"
@@ -32,7 +32,7 @@ uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00,0xA4,0x04,0x00,0x05,0xF2,0x22,0x22,0x22,
 
 void nfc_initiator_set_mode(uint8_t mode)
 {
-    if (mode) {
+    if (mode != 0) {
         xEventGroupSetBits(task_event_group, NFC_INITIATOR_READY_BIT);
     } else {
         xEventGroupClearBits(task_event_group, NFC_INITIATOR_READY_BIT);
@@ -47,13 +47,24 @@ void nfc_initiator_task(void *pvParameter)
         .nbr = NBR_106
     };
 
-    nfc_initiator_set_mode(1);
+    emdev_init();
 
     while (1) {
         // Wait for some prerequisites
-        xEventGroupWaitBits(system_event_group, WIFI_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-        xEventGroupWaitBits(task_event_group, SNTP_CLIENT_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-        xEventGroupWaitBits(task_event_group, NFC_INITIATOR_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+        xEventGroupWaitBits(
+            system_event_group,
+            WIFI_READY_BIT,
+            pdFALSE,
+            pdTRUE,
+            portMAX_DELAY
+        );
+        xEventGroupWaitBits(
+            task_event_group,
+            BLUFI_DAEMON_READY_BIT | SNTP_CLIENT_READY_BIT | NFC_INITIATOR_READY_BIT,
+            pdFALSE,
+            pdTRUE,
+            portMAX_DELAY
+        );
         // Open NFC device
         nfc_device *pnd = nfc_open(&emdev);
         if (pnd == NULL) {
@@ -81,11 +92,11 @@ void nfc_initiator_task(void *pvParameter)
         if (res > 0) {
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
                 if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
-                    gui_show_image(1);
-                    mp3_player_play_file(0);
+                    token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
                     led_indicator_set_mode(4);
                     nfc_initiator_set_mode(0);
-                    token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
+                    gui_daemon_show_image(1);
+                    mp3_player_play_file(0);
                 } else {
                     ESP_LOGW(TAG, "invalid frame data");
                 }
@@ -98,7 +109,7 @@ void nfc_initiator_task(void *pvParameter)
     }
 
     ESP_LOGE(TAG, "could not open nfc device, rebooting...");
-    gui_show_image(4);
+    gui_daemon_show_image(4);
     vTaskDelay(5000 / portTICK_RATE_MS);
     esp_restart();
 }
