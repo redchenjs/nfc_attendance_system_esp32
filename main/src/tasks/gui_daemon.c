@@ -1,5 +1,5 @@
 /*
- * gui_task.c
+ * gui_daemon.c
  *
  *  Created on: 2018-02-13 22:57
  *      Author: Jack Chen <redchenjs@live.com>
@@ -9,7 +9,7 @@
 #include "esp_log.h"
 
 #include "system/event.h"
-#include "tasks/gui_task.h"
+#include "tasks/gui_daemon.h"
 
 #define TAG "gui_task"
 
@@ -36,7 +36,7 @@ static const uint8_t *img_file_ptr[][2] = {
                                         };
 uint8_t img_file_index = 0;
 
-void gui_show_image(uint8_t filename_index)
+void gui_daemon_show_image(uint8_t filename_index)
 {
 #if defined(CONFIG_ENABLE_GUI)
     if (filename_index >= (sizeof(img_file_ptr) / 2)) {
@@ -44,11 +44,11 @@ void gui_show_image(uint8_t filename_index)
         return;
     }
     img_file_index = filename_index;
-    xEventGroupSetBits(task_event_group, GUI_RELOAD_BIT);
+    xEventGroupSetBits(task_event_group, GUI_DAEMON_RELOAD_BIT);
 #endif
 }
 
-void gui_task(void *pvParameter)
+void gui_daemon_task(void *pvParameter)
 {
     gfxInit();
 
@@ -57,8 +57,8 @@ void gui_task(void *pvParameter)
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, White);
             while (1) {
-                if (xEventGroupGetBits(task_event_group) & GUI_RELOAD_BIT) {
-                    xEventGroupClearBits(task_event_group, GUI_RELOAD_BIT);
+                if (xEventGroupGetBits(task_event_group) & GUI_DAEMON_RELOAD_BIT) {
+                    xEventGroupClearBits(task_event_group, GUI_DAEMON_RELOAD_BIT);
                     break;
                 }
                 if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {

@@ -1,12 +1,12 @@
 /*
- * gui_task.h
+ * gui_daemon.h
  *
  *  Created on: 2018-02-13 22:57
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_GUI_TASK_H_
-#define INC_TASKS_GUI_TASK_H_
+#ifndef INC_TASKS_GUI_DAEMON_H_
+#define INC_TASKS_GUI_DAEMON_H_
 
 #include <stdint.h>
 
@@ -62,7 +62,7 @@ extern const uint8_t ani7_160x80_gif_ptr[] asm("_binary_ani7_160x80_gif_start");
 extern const uint8_t ani7_160x80_gif_end[] asm("_binary_ani7_160x80_gif_end");
 #endif
 
-extern void gui_show_image(uint8_t filename_index);
-extern void gui_task(void *pvParameter);
+extern void gui_daemon_show_image(uint8_t filename_index);
+extern void gui_daemon_task(void *pvParameter);
 
-#endif /* INC_TASKS_GUI_TASK_H_ */
+#endif /* INC_TASKS_GUI_DAEMON_H_ */
