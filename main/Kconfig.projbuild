@@ -44,7 +44,7 @@ config ENABLE_BLUFI
 
 config BLE_DEVICE_NAME
     string "BLE Device Name"
-    default "nas-01"
+    default WIFI_HOSTNAME
     depends on ENABLE_BLUFI
     help
 	BLE name for the device to use.
