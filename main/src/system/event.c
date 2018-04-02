@@ -38,6 +38,9 @@ esp_err_t system_event_handler(void *ctx, system_event_t *event)
             gui_daemon_show_image(5);
             xEventGroupWaitBits(
                 task_event_group,
+#if defined(CONFIG_ENABLE_BLUFI)
+                BLUFI_DAEMON_READY_BIT |
+#endif
                 SNTP_CLIENT_READY_BIT,
                 pdFALSE,
                 pdTRUE,
@@ -50,9 +53,9 @@ esp_err_t system_event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_CONNECTED:
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
             ESP_ERROR_CHECK(esp_wifi_connect());
             wifi_daemon_reconnect(1);
+            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
             break;
         case SYSTEM_EVENT_SCAN_DONE:
             break;
