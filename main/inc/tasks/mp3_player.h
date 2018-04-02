@@ -32,7 +32,7 @@ extern const uint8_t snd5_mp3_end[] asm("_binary_snd5_mp3_end");
 extern const uint8_t snd6_mp3_ptr[] asm("_binary_snd6_mp3_start");
 extern const uint8_t snd6_mp3_end[] asm("_binary_snd6_mp3_end");
 
-extern void mp3_player_play_file(uint8_t filename_index);
 extern void mp3_player_task(void *pvParameter);
+extern void mp3_player_play_file(uint8_t filename_index);
 
 #endif /* INC_TASKS_MP3_PLAYER_H_ */
