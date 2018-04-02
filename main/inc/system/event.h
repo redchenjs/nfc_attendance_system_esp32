@@ -13,7 +13,8 @@
 
 enum system_event_group_bits {
     WIFI_READY_BIT      = BIT0,
-    BLUFI_CONNECTED_BIT = BIT1
+    WIFI_NO_CONFIG_BIT  = BIT1,
+    BLUFI_CONNECTED_BIT = BIT2
 };
 
 enum task_event_group_bits {
