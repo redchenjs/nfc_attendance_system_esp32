@@ -24,17 +24,6 @@
 
 #define TAG "wifi_daemon"
 
-void wifi_daemon_reconnect(uint8_t mode)
-{
-    switch (mode) {
-    case 1:
-        xEventGroupSetBits(task_event_group, WIFI_DAEMON_RECONNECT_BIT);
-        break;
-    default:
-        break;
-    }
-}
-
 void wifi_daemon_task(void *pvParameter)
 {
     while (1) {
@@ -45,7 +34,7 @@ void wifi_daemon_task(void *pvParameter)
             pdFALSE,
             portMAX_DELAY
         );
-        if ((uxBits & BLUFI_DAEMON_READY_BIT) != 0) {
+        if ((uxBits & NFC_INITIATOR_READY_BIT) != 0) {
             nfc_initiator_set_mode(0);
             led_indicator_set_mode(7);
             gui_daemon_show_image(0);
@@ -67,5 +56,12 @@ void wifi_daemon_task(void *pvParameter)
             }
         }
         xEventGroupClearBits(task_event_group, WIFI_DAEMON_RECONNECT_BIT);
+    }
+}
+
+void wifi_daemon_reconnect(uint8_t mode)
+{
+    if (mode != 0) {
+        xEventGroupSetBits(task_event_group, WIFI_DAEMON_RECONNECT_BIT);
     }
 }

@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-extern void wifi_daemon_reconnect(uint8_t mode);
 extern void wifi_daemon_task(void *pvParameter);
+extern void wifi_daemon_reconnect(uint8_t mode);
 
 #endif /* INC_TASKS_WIFI_DAEMON_H_ */
