@@ -30,7 +30,9 @@ void task_init(void)
 #if defined(CONFIG_ENABLE_BLUFI)
     xTaskCreate(blufi_daemon_task, "blufi_daemon_task", 1024, NULL, 5, NULL);
 #endif
-    xTaskCreate(led_indicator_task, "led_indicator_task", 1024, NULL, 5, NULL);
     xTaskCreate(nfc_initiator_task, "nfc_initiator_task", 5120, NULL, 5, NULL);
+#if defined(CONFIG_ENABLE_LED)
+    xTaskCreate(led_indicator_task, "led_indicator_task", 1024, NULL, 5, NULL);
+#endif
     xTaskCreate(token_verifier_task, "token_verifier_task", 19200, NULL, 5, NULL);
 }
