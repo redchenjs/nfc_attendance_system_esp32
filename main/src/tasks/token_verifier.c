@@ -31,12 +31,6 @@ uint8_t cert_file_index = 0;
 
 static char *data_ptr = NULL;
 
-void token_verifier_verify_token(char *token)
-{
-    data_ptr = token;
-    xEventGroupSetBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
-}
-
 static int token_verifier_parse_data(struct http2c_handle *handle, const char *data, size_t len, int flags)
 {
     cJSON *root   = NULL;
@@ -119,4 +113,10 @@ void token_verifier_task(void *pvParameter)
 
         xEventGroupClearBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
     }
+}
+
+void token_verifier_verify_token(char *token)
+{
+    data_ptr = token;
+    xEventGroupSetBits(task_event_group, TOKEN_VERIFIER_READY_BIT);
 }
