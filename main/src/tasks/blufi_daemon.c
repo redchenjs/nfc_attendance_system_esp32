@@ -18,11 +18,10 @@
 
 #include "device/bt.h"
 #include "system/event.h"
+#include "tasks/led_indicator.h"
 #include "tasks/blufi_security.h"
 
 #define TAG "blufi_daemon"
-
-#define BLE_DEVICE_NAME CONFIG_BLE_DEVICE_NAME
 
 static uint8_t blufi_service_uuid128[32] = {
     /* LSB <--------------------------------------------------------------------------------> MSB */
@@ -74,9 +73,9 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
     switch (event) {
     case ESP_BLUFI_EVENT_INIT_FINISH:
 #if defined(CONFIG_ENABLE_BLUFI)
-        esp_ble_gap_set_device_name(BLE_DEVICE_NAME);
-        esp_ble_gap_config_adv_data(&blufi_adv_data);
+        esp_ble_gap_set_device_name(CONFIG_BLE_DEVICE_NAME);
 #endif
+        esp_ble_gap_config_adv_data(&blufi_adv_data);
         break;
     case ESP_BLUFI_EVENT_DEINIT_FINISH:
         break;
@@ -85,6 +84,7 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
         conn_id = param->connect.conn_id;
         esp_ble_gap_stop_advertising();
         blufi_security_init();
+        led_indicator_set_mode(5);
         xEventGroupSetBits(system_event_group, BLUFI_CONNECTED_BIT);
         break;
     case ESP_BLUFI_EVENT_BLE_DISCONNECT:
@@ -95,6 +95,11 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
     case ESP_BLUFI_EVENT_SET_WIFI_OPMODE:
         break;
     case ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP:
+        if ((xEventGroupGetBits(system_event_group) & WIFI_NO_CONFIG_BIT) != 0) {
+            ESP_ERROR_CHECK(esp_wifi_start());
+            ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, CONFIG_WIFI_HOSTNAME));
+            xEventGroupClearBits(system_event_group, WIFI_NO_CONFIG_BIT);
+        }
         esp_wifi_connect();
         break;
     case ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP:
@@ -173,15 +178,6 @@ static esp_blufi_callbacks_t blufi_daemon_callbacks = {
     .checksum_func = blufi_security_crc_checksum,
 };
 
-void blufi_daemon_send_response(uint8_t response)
-{
-#if defined(CONFIG_ENABLE_BLUFI)
-    if (response != 0) {
-        xEventGroupSetBits(task_event_group, BLUFI_DAEMON_RESPONSE_BIT);
-    }
-#endif
-}
-
 void blufi_daemon_task(void *pvParameter)
 {
     ESP_LOGD(TAG, "start blufi version %04x", esp_blufi_get_version());
@@ -212,4 +208,13 @@ void blufi_daemon_task(void *pvParameter)
     xEventGroupSetBits(task_event_group, BLUFI_DAEMON_READY_BIT);
 
     vTaskDelete(NULL);
+}
+
+void blufi_daemon_send_response(uint8_t response)
+{
+#if defined(CONFIG_ENABLE_BLUFI)
+    if (response != 0) {
+        xEventGroupSetBits(task_event_group, BLUFI_DAEMON_RESPONSE_BIT);
+    }
+#endif
 }
