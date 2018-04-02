@@ -62,7 +62,7 @@ extern const uint8_t ani7_160x80_gif_ptr[] asm("_binary_ani7_160x80_gif_start");
 extern const uint8_t ani7_160x80_gif_end[] asm("_binary_ani7_160x80_gif_end");
 #endif
 
-extern void gui_daemon_show_image(uint8_t filename_index);
 extern void gui_daemon_task(void *pvParameter);
+extern void gui_daemon_show_image(uint8_t filename_index);
 
 #endif /* INC_TASKS_GUI_DAEMON_H_ */
