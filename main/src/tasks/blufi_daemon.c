@@ -80,30 +80,29 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
     case ESP_BLUFI_EVENT_DEINIT_FINISH:
         break;
     case ESP_BLUFI_EVENT_BLE_CONNECT:
+        xEventGroupSetBits(system_event_group, BLUFI_RUNNING_BIT);
+        ESP_ERROR_CHECK(esp_wifi_stop());
         server_if = param->connect.server_if;
         conn_id = param->connect.conn_id;
         esp_ble_gap_stop_advertising();
         blufi_security_init();
         led_indicator_set_mode(5);
-        xEventGroupSetBits(system_event_group, BLUFI_CONNECTED_BIT);
         break;
     case ESP_BLUFI_EVENT_BLE_DISCONNECT:
-        xEventGroupClearBits(system_event_group, BLUFI_CONNECTED_BIT);
+        xEventGroupClearBits(system_event_group, BLUFI_RUNNING_BIT);
         blufi_security_deinit();
         esp_ble_gap_start_advertising(&blufi_adv_params);
         break;
     case ESP_BLUFI_EVENT_SET_WIFI_OPMODE:
         break;
     case ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP:
-        if ((xEventGroupGetBits(system_event_group) & WIFI_NO_CONFIG_BIT) != 0) {
-            ESP_ERROR_CHECK(esp_wifi_start());
-            ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, CONFIG_WIFI_HOSTNAME));
-            xEventGroupClearBits(system_event_group, WIFI_NO_CONFIG_BIT);
-        }
-        esp_wifi_connect();
+        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
+        ESP_ERROR_CHECK(esp_wifi_start());
+        ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, CONFIG_WIFI_HOSTNAME));
+        ESP_ERROR_CHECK(esp_wifi_connect());
         break;
     case ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP:
-        esp_wifi_disconnect();
+        ESP_ERROR_CHECK(esp_wifi_disconnect());
         break;
     case ESP_BLUFI_EVENT_REPORT_ERROR:
         break;
@@ -119,13 +118,11 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
     case ESP_BLUFI_EVENT_RECV_STA_SSID:
         strncpy((char *)sta_config.sta.ssid, (char *)param->sta_ssid.ssid, param->sta_ssid.ssid_len);
         sta_config.sta.ssid[param->sta_ssid.ssid_len] = '\0';
-        esp_wifi_set_config(WIFI_IF_STA, &sta_config);
         ESP_LOGW(TAG, "recv sta ssid %s", sta_config.sta.ssid);
         break;
     case ESP_BLUFI_EVENT_RECV_STA_PASSWD:
         strncpy((char *)sta_config.sta.password, (char *)param->sta_passwd.passwd, param->sta_passwd.passwd_len);
         sta_config.sta.password[param->sta_passwd.passwd_len] = '\0';
-        esp_wifi_set_config(WIFI_IF_STA, &sta_config);
         ESP_LOGW(TAG, "recv sta password %s", sta_config.sta.password);
         break;
     case ESP_BLUFI_EVENT_RECV_SOFTAP_SSID:
@@ -195,8 +192,7 @@ void blufi_daemon_task(void *pvParameter)
         portMAX_DELAY
     );
 
-    EventBits_t uxBits = xEventGroupGetBits(system_event_group);
-    if ((uxBits & BLUFI_CONNECTED_BIT) != 0) {
+    if ((xEventGroupGetBits(system_event_group) & BLUFI_RUNNING_BIT) != 0) {
         wifi_mode_t mode;
         esp_wifi_get_mode(&mode);
         esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_SUCCESS, 0, NULL);
