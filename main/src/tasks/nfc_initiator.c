@@ -14,6 +14,7 @@
 #include "tasks/gui_daemon.h"
 #include "tasks/mp3_player.h"
 #include "tasks/sntp_client.h"
+#include "tasks/nfc_initiator.h"
 #include "tasks/led_indicator.h"
 #include "tasks/token_verifier.h"
 
@@ -30,15 +31,6 @@
 uint8_t abtRx[RX_FRAME_LEN + 1] = {0};
 uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00,0xA4,0x04,0x00,0x05,0xF2,0x22,0x22,0x22,0x22};
 
-void nfc_initiator_set_mode(uint8_t mode)
-{
-    if (mode != 0) {
-        xEventGroupSetBits(task_event_group, NFC_INITIATOR_READY_BIT);
-    } else {
-        xEventGroupClearBits(task_event_group, NFC_INITIATOR_READY_BIT);
-    }
-}
-
 void nfc_initiator_task(void *pvParameter)
 {
     nfc_target nt;
@@ -50,17 +42,9 @@ void nfc_initiator_task(void *pvParameter)
     emdev_init();
 
     while (1) {
-        // Wait for some prerequisites
-        xEventGroupWaitBits(
-            system_event_group,
-            WIFI_READY_BIT,
-            pdFALSE,
-            pdTRUE,
-            portMAX_DELAY
-        );
         xEventGroupWaitBits(
             task_event_group,
-            BLUFI_DAEMON_READY_BIT | SNTP_CLIENT_READY_BIT | NFC_INITIATOR_READY_BIT,
+            NFC_INITIATOR_READY_BIT,
             pdFALSE,
             pdTRUE,
             portMAX_DELAY
@@ -93,8 +77,8 @@ void nfc_initiator_task(void *pvParameter)
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
                 if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                     token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
-                    led_indicator_set_mode(4);
                     nfc_initiator_set_mode(0);
+                    led_indicator_set_mode(4);
                     gui_daemon_show_image(1);
                     mp3_player_play_file(0);
                 } else {
@@ -112,4 +96,13 @@ void nfc_initiator_task(void *pvParameter)
     gui_daemon_show_image(4);
     vTaskDelay(5000 / portTICK_RATE_MS);
     esp_restart();
+}
+
+void nfc_initiator_set_mode(uint8_t mode)
+{
+    if (mode != 0) {
+        xEventGroupSetBits(task_event_group, NFC_INITIATOR_READY_BIT);
+    } else {
+        xEventGroupClearBits(task_event_group, NFC_INITIATOR_READY_BIT);
+    }
 }

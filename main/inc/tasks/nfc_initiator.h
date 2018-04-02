@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-extern void nfc_initiator_set_mode(uint8_t mode);
 extern void nfc_initiator_task(void *pvParameter);
+extern void nfc_initiator_set_mode(uint8_t mode);
 
 #endif /* INC_TASKS_NFC_INITIATOR_H_ */
