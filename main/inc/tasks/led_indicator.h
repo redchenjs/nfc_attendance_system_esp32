@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-extern void led_indicator_set_mode(uint8_t mode);
 extern void led_indicator_task(void *pvParameter);
+extern void led_indicator_set_mode(uint8_t mode);
 
 #endif /* INC_LED_INDICATOR_H_ */

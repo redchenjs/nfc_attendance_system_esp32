@@ -19,8 +19,27 @@ static uint16_t led_count = 50;
 
 #define TAG "led_indicator"
 
+void led_indicator_task(void *pvParameter)
+{
+    uint16_t i = 0;
+
+    while (1) {
+        portTickType xLastWakeTime = xTaskGetTickCount();
+
+        if (i++ % led_count) {
+            led_indicator_off();
+        }
+        else {
+            led_indicator_on();
+        }
+
+        vTaskDelayUntil(&xLastWakeTime, led_delay);
+    }
+}
+
 void led_indicator_set_mode(uint8_t mode_index)
 {
+#if defined(CONFIG_ENABLE_LED)
     ESP_LOGD(TAG, "set mode %u", mode_index);
     switch (mode_index) {
         case 1:
@@ -41,22 +60,5 @@ void led_indicator_set_mode(uint8_t mode_index)
             ESP_LOGE(TAG, "set mode failed");
             break;
     }
-}
-
-void led_indicator_task(void *pvParameter)
-{
-    uint16_t i = 0;
-
-    while (1) {
-        portTickType xLastWakeTime = xTaskGetTickCount();
-
-        if (i++ % led_count) {
-            led_indicator_off();
-        }
-        else {
-            led_indicator_on();
-        }
-
-        vTaskDelayUntil(&xLastWakeTime, led_delay);
-    }
+#endif
 }
