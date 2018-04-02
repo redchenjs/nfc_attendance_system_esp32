@@ -20,7 +20,6 @@ char bt0_addr_str[18] = {0};
 
 void bt0_init(void)
 {
-#if defined(CONFIG_ENABLE_BLUFI)
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_init(&bt_cfg));
@@ -28,7 +27,6 @@ void bt0_init(void)
     ESP_ERROR_CHECK(esp_bluedroid_init());
     ESP_ERROR_CHECK(esp_bluedroid_enable());
     snprintf(bt0_addr_str, sizeof(bt0_addr_str), ""ESP_BD_ADDR_STR"", ESP_BD_ADDR_HEX(esp_bt_dev_get_address()));
-#endif
 }
 
 void bt0_deinit(void)
