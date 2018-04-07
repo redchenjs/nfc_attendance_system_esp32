@@ -1,5 +1,7 @@
 menu "NFC Attendence System"
 
+menu "WiFi Configuration"
+
 config WIFI_SSID
     string "WiFi SSID"
     default "myssid"
@@ -18,6 +20,10 @@ config WIFI_HOSTNAME
     help
         WiFi hostname for the device to use.
 
+endmenu
+
+menu "Server Configuration"
+
 config SERVER_URI
     string "Server URI"
     default "https://redchenjs.vicp.net"
@@ -30,11 +36,25 @@ config SERVER_POST_PATH
     help
         Server post path.
 
-config ENABLE_VOICE_PROMPT
-    bool "Enable Voice Prompt"
+config ENABLE_SERVER_CERT_VERIFY
+    bool "Verify Server SSL Certificate"
+    default "y"
+    help
+        Select this to enable server ssl certificate verification.
+
+endmenu
+
+config ENABLE_AUDIO
+    bool "Enable Audio Output"
     default y
     help
-        Select this to enable voice prompt.
+        Select this to enable audio output.
+
+config ENABLE_OTA
+    bool "Enable OTA Update"
+    default y
+    help
+        Select this to enable ota update.
 
 menuconfig ENABLE_BLUFI
     bool "Enable BluFi"
@@ -94,5 +114,11 @@ config LED_PIN_NUM
     depends on ENABLE_LED
     help
         LED pin for the device to use.
+
+config FIRMWARE_VERSION
+    string "Firmware Version"
+    default "v4.0"
+    help
+        Set firmware version.
 
 endmenu
