@@ -1,12 +1,12 @@
 /*
- * mp3_player.h
+ * audio_daemon.h
  *
  *  Created on: 2018-02-12 20:13
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_MP3_PLAYER_H_
-#define INC_TASKS_MP3_PLAYER_H_
+#ifndef INC_TASKS_AUDIO_DAEMON_H_
+#define INC_TASKS_AUDIO_DAEMON_H_
 
 #include <stdint.h>
 
@@ -32,7 +32,7 @@ extern const uint8_t snd5_mp3_end[] asm("_binary_snd5_mp3_end");
 extern const uint8_t snd6_mp3_ptr[] asm("_binary_snd6_mp3_start");
 extern const uint8_t snd6_mp3_end[] asm("_binary_snd6_mp3_end");
 
-extern void mp3_player_task(void *pvParameter);
-extern void mp3_player_play_file(uint8_t filename_index);
+extern void audio_daemon(void *pvParameter);
+extern void audio_play_file(uint8_t filename_index);
 
-#endif /* INC_TASKS_MP3_PLAYER_H_ */
+#endif /* INC_TASKS_AUDIO_DAEMON_H_ */

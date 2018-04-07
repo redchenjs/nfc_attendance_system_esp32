@@ -1,5 +1,5 @@
 /*
- * mp3_player.c
+ * audio_daemon.c
  *
  *  Created on: 2018-02-12 20:13
  *      Author: Jack Chen <redchenjs@live.com>
@@ -16,9 +16,9 @@
 #include "driver/i2s.h"
 
 #include "system/event.h"
-#include "tasks/mp3_player.h"
+#include "tasks/audio_daemon.h"
 
-#define TAG "mp3_player"
+#define TAG "audio"
 
 static const uint8_t *mp3_file_ptr[][2] = {
                                             {snd0_mp3_ptr, snd0_mp3_end}, // "叮"
@@ -29,9 +29,9 @@ static const uint8_t *mp3_file_ptr[][2] = {
                                             {snd5_mp3_ptr, snd5_mp3_end}, // "网络故障"
                                             {snd6_mp3_ptr, snd6_mp3_end}  // "系统故障"
                                         };
-uint8_t mp3_file_index = 0;
+static uint8_t mp3_file_index = 0;
 
-void mp3_player_task(void *pvParameters)
+void audio_daemon(void *pvParameters)
 {
     //Allocate structs needed for mp3 decoding
     struct mad_stream *stream = malloc(sizeof(struct mad_stream));
@@ -48,7 +48,7 @@ void mp3_player_task(void *pvParameters)
     mad_synth_init(synth);
 
     while (1) {
-        xEventGroupWaitBits(task_event_group, MP3_PLAYER_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
+        xEventGroupWaitBits(daemon_event_group, AUDIO_DAEMON_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
 
         mad_stream_buffer(stream, mp3_file_ptr[mp3_file_index][0], mp3_file_ptr[mp3_file_index][1] - mp3_file_ptr[mp3_file_index][0]);
         while (1) {
@@ -76,53 +76,14 @@ err:
     esp_restart();
 }
 
-void mp3_player_play_file(uint8_t filename_index)
+void audio_play_file(uint8_t filename_index)
 {
-#if defined(CONFIG_ENABLE_VOICE_PROMPT)
+#if defined(CONFIG_ENABLE_AUDIO)
     if (filename_index >= (sizeof(mp3_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;
     }
     mp3_file_index = filename_index;
-    xEventGroupSetBits(task_event_group, MP3_PLAYER_READY_BIT);
+    xEventGroupSetBits(daemon_event_group, AUDIO_DAEMON_READY_BIT);
 #endif
-}
-
-/* render callback for the libmad synth */
-void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num_samples, unsigned int num_channels)
-{
-    // pointer to left / right sample position
-    char *ptr_l = (char*) sample_buff_ch0;
-    char *ptr_r = (char*) sample_buff_ch1;
-    uint8_t stride = sizeof(short);
-
-    if (num_channels == 1) {
-        ptr_r = ptr_l;
-    }
-
-    int bytes_pushed = 0;
-    TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
-    for (int i = 0; i < num_samples; i++) {
-        /* low - high / low - high */
-        const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]};
-        bytes_pushed = i2s_push_sample(0, (const char*) &samp32, max_wait);
-
-        // DMA buffer full - retry
-        if (bytes_pushed == 0) {
-            i--;
-        } else {
-            ptr_r += stride;
-            ptr_l += stride;
-        }
-    }
-}
-
-/* Called by the NXP modifications of libmad. Sets the needed output sample rate. */
-void set_dac_sample_rate(int rate)
-{
-    static int dac_sample_rate = 44100;
-    if (rate != dac_sample_rate) {
-        i2s_set_sample_rates(0, rate);
-        dac_sample_rate = rate;
-    }
 }

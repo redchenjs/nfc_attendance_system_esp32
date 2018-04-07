@@ -31,6 +31,8 @@
 # include "string.h"
 //# include "lpc_io.h"
 
+# include "tasks/audio_render.h"
+
 #define TAG "libmad"
 
 // #define SAVED_SAMPLE_BUFF_LEN   240000
