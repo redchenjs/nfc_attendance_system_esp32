@@ -20,17 +20,21 @@ void device_init(void)
     nvs0_init();
     wifi0_init();
     uart1_init();
+
 #if defined(CONFIG_ENABLE_BLUFI)
     bt0_init();
 #else
     bt0_deinit();
 #endif
+
+#if defined(CONFIG_ENABLE_AUDIO)
+    i2s0_init();
+#endif
+
 #if defined(CONFIG_ENABLE_GUI)
     spi1_init();
 #endif
-#if defined(CONFIG_ENABLE_VOICE_PROMPT)
-    i2s0_init();
-#endif
+
 #if defined(CONFIG_ENABLE_LED)
     gpio0_init();
 #endif
