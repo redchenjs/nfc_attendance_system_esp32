@@ -62,9 +62,6 @@ void ntp_daemon(void *pvParameter)
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
 
-    led_set_mode(2);
-    gui_show_image(5);
-
     xEventGroupSetBits(daemon_event_group, NTP_DAEMON_FINISH_BIT);
 
     while (1) {
