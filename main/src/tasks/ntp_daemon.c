@@ -1,5 +1,5 @@
 /*
- * sntp_client.c
+ * ntp_daemon.c
  *
  *  Created on: 2018-02-16 17:50
  *      Author: Jack Chen <redchenjs@live.com>
@@ -10,16 +10,26 @@
 
 #include "system/event.h"
 #include "tasks/gui_daemon.h"
+#include "tasks/led_daemon.h"
 
-#define TAG "sntp_client"
+#define TAG "ntp"
 
-void sntp_client_task(void *pvParameter)
+void ntp_daemon(void *pvParameter)
 {
-    xEventGroupWaitBits(system_event_group, WIFI_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-    
+    xEventGroupWaitBits(
+        daemon_event_group,
+        NTP_DAEMON_READY_BIT,
+        pdTRUE,
+        pdFALSE,
+        portMAX_DELAY
+    );
+
+    led_set_mode(2);
+    gui_show_image(5);
+
     setenv("TZ", "CST-8", 1);
     tzset();
-    
+
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     sntp_setservername(0,"0.cn.pool.ntp.org");
     sntp_setservername(1,"1.cn.pool.ntp.org");
@@ -43,16 +53,42 @@ void sntp_client_task(void *pvParameter)
         }
         if (++retry > retry_count) {
             ESP_LOGE(TAG, "can not wait to reboot...");
-            gui_daemon_show_image(4);
-            vTaskDelay(5000 / portTICK_RATE_MS);
+            gui_show_image(4);
+            vTaskDelay(2000 / portTICK_RATE_MS);
             esp_restart();
         }
     }
 
-    xEventGroupSetBits(task_event_group, SNTP_CLIENT_READY_BIT);
-
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
 
-    vTaskDelete(NULL);
+    led_set_mode(2);
+    gui_show_image(5);
+
+    xEventGroupSetBits(daemon_event_group, NTP_DAEMON_FINISH_BIT);
+
+    while (1) {
+        vTaskDelay(60000 / portTICK_RATE_MS);
+        time(&now);
+        localtime_r(&now, &timeinfo);
+        if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
+            ESP_LOGW(TAG, "scheduled reboot...");
+            gui_show_image(4);
+            vTaskDelay(2000 / portTICK_RATE_MS);
+            esp_restart();
+        }
+    }
+}
+
+void ntp_sync_time(void)
+{
+    EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
+    if ((uxBits & NTP_DAEMON_FINISH_BIT) == 0) {
+        xEventGroupSync(
+            daemon_event_group,
+            NTP_DAEMON_READY_BIT,
+            NTP_DAEMON_FINISH_BIT,
+            portMAX_DELAY
+        );
+    }
 }
