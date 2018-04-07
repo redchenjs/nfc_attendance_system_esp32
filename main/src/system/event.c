@@ -13,49 +13,26 @@
 #include "freertos/event_groups.h"
 
 #include "system/event.h"
-#include "tasks/gui_daemon.h"
-#include "tasks/sntp_client.h"
 #include "tasks/wifi_daemon.h"
-#include "tasks/blufi_daemon.h"
-#include "tasks/led_indicator.h"
-#include "tasks/nfc_initiator.h"
 
 #define TAG "event"
 
 EventGroupHandle_t system_event_group;
-EventGroupHandle_t task_event_group;
+EventGroupHandle_t daemon_event_group;
 
-esp_err_t system_event_handler(void *ctx, system_event_t *event)
+static esp_err_t system_event_handler(void *ctx, system_event_t *event)
 {
     switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
-            ESP_ERROR_CHECK(esp_wifi_connect());
+            wifi_on_start();
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
-            xEventGroupSetBits(system_event_group, WIFI_READY_BIT);
-            blufi_daemon_send_response(1);
-            led_indicator_set_mode(2);
-            gui_daemon_show_image(5);
-            xEventGroupWaitBits(
-                task_event_group,
-#if defined(CONFIG_ENABLE_BLUFI)
-                BLUFI_DAEMON_READY_BIT |
-#endif
-                SNTP_CLIENT_READY_BIT,
-                pdFALSE,
-                pdTRUE,
-                portMAX_DELAY
-            );
-            nfc_initiator_set_mode(1);
-            led_indicator_set_mode(1);
-            gui_daemon_show_image(3);
+            wifi_on_got_ip();
             break;
         case SYSTEM_EVENT_STA_CONNECTED:
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
-            ESP_ERROR_CHECK(esp_wifi_connect());
-            wifi_daemon_reconnect(1);
+            wifi_on_disconnected();
             break;
         case SYSTEM_EVENT_SCAN_DONE:
             break;
@@ -68,7 +45,7 @@ esp_err_t system_event_handler(void *ctx, system_event_t *event)
 void event_init(void)
 {
     system_event_group = xEventGroupCreate();
-    task_event_group = xEventGroupCreate();
+    daemon_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_event_loop_init(system_event_handler, NULL));
 }
