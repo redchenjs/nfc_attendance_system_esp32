@@ -7,14 +7,8 @@
 
 #include <string.h>
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-
 #include "esp_log.h"
 #include "esp_wifi.h"
-
-#include "system/event.h"
 
 char wifi0_mac_str[18] = {0};
 
@@ -66,7 +60,6 @@ void wifi0_init(void)
         ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, CONFIG_WIFI_HOSTNAME));
     } else {
         ESP_LOGW(TAG, "no wifi configuration available");
-        xEventGroupSetBits(system_event_group, WIFI_NO_CONFIG_BIT);
     }
     uint8_t wifi0_mac[6] = {0};
     ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi0_mac));
