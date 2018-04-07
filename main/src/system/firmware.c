@@ -11,7 +11,7 @@
 
 #define TAG "firmware"
 
-const char *version = CONFIG_FIRMWARE_VERSION_STRING;
+const char *version = CONFIG_FIRMWARE_VERSION;
 
 const char *firmware_get_version(void)
 {
