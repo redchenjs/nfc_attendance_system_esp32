@@ -11,7 +11,7 @@
 #include "system/event.h"
 #include "tasks/gui_daemon.h"
 
-#define TAG "gui_task"
+#define TAG "gui"
 
 static const uint8_t *img_file_ptr[][2] = {
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
@@ -22,7 +22,8 @@ static const uint8_t *img_file_ptr[][2] = {
                                             {ani4_96x64_gif_ptr, ani4_96x64_gif_end}, // "PowerOff"
                                             {ani5_96x64_gif_ptr, ani5_96x64_gif_end}, // "Clock"
                                             {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
-                                            {ani7_96x64_gif_ptr, ani7_96x64_gif_end}  // "Fail"
+                                            {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Fail"
+                                            {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
 #elif defined(CONFIG_SCREEN_PANEL_ST7735)
                                             {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
                                             {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
@@ -31,12 +32,13 @@ static const uint8_t *img_file_ptr[][2] = {
                                             {ani4_160x80_gif_ptr, ani4_160x80_gif_end}, // "PowerOff"
                                             {ani5_160x80_gif_ptr, ani5_160x80_gif_end}, // "Clock"
                                             {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
-                                            {ani7_160x80_gif_ptr, ani7_160x80_gif_end}  // "Fail"
+                                            {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Fail"
+                                            {ani8_160x80_gif_ptr, ani8_160x80_gif_end}  // "Updating"
 #endif
                                         };
-uint8_t img_file_index = 0;
+static uint8_t img_file_index = 0;
 
-void gui_daemon_task(void *pvParameter)
+void gui_daemon(void *pvParameter)
 {
     gfxInit();
 
@@ -45,15 +47,29 @@ void gui_daemon_task(void *pvParameter)
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, White);
             while (1) {
-                if (xEventGroupGetBits(task_event_group) & GUI_DAEMON_RELOAD_BIT) {
-                    xEventGroupClearBits(task_event_group, GUI_DAEMON_RELOAD_BIT);
+                if (xEventGroupGetBits(daemon_event_group) & GUI_DAEMON_RELOAD_BIT) {
+                    xEventGroupClearBits(daemon_event_group, GUI_DAEMON_RELOAD_BIT);
                     break;
                 }
                 if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
+                    xEventGroupWaitBits(
+                        daemon_event_group,
+                        GUI_DAEMON_RELOAD_BIT,
+                        pdTRUE,
+                        pdFALSE,
+                        portMAX_DELAY
+                    );
                     break;
                 }
                 delaytime_t delay = gdispImageNext(&gfx_image);
                 if (delay == TIME_INFINITE) {
+                    xEventGroupWaitBits(
+                        daemon_event_group,
+                        GUI_DAEMON_RELOAD_BIT,
+                        pdTRUE,
+                        pdFALSE,
+                        portMAX_DELAY
+                    );
                     break;
                 }
                 if (delay != TIME_IMMEDIATE) {
@@ -69,7 +85,7 @@ void gui_daemon_task(void *pvParameter)
     esp_restart();
 }
 
-void gui_daemon_show_image(uint8_t filename_index)
+void gui_show_image(uint8_t filename_index)
 {
 #if defined(CONFIG_ENABLE_GUI)
     if (filename_index >= (sizeof(img_file_ptr) / 2)) {
@@ -77,6 +93,6 @@ void gui_daemon_show_image(uint8_t filename_index)
         return;
     }
     img_file_index = filename_index;
-    xEventGroupSetBits(task_event_group, GUI_DAEMON_RELOAD_BIT);
+    xEventGroupSetBits(daemon_event_group, GUI_DAEMON_RELOAD_BIT);
 #endif
 }

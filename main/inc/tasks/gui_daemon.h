@@ -35,6 +35,9 @@ extern const uint8_t ani6_96x64_gif_end[] asm("_binary_ani6_96x64_gif_end");
 // ani7.gif
 extern const uint8_t ani7_96x64_gif_ptr[] asm("_binary_ani7_96x64_gif_start");
 extern const uint8_t ani7_96x64_gif_end[] asm("_binary_ani7_96x64_gif_end");
+// ani8.gif
+extern const uint8_t ani8_96x64_gif_ptr[] asm("_binary_ani8_96x64_gif_start");
+extern const uint8_t ani8_96x64_gif_end[] asm("_binary_ani8_96x64_gif_end");
 #elif defined(CONFIG_SCREEN_PANEL_ST7735)
 // ani0.gif
 extern const uint8_t ani0_160x80_gif_ptr[] asm("_binary_ani0_160x80_gif_start");
@@ -60,9 +63,12 @@ extern const uint8_t ani6_160x80_gif_end[] asm("_binary_ani6_160x80_gif_end");
 // ani7.gif
 extern const uint8_t ani7_160x80_gif_ptr[] asm("_binary_ani7_160x80_gif_start");
 extern const uint8_t ani7_160x80_gif_end[] asm("_binary_ani7_160x80_gif_end");
+// ani8.gif
+extern const uint8_t ani8_160x80_gif_ptr[] asm("_binary_ani8_160x80_gif_start");
+extern const uint8_t ani8_160x80_gif_end[] asm("_binary_ani8_160x80_gif_end");
 #endif
 
-extern void gui_daemon_task(void *pvParameter);
-extern void gui_daemon_show_image(uint8_t filename_index);
+extern void gui_daemon(void *pvParameter);
+extern void gui_show_image(uint8_t filename_index);
 
 #endif /* INC_TASKS_GUI_DAEMON_H_ */
