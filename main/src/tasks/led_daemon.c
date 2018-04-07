@@ -1,5 +1,5 @@
 /*
- * led_indicator.c
+ * led_daemon.c
  *
  *  Created on: 2018-02-13 15:43
  *      Author: Jack Chen <redchenjs@live.com>
@@ -17,9 +17,9 @@ static portTickType led_delay = 25;
 static const uint16_t led_count_mode[5] = {25, 50, 100};
 static uint16_t led_count = 50;
 
-#define TAG "led_indicator"
+#define TAG "led"
 
-void led_indicator_task(void *pvParameter)
+void led_daemon(void *pvParameter)
 {
     uint16_t i = 0;
 
@@ -37,7 +37,7 @@ void led_indicator_task(void *pvParameter)
     }
 }
 
-void led_indicator_set_mode(uint8_t mode_index)
+void led_set_mode(uint8_t mode_index)
 {
 #if defined(CONFIG_ENABLE_LED)
     ESP_LOGD(TAG, "set mode %u", mode_index);
