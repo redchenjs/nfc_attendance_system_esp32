@@ -1,5 +1,5 @@
 /*
- * nfc_initiator.c
+ * nfc_daemon.c
  *
  *  Created on: 2018-02-13 21:50
  *      Author: Jack Chen <redchenjs@live.com>
@@ -12,13 +12,13 @@
 
 #include "system/event.h"
 #include "tasks/gui_daemon.h"
-#include "tasks/mp3_player.h"
-#include "tasks/sntp_client.h"
-#include "tasks/nfc_initiator.h"
-#include "tasks/led_indicator.h"
-#include "tasks/token_verifier.h"
+#include "tasks/ntp_daemon.h"
+#include "tasks/nfc_daemon.h"
+#include "tasks/led_daemon.h"
+#include "tasks/audio_daemon.h"
+#include "tasks/token_verify.h"
 
-#define TAG "nfc_initiator"
+#define TAG "nfc"
 
 #define RX_FRAME_PRFX "f222222222"
 
@@ -28,10 +28,10 @@
 #define RX_FRAME_LEN (RX_FRAME_PRFX_LEN + RX_FRAME_DATA_LEN)
 #define TX_FRAME_LEN (10)
 
-uint8_t abtRx[RX_FRAME_LEN + 1] = {0};
-uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00,0xA4,0x04,0x00,0x05,0xF2,0x22,0x22,0x22,0x22};
+static uint8_t abtRx[RX_FRAME_LEN + 1] = {0};
+static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00,0xA4,0x04,0x00,0x05,0xF2,0x22,0x22,0x22,0x22};
 
-void nfc_initiator_task(void *pvParameter)
+void nfc_daemon(void *pvParameter)
 {
     nfc_target nt;
     nfc_modulation nm = {
@@ -43,8 +43,8 @@ void nfc_initiator_task(void *pvParameter)
 
     while (1) {
         xEventGroupWaitBits(
-            task_event_group,
-            NFC_INITIATOR_READY_BIT,
+            daemon_event_group,
+            NFC_DAEMON_READY_BIT,
             pdFALSE,
             pdTRUE,
             portMAX_DELAY
@@ -76,11 +76,8 @@ void nfc_initiator_task(void *pvParameter)
         if (res > 0) {
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
                 if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
-                    token_verifier_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
-                    nfc_initiator_set_mode(0);
-                    led_indicator_set_mode(4);
-                    gui_daemon_show_image(1);
-                    mp3_player_play_file(0);
+                    audio_play_file(0);
+                    token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
                 } else {
                     ESP_LOGW(TAG, "invalid frame data");
                 }
@@ -93,16 +90,16 @@ void nfc_initiator_task(void *pvParameter)
     }
 
     ESP_LOGE(TAG, "could not open nfc device, rebooting...");
-    gui_daemon_show_image(4);
-    vTaskDelay(5000 / portTICK_RATE_MS);
+    gui_show_image(4);
+    vTaskDelay(2000 / portTICK_RATE_MS);
     esp_restart();
 }
 
-void nfc_initiator_set_mode(uint8_t mode)
+void nfc_set_mode(uint8_t mode)
 {
     if (mode != 0) {
-        xEventGroupSetBits(task_event_group, NFC_INITIATOR_READY_BIT);
+        xEventGroupSetBits(daemon_event_group, NFC_DAEMON_READY_BIT);
     } else {
-        xEventGroupClearBits(task_event_group, NFC_INITIATOR_READY_BIT);
+        xEventGroupClearBits(daemon_event_group, NFC_DAEMON_READY_BIT);
     }
 }
