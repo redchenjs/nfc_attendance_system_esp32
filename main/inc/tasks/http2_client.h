@@ -32,18 +32,18 @@ struct http2c_handle {
 typedef int (*http2c_frame_data_recv_cb_t)(struct http2c_handle *handle, const char *data, size_t len, int flags);
 typedef int (*http2c_putpost_data_cb_t)(struct http2c_handle *handle, char *data, size_t len, uint32_t *data_flags);
 
-int  http2_client_connect(struct http2c_handle *hd, const char *uri);
-void http2_client_free(struct http2c_handle *hd);
+extern int  http2_client_connect(struct http2c_handle *hd, const char *uri);
+extern void http2_client_free(struct http2c_handle *hd);
 
-int http2_client_do_get(struct http2c_handle *hd, const char *path, http2c_frame_data_recv_cb_t recv_cb);
-int http2_client_do_post(struct http2c_handle *hd, const char *path,
+extern int http2_client_do_get(struct http2c_handle *hd, const char *path, http2c_frame_data_recv_cb_t recv_cb);
+extern int http2_client_do_post(struct http2c_handle *hd, const char *path,
                    http2c_putpost_data_cb_t send_cb,
                    http2c_frame_data_recv_cb_t recv_cb);
-int http2_client_do_put(struct http2c_handle *hd, const char *path,
+extern int http2_client_do_put(struct http2c_handle *hd, const char *path,
                   http2c_putpost_data_cb_t send_cb,
                   http2c_frame_data_recv_cb_t recv_cb);
 
-int http2_client_execute(struct http2c_handle *hd);
+extern int http2_client_execute(struct http2c_handle *hd);
 
 #define HTTP2C_MAKE_NV(NAME, VALUE)                                    \
   {                                                                    \
@@ -51,9 +51,9 @@ int http2_client_execute(struct http2c_handle *hd);
         NGHTTP2_NV_FLAG_NONE                                           \
   }
 
-int http2_client_do_get_with_nv(struct http2c_handle *hd, const nghttp2_nv *nva, size_t nvlen, http2c_frame_data_recv_cb_t recv_cb);
-int http2_client_do_putpost_with_nv(struct http2c_handle *hd, const nghttp2_nv *nva, size_t nvlen,
-                              http2c_putpost_data_cb_t send_cb,
-                              http2c_frame_data_recv_cb_t recv_cb);
+extern int http2_client_do_get_with_nv(struct http2c_handle *hd, const nghttp2_nv *nva, size_t nvlen, http2c_frame_data_recv_cb_t recv_cb);
+extern int http2_client_do_putpost_with_nv(struct http2c_handle *hd, const nghttp2_nv *nva, size_t nvlen,
+                                            http2c_putpost_data_cb_t send_cb,
+                                            http2c_frame_data_recv_cb_t recv_cb);
 
 #endif /* INC_TASKS_HTTP2_CLIENT_H_ */

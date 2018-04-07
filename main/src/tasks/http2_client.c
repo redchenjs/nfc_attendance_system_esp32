@@ -108,7 +108,7 @@ static int http2_client_parse_uri(struct http2c_handle *hd, const char *uri)
     return 0;
 }
 
-int http2_client_connect_to_host(struct http2c_handle *hd)
+static int http2_client_connect_to_host(struct http2c_handle *hd)
 {
     int ret;
     struct addrinfo hints = {
@@ -263,7 +263,7 @@ static ssize_t nghttp2_callback_recv(nghttp2_session *session, uint8_t *buf,
     return rv;
 }
 
-char *nghttp2_frame_type_str(int type)
+static char *nghttp2_frame_type_str(int type)
 {
     switch (type) {
     case NGHTTP2_HEADERS:
@@ -535,4 +535,3 @@ int http2_client_do_put(struct http2c_handle *hd, const char *path,
                              };
     return http2_client_do_putpost_with_nv(hd, nva, sizeof(nva) / sizeof(nva[0]), send_cb, recv_cb);
 }
-
