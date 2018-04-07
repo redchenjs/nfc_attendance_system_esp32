@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-extern void blufi_daemon_task(void *pvParameter);
-extern void blufi_daemon_send_response(uint8_t response);
+extern void blufi_daemon(void *pvParameter);
+extern void blufi_response(void);
 
 #endif /* INC_TASKS_BLUFI_DAEMON_H_ */

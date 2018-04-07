@@ -18,10 +18,10 @@
 
 #include "device/bt.h"
 #include "system/event.h"
-#include "tasks/led_indicator.h"
+#include "tasks/led_daemon.h"
 #include "tasks/blufi_security.h"
 
-#define TAG "blufi_daemon"
+#define TAG "blufi"
 
 static uint8_t blufi_service_uuid128[32] = {
     /* LSB <--------------------------------------------------------------------------------> MSB */
@@ -56,7 +56,7 @@ static esp_ble_adv_params_t blufi_adv_params = {
     .adv_filter_policy  = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY
 };
 
-static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_t *param)
+static void blufi_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_t *param)
 {
     /* connect info */
     static uint8_t server_if;
@@ -80,18 +80,18 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
     case ESP_BLUFI_EVENT_DEINIT_FINISH:
         break;
     case ESP_BLUFI_EVENT_BLE_CONNECT:
-        xEventGroupSetBits(system_event_group, BLUFI_RUNNING_BIT);
+        xEventGroupSetBits(system_event_group, BLUFI_READY_BIT);
         ESP_ERROR_CHECK(esp_wifi_stop());
         server_if = param->connect.server_if;
         conn_id = param->connect.conn_id;
         esp_ble_gap_stop_advertising();
         blufi_security_init();
-        led_indicator_set_mode(5);
+        led_set_mode(5);
         break;
     case ESP_BLUFI_EVENT_BLE_DISCONNECT:
-        xEventGroupClearBits(system_event_group, BLUFI_RUNNING_BIT);
         blufi_security_deinit();
         esp_ble_gap_start_advertising(&blufi_adv_params);
+        xEventGroupClearBits(system_event_group, BLUFI_READY_BIT);
         break;
     case ESP_BLUFI_EVENT_SET_WIFI_OPMODE:
         break;
@@ -156,7 +156,7 @@ static void blufi_daemon_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb
     }
 }
 
-static void blufi_daemon_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
+static void blufi_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
     switch (event) {
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
@@ -167,32 +167,34 @@ static void blufi_daemon_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble
     }
 }
 
-static esp_blufi_callbacks_t blufi_daemon_callbacks = {
-    .event_cb = blufi_daemon_event_callback,
+static esp_blufi_callbacks_t blufi_callbacks = {
+    .event_cb = blufi_event_callback,
     .negotiate_data_handler = blufi_security_dh_negotiate_data_handler,
     .encrypt_func = blufi_security_aes_encrypt,
     .decrypt_func = blufi_security_aes_decrypt,
     .checksum_func = blufi_security_crc_checksum,
 };
 
-void blufi_daemon_task(void *pvParameter)
+void blufi_daemon(void *pvParameter)
 {
     ESP_LOGD(TAG, "start blufi version %04x", esp_blufi_get_version());
 
-    ESP_ERROR_CHECK(esp_ble_gap_register_callback(blufi_daemon_gap_event_handler));
-    ESP_ERROR_CHECK(esp_blufi_register_callbacks(&blufi_daemon_callbacks));
+    ESP_ERROR_CHECK(esp_ble_gap_register_callback(blufi_gap_event_handler));
+    ESP_ERROR_CHECK(esp_blufi_register_callbacks(&blufi_callbacks));
 
     esp_blufi_profile_init();
 
     xEventGroupWaitBits(
-        task_event_group,
-        BLUFI_DAEMON_RESPONSE_BIT,
+        daemon_event_group,
+        BLUFI_DAEMON_READY_BIT,
         pdTRUE,
         pdFALSE,
         portMAX_DELAY
     );
 
-    if ((xEventGroupGetBits(system_event_group) & BLUFI_RUNNING_BIT) != 0) {
+    EventBits_t uxBits;
+    uxBits = xEventGroupGetBits(system_event_group);
+    if ((uxBits & BLUFI_READY_BIT) != 0) {
         wifi_mode_t mode;
         esp_wifi_get_mode(&mode);
         esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_SUCCESS, 0, NULL);
@@ -201,16 +203,22 @@ void blufi_daemon_task(void *pvParameter)
     esp_blufi_profile_deinit();
     bt0_deinit();
 
-    xEventGroupSetBits(task_event_group, BLUFI_DAEMON_READY_BIT);
+    xEventGroupSetBits(daemon_event_group, BLUFI_DAEMON_FINISH_BIT);
 
     vTaskDelete(NULL);
 }
 
-void blufi_daemon_send_response(uint8_t response)
+void blufi_response(void)
 {
 #if defined(CONFIG_ENABLE_BLUFI)
-    if (response != 0) {
-        xEventGroupSetBits(task_event_group, BLUFI_DAEMON_RESPONSE_BIT);
+    EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
+    if ((uxBits & BLUFI_DAEMON_FINISH_BIT) == 0) {
+        xEventGroupSync(
+            daemon_event_group,
+            BLUFI_DAEMON_READY_BIT,
+            BLUFI_DAEMON_FINISH_BIT,
+            portMAX_DELAY
+        );
     }
 #endif
 }
