@@ -66,6 +66,10 @@ void ntp_daemon(void *pvParameter)
 
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
+        EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
+        if ((uxBits & NFC_DAEMON_READY_BIT) == 0) {
+            continue;
+        }
         time(&now);
         localtime_r(&now, &timeinfo);
         if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
