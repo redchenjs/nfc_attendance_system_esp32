@@ -63,6 +63,7 @@ int ota_update_parse_data(struct http2c_handle *handle, const char *data, size_t
         EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
         if (uxBits & HTTP2_DAEMON_OTA_FAILED_BIT) {
             ESP_LOGE(TAG, "ota update failed");
+            esp_ota_end(update_handle);
         } else if (binary_file_length != 0) {
             if (esp_ota_end(update_handle) != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_end failed!");
