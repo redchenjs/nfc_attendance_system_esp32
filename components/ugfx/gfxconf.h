@@ -117,7 +117,7 @@
    #define GDISP_NEED_IMAGE_NATIVE                  TRUE
    #define GDISP_NEED_IMAGE_GIF                     TRUE
        #define GDISP_IMAGE_GIF_BLIT_BUFFER_SIZE     32
-   #define GDISP_NEED_IMAGE_BMP                     TRUE
+//    #define GDISP_NEED_IMAGE_BMP                     TRUE
 //        #define GDISP_NEED_IMAGE_BMP_1               TRUE
 //        #define GDISP_NEED_IMAGE_BMP_4               TRUE
 //        #define GDISP_NEED_IMAGE_BMP_4_RLE           TRUE
@@ -128,11 +128,11 @@
 //        #define GDISP_NEED_IMAGE_BMP_32              TRUE
 //        #define GDISP_IMAGE_BMP_BLIT_BUFFER_SIZE     32
 //    #define GDISP_NEED_IMAGE_JPG                     TRUE
-   #define GDISP_NEED_IMAGE_PNG                     TRUE
+//    #define GDISP_NEED_IMAGE_PNG                     TRUE
     //    #define GDISP_NEED_IMAGE_PNG_INTERLACED      TRUE
-       #define GDISP_NEED_IMAGE_PNG_TRANSPARENCY    TRUE
-       #define GDISP_NEED_IMAGE_PNG_BACKGROUND      TRUE
-       #define GDISP_NEED_IMAGE_PNG_ALPHACLIFF      32
+    //    #define GDISP_NEED_IMAGE_PNG_TRANSPARENCY    TRUE
+    //    #define GDISP_NEED_IMAGE_PNG_BACKGROUND      TRUE
+    //    #define GDISP_NEED_IMAGE_PNG_ALPHACLIFF      32
 //        #define GDISP_NEED_IMAGE_PNG_PALETTE_124     TRUE
 //        #define GDISP_NEED_IMAGE_PNG_PALETTE_8       TRUE
 //        #define GDISP_NEED_IMAGE_PNG_GRAYSCALE_124   TRUE
