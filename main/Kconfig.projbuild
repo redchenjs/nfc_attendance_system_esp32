@@ -26,7 +26,7 @@ menu "Server Configuration"
 
 config SERVER_URI
     string "Server URI"
-    default "https://redchenjs.vicp.net"
+    default "https://example.com"
     help
         Server to connect.
 
@@ -85,7 +85,7 @@ menuconfig ENABLE_GUI
 
 choice SCREEN_PANEL
     prompt "Screen Panel"
-    default SCREEN_PANEL_SSD1331
+    default SCREEN_PANEL_ST7735
     depends on ENABLE_GUI
     help
         Select to use which screen panel.
