@@ -32,7 +32,7 @@ void task_init(void)
 #endif
 
 #if defined(CONFIG_ENABLE_BLUFI)
-    xTaskCreate(blufi_daemon, "blufi_daemon", 768, NULL, 6, NULL);
+    xTaskCreate(blufi_daemon, "blufi_daemon", 960, NULL, 6, NULL);
 #endif
 
     xTaskCreate(nfc_daemon, "nfc_daemon", 4000, NULL, 4, NULL);
