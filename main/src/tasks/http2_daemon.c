@@ -7,9 +7,7 @@
 
 #include <string.h>
 
-#include "cJSON.h"
 #include "esp_log.h"
-#include "esp_ota_ops.h"
 
 #include "device/wifi.h"
 #include "system/event.h"
@@ -25,20 +23,11 @@
 
 #define TAG "http2"
 
-#if defined(CONFIG_ENABLE_SERVER_CERT_VERIFY)
-static const uint8_t *cert_file_ptr[][2] =  {
-                                                {cert0_pem_ptr, cert0_pem_end}  // "DigiCert Global Root CA"
-                                            };
-static uint8_t cert_file_index = 0;
-#endif
-
 void http2_daemon(void *pvParameter)
 {
     struct http2c_handle hd;
 
     while (1) {
-        memset(&hd, 0, sizeof(hd));
-
         EventBits_t uxBitsPrev = xEventGroupWaitBits(
             daemon_event_group,
             HTTP2_DAEMON_TOKEN_READY_BIT | HTTP2_DAEMON_OTA_READY_BIT,
@@ -49,11 +38,6 @@ void http2_daemon(void *pvParameter)
 
         led_set_mode(4);
         gui_show_image(1);
-
-#if defined(CONFIG_ENABLE_SERVER_CERT_VERIFY)
-        hd.ca_file_ptr = cert_file_ptr[cert_file_index][0];
-        hd.ca_file_len = cert_file_ptr[cert_file_index][1] - cert_file_ptr[cert_file_index][0];
-#endif
 
         if (http2_client_connect(&hd, CONFIG_SERVER_URI) != 0) {
             ESP_LOGE(TAG, "failed to connect");

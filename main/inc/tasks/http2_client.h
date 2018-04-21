@@ -8,22 +8,19 @@
 #ifndef INC_TASKS_HTTP2_CLIENT_H_
 #define INC_TASKS_HTTP2_CLIENT_H_
 
-#include "openssl/ssl.h"
+#include <stdint.h>
+
+// cert0.pem
+extern const uint8_t cert0_pem_ptr[] asm("_binary_cert0_pem_start");
+extern const uint8_t cert0_pem_end[] asm("_binary_cert0_pem_end");
+
+#include "esp_tls.h"
 #include "nghttp2/nghttp2.h"
 
 struct http2c_handle {
-    /* Ideally, CTX is per-program, so we could potentially take it out of this
-     * per-connection structure
-     */
-    char             host[64];
-    char             port[6];
-    char             path[128];
-    const uint8_t   *ca_file_ptr;
-    uint32_t         ca_file_len;
-    SSL_CTX         *ssl_ctx;      /*!< Pointer to the SSL context */
-    SSL             *ssl;          /*!< Pointer to the SSL handle */
     nghttp2_session *http2_sess;   /*!< Pointer to the HTTP2 session handle */
-    int              sockfd;       /*!< Socket file descriptor */
+    char            *hostname;     /*!< The hostname we are connected to */
+    struct esp_tls  *http2_tls;    /*!< Pointer to the TLS session handle */
 };
 
 #define DATA_RECV_RST_STREAM      1
@@ -37,11 +34,11 @@ extern void http2_client_free(struct http2c_handle *hd);
 
 extern int http2_client_do_get(struct http2c_handle *hd, const char *path, http2c_frame_data_recv_cb_t recv_cb);
 extern int http2_client_do_post(struct http2c_handle *hd, const char *path,
-                   http2c_putpost_data_cb_t send_cb,
-                   http2c_frame_data_recv_cb_t recv_cb);
+                                http2c_putpost_data_cb_t send_cb,
+                                http2c_frame_data_recv_cb_t recv_cb);
 extern int http2_client_do_put(struct http2c_handle *hd, const char *path,
-                  http2c_putpost_data_cb_t send_cb,
-                  http2c_frame_data_recv_cb_t recv_cb);
+                               http2c_putpost_data_cb_t send_cb,
+                               http2c_frame_data_recv_cb_t recv_cb);
 
 extern int http2_client_execute(struct http2c_handle *hd);
 
@@ -53,7 +50,7 @@ extern int http2_client_execute(struct http2c_handle *hd);
 
 extern int http2_client_do_get_with_nv(struct http2c_handle *hd, const nghttp2_nv *nva, size_t nvlen, http2c_frame_data_recv_cb_t recv_cb);
 extern int http2_client_do_putpost_with_nv(struct http2c_handle *hd, const nghttp2_nv *nva, size_t nvlen,
-                                            http2c_putpost_data_cb_t send_cb,
-                                            http2c_frame_data_recv_cb_t recv_cb);
+                                           http2c_putpost_data_cb_t send_cb,
+                                           http2c_frame_data_recv_cb_t recv_cb);
 
 #endif /* INC_TASKS_HTTP2_CLIENT_H_ */
