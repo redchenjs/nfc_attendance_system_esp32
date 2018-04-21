@@ -76,6 +76,7 @@ void nfc_daemon(void *pvParameter)
         if (res > 0) {
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
                 if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
+                    ESP_LOGW(TAG, "total free mem %u", heap_caps_get_free_size(MALLOC_CAP_32BIT));
                     audio_play_file(0);
                     token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
                 } else {
