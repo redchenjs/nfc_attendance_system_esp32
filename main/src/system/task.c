@@ -20,11 +20,11 @@
 void task_init(void)
 {
 #if defined(CONFIG_ENABLE_LED)
-    xTaskCreate(led_daemon, "led_daemon", 1024, NULL, 6, NULL);
+    xTaskCreate(led_daemon, "led_daemon", 640, NULL, 6, NULL);
 #endif
 
 #if defined(CONFIG_ENABLE_GUI)
-    xTaskCreate(gui_daemon, "gui_daemon", 1920, NULL, 6, NULL);
+    xTaskCreate(gui_daemon, "gui_daemon", 1024, NULL, 6, NULL);
 #endif
 
 #if defined(CONFIG_ENABLE_AUDIO)
@@ -32,11 +32,11 @@ void task_init(void)
 #endif
 
 #if defined(CONFIG_ENABLE_BLUFI)
-    xTaskCreate(blufi_daemon, "blufi_daemon", 1024, NULL, 6, NULL);
+    xTaskCreate(blufi_daemon, "blufi_daemon", 768, NULL, 6, NULL);
 #endif
 
-    xTaskCreate(nfc_daemon, "nfc_daemon", 5120, NULL, 4, NULL);
-    xTaskCreate(ntp_daemon, "ntp_daemon", 2048, NULL, 5, NULL);
-    xTaskCreate(wifi_daemon, "wifi_daemon", 1920, NULL, 5, NULL);
-    xTaskCreate(http2_daemon, "http2_daemon", 19200, NULL, 5, NULL);
+    xTaskCreate(nfc_daemon, "nfc_daemon", 4000, NULL, 4, NULL);
+    xTaskCreate(ntp_daemon, "ntp_daemon", 2000, NULL, 5, NULL);
+    xTaskCreate(wifi_daemon, "wifi_daemon", 768, NULL, 5, NULL);
+    xTaskCreate(http2_daemon, "http2_daemon", 18432, NULL, 5, NULL);
 }
