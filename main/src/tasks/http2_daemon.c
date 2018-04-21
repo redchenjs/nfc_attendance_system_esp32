@@ -25,8 +25,6 @@
 
 void http2_daemon(void *pvParameter)
 {
-    struct http2c_handle hd;
-
     while (1) {
         EventBits_t uxBitsPrev = xEventGroupWaitBits(
             daemon_event_group,
@@ -39,6 +37,7 @@ void http2_daemon(void *pvParameter)
         led_set_mode(4);
         gui_show_image(1);
 
+        struct http2c_handle hd;
         if (http2_client_connect(&hd, CONFIG_SERVER_URI) != 0) {
             ESP_LOGE(TAG, "failed to connect");
             if (uxBitsPrev & HTTP2_DAEMON_TOKEN_READY_BIT) {
