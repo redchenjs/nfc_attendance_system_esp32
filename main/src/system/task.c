@@ -38,5 +38,5 @@ void task_init(void)
     xTaskCreate(nfc_daemon, "nfc_daemon", 4000, NULL, 4, NULL);
     xTaskCreate(ntp_daemon, "ntp_daemon", 2000, NULL, 5, NULL);
     xTaskCreate(wifi_daemon, "wifi_daemon", 768, NULL, 5, NULL);
-    xTaskCreate(http2_daemon, "http2_daemon", 18432, NULL, 5, NULL);
+    xTaskCreate(http2_daemon, "http2_daemon", 19200, NULL, 5, NULL);
 }
