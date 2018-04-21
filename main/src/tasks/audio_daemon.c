@@ -42,13 +42,13 @@ void audio_daemon(void *pvParameters)
     if (frame  == NULL) { ESP_LOGE(TAG, "malloc(frame) failed");  goto err; }
     if (synth  == NULL) { ESP_LOGE(TAG, "malloc(synth) failed");  goto err; }
 
-    //Initialize mp3 parts
-    mad_stream_init(stream);
-    mad_frame_init(frame);
-    mad_synth_init(synth);
-
     while (1) {
         xEventGroupWaitBits(daemon_event_group, AUDIO_DAEMON_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
+
+        //Initialize mp3 parts
+        mad_stream_init(stream);
+        mad_frame_init(frame);
+        mad_synth_init(synth);
 
         mad_stream_buffer(stream, mp3_file_ptr[mp3_file_index][0], mp3_file_ptr[mp3_file_index][1] - mp3_file_ptr[mp3_file_index][0]);
         while (1) {
@@ -63,11 +63,11 @@ void audio_daemon(void *pvParameters)
         }
         // avoid noise
         i2s_zero_dma_buffer(0);
-    }
 
-    mad_synth_finish(synth);
-    mad_frame_finish(frame);
-    mad_stream_finish(stream);
+        mad_synth_finish(synth);
+        mad_frame_finish(frame);
+        mad_stream_finish(stream);
+    }
 err:
     free(synth);
     free(frame);
