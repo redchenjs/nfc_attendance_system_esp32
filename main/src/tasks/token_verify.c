@@ -76,7 +76,7 @@ void token_verify(char *token)
         daemon_event_group,
         HTTP2_DAEMON_TOKEN_READY_BIT,
         HTTP2_DAEMON_TOKEN_FINISH_BIT,
-        10000 / portTICK_RATE_MS
+        30000 / portTICK_RATE_MS
     );
     if ((uxBits & HTTP2_DAEMON_TOKEN_FINISH_BIT) == 0) {
         xEventGroupClearBits(daemon_event_group, HTTP2_DAEMON_TOKEN_READY_BIT);
