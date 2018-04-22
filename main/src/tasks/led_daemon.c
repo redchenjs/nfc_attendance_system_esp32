@@ -11,11 +11,19 @@
 
 #include "driver/led.h"
 
-static const portTickType led_delay_mode[5] = {1000, 500, 250, 100, 25};
-static portTickType led_delay = 25;
-
-static const uint16_t led_count_mode[5] = {25, 50, 100};
-static uint16_t led_count = 50;
+static const uint16_t led_mode_table[][2] = {/* { delay, count} */
+                                                {     0,     2},   // 0, Keep off
+                                                {  1000,     2},   // 1,
+                                                {   500,     2},   // 2,
+                                                {   250,     2},   // 3,
+                                                {   100,     2},   // 4,
+                                                {    25,     2},   // 5,
+                                                {    25,    25},   // 6,
+                                                {    25,    50},   // 7,
+                                                {    25,   100},   // 8,
+                                                {    25,     0}    // 9, Keep on
+                                            };
+static uint8_t led_mode_index = 7;
 
 #define TAG "led"
 
@@ -25,40 +33,22 @@ void led_daemon(void *pvParameter)
 
     while (1) {
         portTickType xLastWakeTime = xTaskGetTickCount();
-
-        if (i++ % led_count) {
+        if (i++ % led_mode_table[led_mode_index][1]) {
             led_indicator_off();
-        }
-        else {
+        } else {
             led_indicator_on();
         }
-
-        vTaskDelayUntil(&xLastWakeTime, led_delay);
+        vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
 }
 
 void led_set_mode(uint8_t mode_index)
 {
 #if defined(CONFIG_ENABLE_LED)
-    ESP_LOGD(TAG, "set mode %u", mode_index);
-    switch (mode_index) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            led_delay = led_delay_mode[mode_index-1];
-            led_count = 2;
-            break;
-        case 6:
-        case 7:
-        case 8:
-            led_delay = 25;
-            led_count = led_count_mode[mode_index-6];
-            break;
-        default:
-            ESP_LOGE(TAG, "set mode failed");
-            break;
+    if (mode_index >= (sizeof(led_mode_table) / 2)) {
+        ESP_LOGE(TAG, "invalid mode index");
+        return;
     }
+    led_mode_index = mode_index;
 #endif
 }
