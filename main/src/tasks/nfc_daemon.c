@@ -63,7 +63,7 @@ void nfc_daemon(void *pvParameter)
         int res = 0;
         if (nfc_initiator_init(pnd) >= 0) {
             if (nfc_initiator_select_passive_target(pnd, nm, NULL, 0, &nt) >= 0) {
-                if ((res = nfc_initiator_transceive_bytes(pnd, abtTx, TX_FRAME_LEN, abtRx, RX_FRAME_LEN, 200)) >= 0) {
+                if ((res = nfc_initiator_transceive_bytes(pnd, abtTx, TX_FRAME_LEN, abtRx, RX_FRAME_LEN, -1)) >= 0) {
                     abtRx[res] = 0x00;
                 } else {
                     ESP_LOGW(TAG, "not a valid target");
