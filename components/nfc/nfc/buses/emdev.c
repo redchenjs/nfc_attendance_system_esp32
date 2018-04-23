@@ -20,7 +20,7 @@ void mopen(void) {}
 int mreceive(uint8_t *pbtRx, const size_t szRx, int timeout)
 {
     int err;
-    err = uart_read_bytes(EX_UART_NUM, pbtRx, szRx, timeout);
+    err = uart_read_bytes(EX_UART_NUM, pbtRx, szRx, timeout / portTICK_RATE_MS);
     if (err == -1) {
         ESP_LOGE(TAG, "uart receive timeout\n");
         return -1;
