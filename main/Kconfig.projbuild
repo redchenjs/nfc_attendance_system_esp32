@@ -44,6 +44,28 @@ config ENABLE_SERVER_CERT_VERIFY
 
 endmenu
 
+menu "NFC Configuration"
+
+config NFC_RST_PIN
+    int "NFC Reset Pin"
+    default 26
+    help
+        NFC Reset Pin.
+
+config UART_TXD_PIN
+    int "UART TXD Pin"
+    default 16
+    help
+        UART TXD Pin.
+
+config UART_RXD_PIN
+    int "UART RXD Pin"
+    default 17
+    help
+        UART RXD Pin.
+
+endmenu
+
 config ENABLE_AUDIO
     bool "Enable Audio Output"
     default y
@@ -108,8 +130,8 @@ menuconfig ENABLE_LED
     help
         Select this to enable led.
 
-config LED_PIN_NUM
-    int "LED Pin Number"
+config LED_PIN
+    int "LED Pin"
     default 25
     depends on ENABLE_LED
     help
