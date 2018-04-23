@@ -9,8 +9,8 @@
 #include "driver/uart.h"
 #include "device/uart.h"
 
-#define EX_UART_TXD  (16)
-#define EX_UART_RXD  (17)
+#define EX_UART_TXD  CONFIG_UART_TXD_PIN
+#define EX_UART_RXD  CONFIG_UART_RXD_PIN
 
 #define BUF_SIZE (128)
 
@@ -26,13 +26,14 @@ void uart1_init()
        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
        .rx_flow_ctrl_thresh = 16,
     };
-    //Set UART parameters
+    // Set UART parameters
     uart_param_config(EX_UART_NUM, &uart_config);
-    //Set UART log level
+    // Set UART log level
     esp_log_level_set(TAG, ESP_LOG_INFO);
-    //Install UART driver, and get the queue.
+    // Install UART driver, and get the queue
     uart_driver_install(EX_UART_NUM, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
-
-    //Set UART pins (using UART0 default pins ie no changes.)
+    // Set UART pins
     uart_set_pin(EX_UART_NUM, EX_UART_TXD, EX_UART_RXD, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    // Flush UART RX Buffer
+    uart_flush_input(EX_UART_NUM);
 }
