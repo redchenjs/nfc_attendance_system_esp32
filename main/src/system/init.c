@@ -9,11 +9,11 @@
 #include "device/bt.h"
 #include "device/spi.h"
 #include "device/i2s.h"
-#include "device/gpio.h"
 #include "device/wifi.h"
 #include "device/uart.h"
 
 #include "driver/led.h"
+#include "driver/pn532.h"
 
 void device_init(void)
 {
@@ -34,10 +34,6 @@ void device_init(void)
 #if defined(CONFIG_ENABLE_GUI)
     spi1_init();
 #endif
-
-#if defined(CONFIG_ENABLE_LED)
-    gpio0_init();
-#endif
 }
 
 void driver_init(void)
@@ -45,4 +41,5 @@ void driver_init(void)
 #if defined(CONFIG_ENABLE_LED)
     led_init();
 #endif
+    pn532_init();
 }
