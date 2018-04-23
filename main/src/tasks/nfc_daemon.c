@@ -10,6 +10,7 @@
 #include "esp_log.h"
 #include "buses/emdev.h"
 
+#include "driver/pn532.h"
 #include "system/event.h"
 #include "tasks/gui_daemon.h"
 #include "tasks/ntp_daemon.h"
@@ -34,6 +35,7 @@ static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05, 0xF2, 0x
 void nfc_daemon(void *pvParameter)
 {
     nfc_target nt;
+    nfc_device *pnd = NULL;
     nfc_modulation nm = {
         .nmt = NMT_ISO14443A,
         .nbr = NBR_106
@@ -50,9 +52,12 @@ void nfc_daemon(void *pvParameter)
             portMAX_DELAY
         );
         // Open NFC device
-        nfc_device *pnd = nfc_open(&emdev);
-        if (pnd == NULL) {
-            break;
+        while ((pnd = nfc_open(&emdev)) == NULL) {
+            ESP_LOGE(TAG, "nfc device error, reset nfc device now");
+            pn532_setpin_reset(0);
+            vTaskDelay(100 / portTICK_RATE_MS);
+            pn532_setpin_reset(1);
+            vTaskDelay(100 / portTICK_RATE_MS);
         }
         // Transceive some bytes if target available
         int res = 0;
@@ -67,7 +72,7 @@ void nfc_daemon(void *pvParameter)
                 ESP_LOGI(TAG, "waiting for target");
             }
         } else {
-            ESP_LOGE(TAG, "could not init nfc device");
+            ESP_LOGE(TAG, "init nfc device failed");
         }
         // Close NFC device
         nfc_close(pnd);
@@ -88,11 +93,6 @@ void nfc_daemon(void *pvParameter)
         // Task Delay
         vTaskDelay(100 / portTICK_RATE_MS);
     }
-
-    ESP_LOGE(TAG, "could not open nfc device, rebooting...");
-    gui_show_image(4);
-    vTaskDelay(2000 / portTICK_RATE_MS);
-    esp_restart();
 }
 
 void nfc_set_mode(uint8_t mode)
