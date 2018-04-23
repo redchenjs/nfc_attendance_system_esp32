@@ -7,19 +7,20 @@
 
 #include "driver/gpio.h"
 
-#define LED_INDICATOR_PIN 25
+#define LED0_PIN CONFIG_LED_PIN
 
-void led_indicator_on(void)
+void led_on(void)
 {
-    gpio_set_level(LED_INDICATOR_PIN, 1);
+    gpio_set_level(LED0_PIN, 1);
 }
 
-void led_indicator_off(void)
+void led_off(void)
 {
-    gpio_set_level(LED_INDICATOR_PIN, 0);
+    gpio_set_level(LED0_PIN, 0);
 }
 
 void led_init(void)
 {
-    led_indicator_on();
+    gpio_set_direction(LED0_PIN, GPIO_MODE_OUTPUT);
+    led_on();
 }

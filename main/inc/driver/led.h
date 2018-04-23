@@ -8,8 +8,8 @@
 #ifndef INC_DRIVER_LED_H_
 #define INC_DRIVER_LED_H_
 
-extern void led_indicator_on(void);
-extern void led_indicator_off(void);
+extern void led_on(void);
+extern void led_off(void);
 
 extern void led_init(void);
 
