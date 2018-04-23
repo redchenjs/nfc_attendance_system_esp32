@@ -34,9 +34,9 @@ void led_daemon(void *pvParameter)
     while (1) {
         portTickType xLastWakeTime = xTaskGetTickCount();
         if (i++ % led_mode_table[led_mode_index][1]) {
-            led_indicator_off();
+            led_off();
         } else {
-            led_indicator_on();
+            led_on();
         }
         vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
