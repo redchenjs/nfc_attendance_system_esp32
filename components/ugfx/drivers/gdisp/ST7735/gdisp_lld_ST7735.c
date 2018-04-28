@@ -170,27 +170,71 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
 #endif
 
 #if GDISP_HARDWARE_STREAM_WRITE
+    static int16_t stream_write_x  = 0;
+    static int16_t stream_write_cx = 0;
+    static int16_t stream_write_y  = 0;
+    static int16_t stream_write_cy = 0;
     LLDSPEC	void gdisp_lld_write_start(GDisplay *g) {
+        stream_write_x  = g->p.x;
+        stream_write_cx = g->p.cx;
+        stream_write_y  = g->p.y;
+        stream_write_cy = g->p.cy;
     }
     LLDSPEC	void gdisp_lld_write_color(GDisplay *g) {
-        LLDCOLOR_TYPE c;
-        c = gdispColor2Native(g->p.color);
-        *((uint8_t *)g->priv + (g->p.y * g->g.Width + g->p.x) * 2 + 0) = c >> 8;
-        *((uint8_t *)g->priv + (g->p.y * g->g.Width + g->p.x) * 2 + 1) = c;
+        LLDCOLOR_TYPE c = gdispColor2Native(g->p.color);
+        *((uint8_t *)g->priv + (stream_write_x + stream_write_y * g->g.Width) * 2 + 0) = c >> 8;
+        *((uint8_t *)g->priv + (stream_write_x + stream_write_y * g->g.Width) * 2 + 1) = c;
+        stream_write_x++;
+        if (--stream_write_cx <= 0) {
+            stream_write_x  = g->p.x;
+            stream_write_cx = g->p.cx;
+            stream_write_y++;
+            if (--stream_write_cy <= 0) {
+                stream_write_y  = g->p.y;
+                stream_write_cy = g->p.cy;
+            }
+        }
     }
     LLDSPEC	void gdisp_lld_write_stop(GDisplay *g) {
+        stream_write_x  = 0;
+        stream_write_cx = 0;
+        stream_write_y  = 0;
+        stream_write_cy = 0;
         g->flags |= GDISP_FLG_NEEDFLUSH;
     }
 #endif
 
 #if GDISP_HARDWARE_STREAM_READ
+    static int16_t stream_read_x  = 0;
+    static int16_t stream_read_cx = 0;
+    static int16_t stream_read_y  = 0;
+    static int16_t stream_read_cy = 0;
     LLDSPEC	void gdisp_lld_read_start(GDisplay *g) {
+        stream_read_x  = g->p.x;
+        stream_read_cx = g->p.cx;
+        stream_read_y  = g->p.y;
+        stream_read_cy = g->p.cy;
     }
     LLDSPEC	color_t gdisp_lld_read_color(GDisplay *g) {
-        return (*((uint8_t *)g->priv + (g->p.y * g->g.Width + g->p.x) * 2 + 0) << 8) |
-               (*((uint8_t *)g->priv + (g->p.y * g->g.Width + g->p.x) * 2 + 1));
+        LLDCOLOR_TYPE c = (*((uint8_t *)g->priv + (stream_read_x + stream_read_y * g->g.Width) * 2 + 0) << 8)
+                        | (*((uint8_t *)g->priv + (stream_read_x + stream_read_y * g->g.Width) * 2 + 1));
+        stream_read_x++;
+        if (--stream_read_cx <= 0) {
+            stream_read_x  = g->p.x;
+            stream_read_cx = g->p.cx;
+            stream_read_y++;
+            if (--stream_read_cy <= 0) {
+                stream_read_y  = g->p.y;
+                stream_read_cy = g->p.cy;
+            }
+        }
+        return c;
     }
     LLDSPEC	void gdisp_lld_read_stop(GDisplay *g) {
+        stream_read_x  = 0;
+        stream_read_cx = 0;
+        stream_read_y  = 0;
+        stream_read_cy = 0;
     }
 #endif
 
