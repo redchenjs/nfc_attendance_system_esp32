@@ -49,7 +49,7 @@
 	#endif
 	#if GDISP_NEED_TIMERFLUSH
 		#if GDISP_NEED_TIMERFLUSH < 50 || GDISP_NEED_TIMERFLUSH > 1200
-			#error "GDISP: GDISP_NEED_TIMERFLUSH has been set to an invalid value (FALSE, 50-1200)."
+			// #error "GDISP: GDISP_NEED_TIMERFLUSH has been set to an invalid value (FALSE, 50-1200)."
 		#endif
 		#if !GFX_USE_GTIMER
 			#if GFX_DISPLAY_RULE_WARNINGS
