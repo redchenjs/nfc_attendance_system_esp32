@@ -53,7 +53,7 @@ void nfc_daemon(void *pvParameter)
         );
         // Open NFC device
         while ((pnd = nfc_open(&emdev)) == NULL) {
-            ESP_LOGE(TAG, "nfc device error, reset nfc device now");
+            ESP_LOGE(TAG, "device error");
             pn532_setpin_reset(0);
             vTaskDelay(100 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
