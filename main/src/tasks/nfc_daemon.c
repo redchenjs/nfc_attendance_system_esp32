@@ -55,9 +55,8 @@ void nfc_daemon(void *pvParameter)
         while ((pnd = nfc_open(&emdev)) == NULL) {
             ESP_LOGE(TAG, "device error");
             pn532_setpin_reset(0);
-            vTaskDelay(100 / portTICK_RATE_MS);
+            vTaskDelay(1 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
-            vTaskDelay(100 / portTICK_RATE_MS);
         }
         // Transceive some bytes if target available
         int res = 0;
@@ -98,8 +97,10 @@ void nfc_daemon(void *pvParameter)
 void nfc_set_mode(uint8_t mode)
 {
     if (mode != 0) {
+        pn532_setpin_reset(1);
         xEventGroupSetBits(daemon_event_group, NFC_DAEMON_READY_BIT);
     } else {
         xEventGroupClearBits(daemon_event_group, NFC_DAEMON_READY_BIT);
+        pn532_setpin_reset(0);
     }
 }
