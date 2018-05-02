@@ -1,3 +1,3 @@
 NFC Attendence System
-=======================
-<img src="doc/board.png">
+=====================
+<img src="docs/board.png">
