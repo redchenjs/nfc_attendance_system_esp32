@@ -61,6 +61,7 @@ void wifi0_init(void)
     } else {
         ESP_LOGW(TAG, "no wifi configuration available");
     }
+    esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
     uint8_t wifi0_mac[6] = {0};
     ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi0_mac));
     snprintf(wifi0_mac_str, sizeof(wifi0_mac_str), MACSTR, MAC2STR(wifi0_mac));
