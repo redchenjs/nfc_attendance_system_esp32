@@ -13,11 +13,14 @@
 void pn532_setpin_reset(uint8_t rst)
 {
     gpio_set_level(PN532_RST_PIN, rst);
-    uart_flush_input(1);
+    if (rst != 0) {
+        uart_flush_input(1);
+        vTaskDelay(10 / portTICK_RATE_MS);
+    }
 }
 
 void pn532_init(void)
 {
-    gpio_set_direction(PN532_RST_PIN,  GPIO_MODE_OUTPUT);
-    pn532_setpin_reset(1);
+    gpio_set_direction(PN532_RST_PIN, GPIO_MODE_OUTPUT);
+    pn532_setpin_reset(0);
 }
