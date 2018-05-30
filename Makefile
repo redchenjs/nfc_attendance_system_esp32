@@ -3,7 +3,9 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := nfc_attendence_system
+IDF_PATH ?= ./esp-idf
+
+PROJECT_NAME := nfc_attendance_system
 
 include $(IDF_PATH)/make/project.mk
 
