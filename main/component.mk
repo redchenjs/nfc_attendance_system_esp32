@@ -7,7 +7,7 @@
 # please read the ESP-IDF documents if you need to do this.
 #
 
-COMPONENT_SRCDIRS := src src/tasks src/system src/driver src/device
+COMPONENT_SRCDIRS := src src/user src/system src/driver src/device
 COMPONENT_ADD_INCLUDEDIRS := inc
 COMPONENT_EMBED_TXTFILES := res/cert/cert0.pem
 COMPONENT_EMBED_FILES := res/snd/snd0.mp3 res/snd/snd1.mp3 res/snd/snd2.mp3 res/snd/snd3.mp3 res/snd/snd4.mp3 res/snd/snd5.mp3 res/snd/snd6.mp3

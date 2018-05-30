@@ -14,12 +14,12 @@
 #include "device/wifi.h"
 #include "system/event.h"
 #include "system/firmware.h"
-#include "tasks/gui_daemon.h"
-#include "tasks/nfc_daemon.h"
-#include "tasks/led_daemon.h"
-#include "tasks/audio_daemon.h"
-#include "tasks/http2_daemon.h"
-#include "tasks/http2_client.h"
+#include "user/gui_daemon.h"
+#include "user/nfc_daemon.h"
+#include "user/led_daemon.h"
+#include "user/audio_daemon.h"
+#include "user/http2_daemon.h"
+#include "user/http2_client.h"
 
 #define TAG "token"
 

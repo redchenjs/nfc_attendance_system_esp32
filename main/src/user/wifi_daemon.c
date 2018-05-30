@@ -15,13 +15,13 @@
 #include "esp_system.h"
 
 #include "system/event.h"
-#include "tasks/ota_update.h"
-#include "tasks/gui_daemon.h"
-#include "tasks/led_daemon.h"
-#include "tasks/nfc_daemon.h"
-#include "tasks/ntp_daemon.h"
-#include "tasks/wifi_daemon.h"
-#include "tasks/blufi_daemon.h"
+#include "user/ota_update.h"
+#include "user/gui_daemon.h"
+#include "user/led_daemon.h"
+#include "user/nfc_daemon.h"
+#include "user/ntp_daemon.h"
+#include "user/wifi_daemon.h"
+#include "user/blufi_daemon.h"
 
 #define TAG "wifi"
 

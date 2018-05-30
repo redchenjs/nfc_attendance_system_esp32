@@ -12,12 +12,12 @@
 
 #include "driver/pn532.h"
 #include "system/event.h"
-#include "tasks/gui_daemon.h"
-#include "tasks/ntp_daemon.h"
-#include "tasks/nfc_daemon.h"
-#include "tasks/led_daemon.h"
-#include "tasks/audio_daemon.h"
-#include "tasks/token_verify.h"
+#include "user/gui_daemon.h"
+#include "user/ntp_daemon.h"
+#include "user/nfc_daemon.h"
+#include "user/led_daemon.h"
+#include "user/audio_daemon.h"
+#include "user/token_verify.h"
 
 #define TAG "nfc"
 

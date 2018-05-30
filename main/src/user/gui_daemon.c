@@ -9,7 +9,7 @@
 #include "esp_log.h"
 
 #include "system/event.h"
-#include "tasks/gui_daemon.h"
+#include "user/gui_daemon.h"
 
 #define TAG "gui"
 

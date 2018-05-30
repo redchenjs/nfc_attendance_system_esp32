@@ -18,8 +18,8 @@
 
 #include "device/bt.h"
 #include "system/event.h"
-#include "tasks/led_daemon.h"
-#include "tasks/blufi_security.h"
+#include "user/led_daemon.h"
+#include "user/blufi_security.h"
 
 #define TAG "blufi"
 

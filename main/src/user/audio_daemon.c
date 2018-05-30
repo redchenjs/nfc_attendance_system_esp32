@@ -16,7 +16,7 @@
 #include "driver/i2s.h"
 
 #include "system/event.h"
-#include "tasks/audio_daemon.h"
+#include "user/audio_daemon.h"
 
 #define TAG "audio"
 
