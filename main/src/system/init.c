@@ -21,11 +21,7 @@ void device_init(void)
     wifi0_init();
     uart1_init();
 
-#if defined(CONFIG_ENABLE_BLUFI)
     bt0_init();
-#else
-    bt0_deinit();
-#endif
 
 #if defined(CONFIG_ENABLE_AUDIO)
     i2s0_init();

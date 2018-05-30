@@ -5,8 +5,8 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_AUDIO_DAEMON_H_
-#define INC_TASKS_AUDIO_DAEMON_H_
+#ifndef INC_USER_AUDIO_DAEMON_H_
+#define INC_USER_AUDIO_DAEMON_H_
 
 #include <stdint.h>
 
@@ -35,4 +35,4 @@ extern const uint8_t snd6_mp3_end[] asm("_binary_snd6_mp3_end");
 extern void audio_daemon(void *pvParameter);
 extern void audio_play_file(uint8_t filename_index);
 
-#endif /* INC_TASKS_AUDIO_DAEMON_H_ */
+#endif /* INC_USER_AUDIO_DAEMON_H_ */

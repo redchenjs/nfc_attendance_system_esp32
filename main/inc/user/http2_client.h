@@ -5,8 +5,8 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_HTTP2_CLIENT_H_
-#define INC_TASKS_HTTP2_CLIENT_H_
+#ifndef INC_USER_HTTP2_CLIENT_H_
+#define INC_USER_HTTP2_CLIENT_H_
 
 #include <stdint.h>
 
@@ -53,4 +53,4 @@ extern int http2_client_do_putpost_with_nv(struct http2c_handle *hd, const nghtt
                                            http2c_putpost_data_cb_t send_cb,
                                            http2c_frame_data_recv_cb_t recv_cb);
 
-#endif /* INC_TASKS_HTTP2_CLIENT_H_ */
+#endif /* INC_USER_HTTP2_CLIENT_H_ */

@@ -5,12 +5,12 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_NFC_DAEMON_H_
-#define INC_TASKS_NFC_DAEMON_H_
+#ifndef INC_USER_NFC_DAEMON_H_
+#define INC_USER_NFC_DAEMON_H_
 
 #include <stdint.h>
 
 extern void nfc_daemon(void *pvParameter);
 extern void nfc_set_mode(uint8_t mode);
 
-#endif /* INC_TASKS_NFC_DAEMON_H_ */
+#endif /* INC_USER_NFC_DAEMON_H_ */

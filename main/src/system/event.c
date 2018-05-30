@@ -13,7 +13,7 @@
 #include "freertos/event_groups.h"
 
 #include "system/event.h"
-#include "tasks/wifi_daemon.h"
+#include "user/wifi_daemon.h"
 
 #define TAG "event"
 

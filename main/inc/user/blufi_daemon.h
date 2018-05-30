@@ -5,12 +5,12 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_BLUFI_DAEMON_H_
-#define INC_TASKS_BLUFI_DAEMON_H_
+#ifndef INC_USER_BLUFI_DAEMON_H_
+#define INC_USER_BLUFI_DAEMON_H_
 
 #include <stdint.h>
 
 extern void blufi_daemon(void *pvParameter);
 extern void blufi_response(void);
 
-#endif /* INC_TASKS_BLUFI_DAEMON_H_ */
+#endif /* INC_USER_BLUFI_DAEMON_H_ */

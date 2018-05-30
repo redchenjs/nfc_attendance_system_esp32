@@ -5,8 +5,8 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_GUI_DAEMON_H_
-#define INC_TASKS_GUI_DAEMON_H_
+#ifndef INC_USER_GUI_DAEMON_H_
+#define INC_USER_GUI_DAEMON_H_
 
 #include <stdint.h>
 
@@ -71,4 +71,4 @@ extern const uint8_t ani8_160x80_gif_end[] asm("_binary_ani8_160x80_gif_end");
 extern void gui_daemon(void *pvParameter);
 extern void gui_show_image(uint8_t filename_index);
 
-#endif /* INC_TASKS_GUI_DAEMON_H_ */
+#endif /* INC_USER_GUI_DAEMON_H_ */

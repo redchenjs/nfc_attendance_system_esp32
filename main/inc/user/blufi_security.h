@@ -5,8 +5,8 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_BLUFI_SECURITY_H_
-#define INC_TASKS_BLUFI_SECURITY_H_
+#ifndef INC_USER_BLUFI_SECURITY_H_
+#define INC_USER_BLUFI_SECURITY_H_
 
 #include <stdint.h>
 
@@ -18,4 +18,4 @@ extern uint16_t blufi_security_crc_checksum(uint8_t iv8, uint8_t *data, int len)
 extern int blufi_security_init(void);
 extern void blufi_security_deinit(void);
 
-#endif /* INC_TASKS_BLUFI_SECURITY_H_ */
+#endif /* INC_USER_BLUFI_SECURITY_H_ */

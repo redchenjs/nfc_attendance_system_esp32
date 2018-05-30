@@ -5,10 +5,10 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_NTP_DAEMON_H_
-#define INC_TASKS_NTP_DAEMON_H_
+#ifndef INC_USER_NTP_DAEMON_H_
+#define INC_USER_NTP_DAEMON_H_
 
 extern void ntp_daemon(void *pvParameter);
 extern void ntp_sync_time(void);
 
-#endif /* INC_TASKS_NTP_DAEMON_H_ */
+#endif /* INC_USER_NTP_DAEMON_H_ */

@@ -7,7 +7,7 @@
 
 #include "system/event.h"
 #include "system/init.h"
-#include "system/task.h"
+#include "system/user.h"
 
 int app_main(void)
 {
@@ -16,7 +16,7 @@ int app_main(void)
     device_init();      // Onchip Module
     driver_init();      // Other Module
 
-    task_init();        // Main Task
+    user_init();        // User Task
     
     return 0;
 }

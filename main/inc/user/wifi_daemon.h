@@ -5,14 +5,15 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_WIFI_DAEMON_H_
-#define INC_TASKS_WIFI_DAEMON_H_
+#ifndef INC_USER_WIFI_DAEMON_H_
+#define INC_USER_WIFI_DAEMON_H_
 
 #include <stdint.h>
 
+extern void wifi_daemon(void *pvParameter);
 extern void wifi_daemon(void *pvParameter);
 extern void wifi_on_disconnected(void);
 extern void wifi_on_got_ip(void);
 extern void wifi_on_start(void);
 
-#endif /* INC_TASKS_WIFI_DAEMON_H_ */
+#endif /* INC_USER_WIFI_DAEMON_H_ */

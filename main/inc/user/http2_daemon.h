@@ -5,9 +5,9 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_TASKS_HTTP2_DAEMON_H_
-#define INC_TASKS_HTTP2_DAEMON_H_
+#ifndef INC_USER_HTTP2_DAEMON_H_
+#define INC_USER_HTTP2_DAEMON_H_
 
 extern void http2_daemon(void *pvParameter);
 
-#endif /* INC_TASKS_HTTP2_DAEMON_H_ */
+#endif /* INC_USER_HTTP2_DAEMON_H_ */
