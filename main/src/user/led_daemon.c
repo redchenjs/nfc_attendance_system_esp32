@@ -9,7 +9,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
-#include "driver/led.h"
+#include "driver/gpio.h"
 
 static const uint16_t led_mode_table[][2] = {/* { delay, count} */
                                                 {     0,     2},   // 0, Keep off
@@ -31,12 +31,14 @@ void led_daemon(void *pvParameter)
 {
     uint16_t i = 0;
 
+    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
+
     while (1) {
         portTickType xLastWakeTime = xTaskGetTickCount();
         if (i++ % led_mode_table[led_mode_index][1]) {
-            led_off();
+            gpio_set_level(CONFIG_LED_PIN, 0);
         } else {
-            led_on();
+            gpio_set_level(CONFIG_LED_PIN, 1);
         }
         vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
