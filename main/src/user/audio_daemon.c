@@ -27,7 +27,8 @@ static const uint8_t *mp3_file_ptr[][2] = {
                                             {snd3_mp3_ptr, snd3_mp3_end}, // "连接失败"
                                             {snd4_mp3_ptr, snd4_mp3_end}, // "连接超时"
                                             {snd5_mp3_ptr, snd5_mp3_end}, // "网络故障"
-                                            {snd6_mp3_ptr, snd6_mp3_end}  // "系统故障"
+                                            {snd6_mp3_ptr, snd6_mp3_end}, // "系统故障"
+                                            {snd7_mp3_ptr, snd7_mp3_end}  // "开始配网"
                                         };
 static uint8_t mp3_file_index = 0;
 

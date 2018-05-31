@@ -31,6 +31,9 @@ extern const uint8_t snd5_mp3_end[] asm("_binary_snd5_mp3_end");
 // snd6.mp3
 extern const uint8_t snd6_mp3_ptr[] asm("_binary_snd6_mp3_start");
 extern const uint8_t snd6_mp3_end[] asm("_binary_snd6_mp3_end");
+// snd7.mp3
+extern const uint8_t snd7_mp3_ptr[] asm("_binary_snd7_mp3_start");
+extern const uint8_t snd7_mp3_end[] asm("_binary_snd7_mp3_end");
 
 extern void audio_daemon(void *pvParameter);
 extern void audio_play_file(uint8_t filename_index);
