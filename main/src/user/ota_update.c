@@ -101,9 +101,10 @@ int ota_update_prepare_data(struct http2c_handle *handle, char *buf, size_t leng
     return strlen(buf);
 }
 
-void ota_update(void)
+void ota_check_update(void)
 {
 #if defined(CONFIG_ENABLE_OTA)
+    ESP_LOGI(TAG, "check firmware update");
     EventBits_t uxBits = xEventGroupSync(
         daemon_event_group,
         HTTP2_DAEMON_OTA_READY_BIT,
