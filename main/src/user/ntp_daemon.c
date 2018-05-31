@@ -11,6 +11,7 @@
 #include "system/event.h"
 #include "user/gui_daemon.h"
 #include "user/led_daemon.h"
+#include "user/ota_update.h"
 
 #define TAG "ntp"
 
@@ -73,10 +74,7 @@ void ntp_daemon(void *pvParameter)
         time(&now);
         localtime_r(&now, &timeinfo);
         if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
-            ESP_LOGW(TAG, "scheduled reboot...");
-            gui_show_image(4);
-            vTaskDelay(2000 / portTICK_RATE_MS);
-            esp_restart();
+            ota_check_update();
         }
     }
 }
@@ -85,10 +83,12 @@ void ntp_sync_time(void)
 {
     EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
     if ((uxBits & NTP_DAEMON_FINISH_BIT) == 0) {
-        xEventGroupSync(
+        xEventGroupSetBits(daemon_event_group, NTP_DAEMON_READY_BIT);
+        xEventGroupWaitBits(
             daemon_event_group,
-            NTP_DAEMON_READY_BIT,
             NTP_DAEMON_FINISH_BIT,
+            pdFALSE,
+            pdFALSE,
             portMAX_DELAY
         );
     }
