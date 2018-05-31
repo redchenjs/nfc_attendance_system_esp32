@@ -6,13 +6,11 @@
  */
 
 #include "device/nvs.h"
-#include "device/bt.h"
 #include "device/spi.h"
 #include "device/i2s.h"
 #include "device/wifi.h"
 #include "device/uart.h"
 
-#include "driver/led.h"
 #include "driver/pn532.h"
 
 void device_init(void)
@@ -20,8 +18,6 @@ void device_init(void)
     nvs0_init();
     wifi0_init();
     uart1_init();
-
-    bt0_init();
 
 #if defined(CONFIG_ENABLE_AUDIO)
     i2s0_init();
@@ -34,8 +30,5 @@ void device_init(void)
 
 void driver_init(void)
 {
-#if defined(CONFIG_ENABLE_LED)
-    led_init();
-#endif
     pn532_init();
 }
