@@ -20,6 +20,26 @@ config WIFI_HOSTNAME
     help
         WiFi hostname for the device to use.
 
+config ENABLE_SMART_CONFIG
+    bool "Enable Smart Config"
+    default y
+    help
+        Select this to enable wifi smartconfig.
+
+config STORE_WIFI_TO_NVS
+    bool "Store WiFi Configuration to NVS Flash"
+    default y
+    depends on ENABLE_SMART_CONFIG
+    help
+        Select this to store wifi configuration to nvs flash.
+
+config SC_KEY_PIN
+    int "SmartConfig Key Pin"
+    default 0
+    depends on ENABLE_SMART_CONFIG
+    help
+        Smart Config Key Pin.
+
 endmenu
 
 menu "Server Configuration"
@@ -46,11 +66,11 @@ endmenu
 
 menu "NFC Configuration"
 
-config NFC_RST_PIN
-    int "NFC Reset Pin"
+config PN532_RST_PIN
+    int "PN532 Reset Pin"
     default 26
     help
-        NFC Reset Pin.
+        PN532 Reset Pin.
 
 config UART_TXD_PIN
     int "UART TXD Pin"
@@ -77,27 +97,6 @@ config ENABLE_OTA
     default y
     help
         Select this to enable ota update.
-
-menuconfig ENABLE_BLUFI
-    bool "Enable BluFi"
-    default y
-    select BT_ENABLED
-    help
-        Select this to enable blufi.
-
-config BLE_DEVICE_NAME
-    string "BLE Device Name"
-    default WIFI_HOSTNAME
-    depends on ENABLE_BLUFI
-    help
-        BLE name for the device to use.
-
-config STORE_WIFI_TO_NVS
-    bool "Store WiFi Configuration to NVS Flash"
-    default y
-    depends on ENABLE_BLUFI
-    help
-        Select this to store wifi configuration to nvs flash.
 
 menuconfig ENABLE_GUI
     bool "Enable GUI"
