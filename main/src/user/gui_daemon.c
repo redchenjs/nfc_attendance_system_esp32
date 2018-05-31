@@ -45,7 +45,7 @@ void gui_daemon(void *pvParameter)
     while (1) {
         gdispImage gfx_image;
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
-            gdispImageSetBgColor(&gfx_image, White);
+            gdispImageSetBgColor(&gfx_image, Black);
             while (1) {
                 if (xEventGroupGetBits(daemon_event_group) & GUI_DAEMON_RELOAD_BIT) {
                     xEventGroupClearBits(daemon_event_group, GUI_DAEMON_RELOAD_BIT);
