@@ -58,6 +58,14 @@ void smart_config_callback(smartconfig_status_t status, void *pdata)
             break;
         case SC_STATUS_LINK_OVER:
             ESP_LOGI(TAG, "link over");
+            if (pdata != NULL) {
+                uint8_t phone_ip[4] = {0};
+                memcpy(phone_ip, (uint8_t *)pdata, 4);
+                ESP_LOGI(TAG, "phone ip is %d.%d.%d.%d", phone_ip[0], phone_ip[1], phone_ip[2], phone_ip[3]);
+            }
+            esp_smartconfig_stop();
+            xEventGroupClearBits(system_event_group, WIFI_CONFIG_BIT);
+            xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
             break;
         default:
             break;
