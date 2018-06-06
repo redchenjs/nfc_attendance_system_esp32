@@ -29,7 +29,7 @@ static void key_smartconfig_handle(void)
 
     nfc_set_mode(0);
     led_set_mode(7);
-    gui_show_image(0);
+    gui_show_image(7);
     audio_play_file(7);
 
     ESP_ERROR_CHECK(esp_smartconfig_set_type(SC_TYPE_ESPTOUCH));
