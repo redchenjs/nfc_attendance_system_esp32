@@ -39,7 +39,7 @@ int token_verify_parse_data(struct http2c_handle *handle, const char *data, size
                 audio_play_file(1);
             } else {
                 ESP_LOGE(TAG, "authentication failed");
-                gui_show_image(7);
+                gui_show_image(6);
                 audio_play_file(2);
             }
         } else {
