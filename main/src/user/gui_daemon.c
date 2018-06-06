@@ -22,7 +22,7 @@ static const uint8_t *img_file_ptr[][2] = {
                                             {ani4_96x64_gif_ptr, ani4_96x64_gif_end}, // "PowerOff"
                                             {ani5_96x64_gif_ptr, ani5_96x64_gif_end}, // "Clock"
                                             {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
-                                            {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Fail"
+                                            {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Config"
                                             {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
 #elif defined(CONFIG_SCREEN_PANEL_ST7735)
                                             {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
@@ -32,7 +32,7 @@ static const uint8_t *img_file_ptr[][2] = {
                                             {ani4_160x80_gif_ptr, ani4_160x80_gif_end}, // "PowerOff"
                                             {ani5_160x80_gif_ptr, ani5_160x80_gif_end}, // "Clock"
                                             {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
-                                            {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Fail"
+                                            {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
                                             {ani8_160x80_gif_ptr, ani8_160x80_gif_end}  // "Updating"
 #endif
                                         };
