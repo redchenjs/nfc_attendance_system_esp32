@@ -34,12 +34,6 @@ static esp_err_t system_event_handler(void *ctx, system_event_t *event)
             break;
         case SYSTEM_EVENT_STA_GOT_IP: {
             xEventGroupSetBits(system_event_group, WIFI_READY_BIT);
-            EventBits_t uxBits = xEventGroupGetBits(system_event_group);
-            if (uxBits & WIFI_CONFIG_BIT) {
-                esp_smartconfig_stop();
-                xEventGroupClearBits(system_event_group, WIFI_CONFIG_BIT);
-                xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
-            }
             ntp_sync_time();
             ota_check_update();
             gui_show_image(3);
@@ -50,14 +44,14 @@ static esp_err_t system_event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_CONNECTED:
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED: {
-            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
             EventBits_t uxBits = xEventGroupGetBits(system_event_group);
-            if (!(uxBits & WIFI_CONFIG_BIT)) {
+            if (!(uxBits & WIFI_CONFIG_BIT) && (uxBits & WIFI_READY_BIT)) {
                 nfc_set_mode(0);
                 led_set_mode(7);
                 gui_show_image(0);
             }
             ESP_ERROR_CHECK(esp_wifi_connect());
+            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
             break;
         }
         case SYSTEM_EVENT_SCAN_DONE:
