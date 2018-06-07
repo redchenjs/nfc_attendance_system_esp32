@@ -25,6 +25,14 @@
 
 static void key_smartconfig_handle(void)
 {
+    EventBits_t uxBits = xEventGroupGetBits(system_event_group);
+    if (uxBits & INPUT_READY_BIT) {
+        ESP_LOGI(TAG, "smartconfig key pressed");
+        xEventGroupClearBits(daemon_event_group, KEY_DAEMON_READY_BIT);
+    } else {
+        return;
+    }
+
     xEventGroupSetBits(system_event_group, WIFI_CONFIG_BIT);
 
     nfc_set_mode(0);
@@ -43,6 +51,7 @@ void key_daemon(void *pvParameter)
     gpio_set_direction(CONFIG_SC_KEY_PIN, GPIO_MODE_INPUT);
     gpio_set_pull_mode(CONFIG_SC_KEY_PIN, GPIO_PULLUP_ONLY);
 
+    xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
     xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
 
     while (1) {
@@ -60,8 +69,6 @@ void key_daemon(void *pvParameter)
             if (count[0]++ == 1) {
                 count[0] = 0;
                 key_smartconfig_handle();
-                ESP_LOGI(TAG, "smartconfig key pressed");
-                xEventGroupClearBits(daemon_event_group, KEY_DAEMON_READY_BIT);
             }
         }
 
