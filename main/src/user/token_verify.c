@@ -71,6 +71,7 @@ int token_verify_prepare_data(struct http2c_handle *handle, char *buf, size_t le
 
 void token_verify(char *token)
 {
+    xEventGroupClearBits(system_event_group, INPUT_READY_BIT);
     data_ptr = token;
     EventBits_t uxBits = xEventGroupSync(
         daemon_event_group,
@@ -81,4 +82,5 @@ void token_verify(char *token)
     if ((uxBits & HTTP2_DAEMON_TOKEN_FINISH_BIT) == 0) {
         xEventGroupClearBits(daemon_event_group, HTTP2_DAEMON_TOKEN_READY_BIT);
     }
+    xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
 }
