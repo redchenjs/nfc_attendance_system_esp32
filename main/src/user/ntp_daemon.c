@@ -81,6 +81,7 @@ void ntp_daemon(void *pvParameter)
 
 void ntp_sync_time(void)
 {
+    xEventGroupClearBits(system_event_group, INPUT_READY_BIT);
     EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
     if ((uxBits & NTP_DAEMON_FINISH_BIT) == 0) {
         xEventGroupSetBits(daemon_event_group, NTP_DAEMON_READY_BIT);
@@ -92,4 +93,5 @@ void ntp_sync_time(void)
             portMAX_DELAY
         );
     }
+    xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
 }
