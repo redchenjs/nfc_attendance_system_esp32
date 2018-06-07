@@ -22,7 +22,7 @@ void user_init(void)
     xTaskCreate(ntp_daemon, "ntp_daemon", 2048, NULL, 5, NULL);
 
 #if defined(CONFIG_ENABLE_SMART_CONFIG)
-    xTaskCreate(key_daemon, "key_daemon", 1024, NULL, 5, NULL);
+    xTaskCreate(key_daemon, "key_daemon", 2048, NULL, 5, NULL);
 #endif
 
 #if defined(CONFIG_ENABLE_LED)
