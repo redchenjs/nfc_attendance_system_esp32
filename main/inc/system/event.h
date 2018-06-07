@@ -11,12 +11,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 
-enum system_event_group_bits {
+typedef enum system_event_group_bits {
     WIFI_READY_BIT  = BIT0,
-    WIFI_CONFIG_BIT = BIT1
-};
+    WIFI_CONFIG_BIT = BIT1,
+    INPUT_READY_BIT = BIT2
+} system_event_group_bits_t;
 
-enum daemon_event_group_bits {
+typedef enum daemon_event_group_bits {
     NFC_DAEMON_READY_BIT          = BIT0,
     KEY_DAEMON_READY_BIT          = BIT1,
     GUI_DAEMON_RELOAD_BIT         = BIT2,
@@ -33,7 +34,7 @@ enum daemon_event_group_bits {
     HTTP2_DAEMON_TOKEN_READY_BIT  = BIT10,
     HTTP2_DAEMON_TOKEN_FINISH_BIT = BIT11,
     HTTP2_DAEMON_TOKEN_FAILED_BIT = BIT12
-};
+} daemon_event_group_bits_t;
 
 #include <stdint.h>
 
