@@ -44,21 +44,34 @@ endmenu
 
 menu "Server Configuration"
 
-config SERVER_URI
-    string "Server URI"
-    default "https://example.com"
+config SERVER_URL
+    string "Server URL"
+    default "example.com"
     help
-        Server to connect.
+        Server URL.
 
-config SERVER_POST_PATH
-    string "Server Post Path"
-    default "/nas/"
+choice TRANSFER_PROTOCOL
+    prompt "Transfer Protocol"
+    default TRANSFER_PROTOCOL_HTTPS
     help
-        Server post path.
+        Select to use which transfer protocol.
+
+config TRANSFER_PROTOCOL_HTTP
+    bool "http"
+    help
+        Select this to use http.
+
+config TRANSFER_PROTOCOL_HTTPS
+    bool "https"
+    help
+        Select this to use https.
+
+endchoice
 
 config ENABLE_SERVER_CERT_VERIFY
     bool "Verify Server SSL Certificate"
     default "y"
+    depends on TRANSFER_PROTOCOL_HTTPS
     help
         Select this to enable server ssl certificate verification.
 
