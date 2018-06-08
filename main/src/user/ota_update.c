@@ -125,7 +125,7 @@ void ota_update(void)
         daemon_event_group,
         HTTP_DAEMON_OTA_READY_BIT,
         HTTP_DAEMON_OTA_FINISH_BIT,
-        300000 / portTICK_RATE_MS
+        60000 / portTICK_RATE_MS
     );
     if ((uxBits & HTTP_DAEMON_OTA_FINISH_BIT) == 0) {
         xEventGroupClearBits(daemon_event_group, HTTP_DAEMON_OTA_READY_BIT);
