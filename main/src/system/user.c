@@ -37,5 +37,5 @@ void user_init(void)
     xTaskCreate(audio_daemon, "audio_daemon", 8448, NULL, 7, NULL);
 #endif
 
-    xTaskCreate(http_daemon, "http_daemon", 19200, NULL, 7, NULL);
+    xTaskCreate(http_daemon, "http_daemon", 5120, NULL, 7, NULL);
 }
