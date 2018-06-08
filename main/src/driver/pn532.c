@@ -8,7 +8,7 @@
 #include "driver/gpio.h"
 #include "driver/uart.h"
 
-#define PN532_RST_PIN CONFIG_PN532_RST_PIN
+#define PN532_RST_PIN   CONFIG_PN532_RST_PIN
 
 void pn532_setpin_reset(uint8_t rst)
 {
