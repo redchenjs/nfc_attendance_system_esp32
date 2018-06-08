@@ -13,29 +13,29 @@
 
 #define TAG "gui"
 
-static const uint8_t *img_file_ptr[][2] = {
+static const char *img_file_ptr[][2] = {
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
-                                            {ani0_96x64_gif_ptr, ani0_96x64_gif_end}, // "WiFi"
-                                            {ani1_96x64_gif_ptr, ani1_96x64_gif_end}, // "Loading"
-                                            {ani2_96x64_gif_ptr, ani2_96x64_gif_end}, // "Success"
-                                            {ani3_96x64_gif_ptr, ani3_96x64_gif_end}, // "NFC"
-                                            {ani4_96x64_gif_ptr, ani4_96x64_gif_end}, // "PowerOff"
-                                            {ani5_96x64_gif_ptr, ani5_96x64_gif_end}, // "Clock"
-                                            {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
-                                            {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Config"
-                                            {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
+    {ani0_96x64_gif_ptr, ani0_96x64_gif_end}, // "WiFi"
+    {ani1_96x64_gif_ptr, ani1_96x64_gif_end}, // "Loading"
+    {ani2_96x64_gif_ptr, ani2_96x64_gif_end}, // "Success"
+    {ani3_96x64_gif_ptr, ani3_96x64_gif_end}, // "NFC"
+    {ani4_96x64_gif_ptr, ani4_96x64_gif_end}, // "PowerOff"
+    {ani5_96x64_gif_ptr, ani5_96x64_gif_end}, // "Clock"
+    {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
+    {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Config"
+    {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
 #elif defined(CONFIG_SCREEN_PANEL_ST7735)
-                                            {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
-                                            {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
-                                            {ani2_160x80_gif_ptr, ani2_160x80_gif_end}, // "Success"
-                                            {ani3_160x80_gif_ptr, ani3_160x80_gif_end}, // "NFC"
-                                            {ani4_160x80_gif_ptr, ani4_160x80_gif_end}, // "PowerOff"
-                                            {ani5_160x80_gif_ptr, ani5_160x80_gif_end}, // "Clock"
-                                            {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
-                                            {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
-                                            {ani8_160x80_gif_ptr, ani8_160x80_gif_end}  // "Updating"
+    {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
+    {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
+    {ani2_160x80_gif_ptr, ani2_160x80_gif_end}, // "Success"
+    {ani3_160x80_gif_ptr, ani3_160x80_gif_end}, // "NFC"
+    {ani4_160x80_gif_ptr, ani4_160x80_gif_end}, // "PowerOff"
+    {ani5_160x80_gif_ptr, ani5_160x80_gif_end}, // "Clock"
+    {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
+    {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
+    {ani8_160x80_gif_ptr, ani8_160x80_gif_end}  // "Updating"
 #endif
-                                        };
+};
 static uint8_t img_file_index = 0;
 
 void gui_daemon(void *pvParameter)
