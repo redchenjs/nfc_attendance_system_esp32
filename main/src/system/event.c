@@ -35,7 +35,7 @@ static esp_err_t system_event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_GOT_IP: {
             xEventGroupSetBits(system_event_group, WIFI_READY_BIT);
             ntp_sync_time();
-            ota_check_update();
+            ota_update();
             gui_show_image(3);
             led_set_mode(1);
             nfc_set_mode(1);
