@@ -5,12 +5,12 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef DEVICE_UART_C_
-#define DEVICE_UART_C_
+#ifndef DEVICE_UART_H_
+#define DEVICE_UART_H_
 
-#define LOG_UART_NUM UART_NUM_0
-#define EX_UART_NUM  UART_NUM_1
+#define LOG_UART_NUM    UART_NUM_0
+#define NFC_UART_NUM    UART_NUM_1
 
 extern void uart1_init(void);
 
-#endif /* DEVICE_UART_C_ */
+#endif /* DEVICE_UART_H_ */

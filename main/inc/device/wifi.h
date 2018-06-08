@@ -5,11 +5,11 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef DEVICE_WIFI_C_
-#define DEVICE_WIFI_C_
+#ifndef DEVICE_WIFI_H_
+#define DEVICE_WIFI_H_
 
-extern char wifi0_mac_str[13];
+extern char wifi_mac_str[13];
 
-extern void wifi0_init(void);
+extern void wifi_init(void);
 
-#endif /* DEVICE_WIFI_C_ */
+#endif /* DEVICE_WIFI_H_ */
