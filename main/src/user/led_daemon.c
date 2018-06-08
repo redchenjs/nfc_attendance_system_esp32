@@ -11,18 +11,19 @@
 
 #include "driver/gpio.h"
 
-static const uint16_t led_mode_table[][2] = {/* { delay, count} */
-                                                {     0,     2},   // 0, Keep off
-                                                {  1000,     2},   // 1,
-                                                {   500,     2},   // 2,
-                                                {   250,     2},   // 3,
-                                                {   100,     2},   // 4,
-                                                {    25,     2},   // 5,
-                                                {    25,    25},   // 6,
-                                                {    25,    50},   // 7,
-                                                {    25,   100},   // 8,
-                                                {    25,     0}    // 9, Keep on
-                                            };
+static const uint16_t led_mode_table[][2] = {
+/*  { delay, count}  */
+    {     0,     2},   // 0, Keep off
+    {  1000,     2},   // 1,
+    {   500,     2},   // 2,
+    {   250,     2},   // 3,
+    {   100,     2},   // 4,
+    {    25,     2},   // 5,
+    {    25,    25},   // 6,
+    {    25,    50},   // 7,
+    {    25,   100},   // 8,
+    {    25,     0}    // 9, Keep on
+};
 static uint8_t led_mode_index = 7;
 
 #define TAG "led"
