@@ -77,7 +77,7 @@ config ENABLE_SERVER_CERT_VERIFY
 
 endmenu
 
-menu "NFC Configuration"
+menu "Pin Configuration"
 
 config PN532_RST_PIN
     int "PN532 Reset Pin"
@@ -85,17 +85,17 @@ config PN532_RST_PIN
     help
         PN532 Reset Pin.
 
-config UART_TXD_PIN
-    int "UART TXD Pin"
-    default 16
-    help
-        UART TXD Pin.
-
-config UART_RXD_PIN
-    int "UART RXD Pin"
+config PN532_TXD_PIN
+    int "PN532 TXD Pin"
     default 17
     help
-        UART RXD Pin.
+        PN532 TXD Pin.
+
+config PN532_RXD_PIN
+    int "PN532 RXD Pin"
+    default 16
+    help
+        PN532 RXD Pin.
 
 endmenu
 
