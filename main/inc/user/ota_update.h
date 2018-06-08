@@ -8,11 +8,10 @@
 #ifndef INC_USER_OTA_UPDATE_H_
 #define INC_USER_OTA_UPDATE_H_
 
-#include "user/http2_client.h"
+#include "esp_http_client.h"
 
-extern int ota_update_parse_data(struct http2c_handle *handle, const char *data, size_t len, int flags);
-extern int ota_update_prepare_data(struct http2c_handle *handle, char *buf, size_t length, uint32_t *data_flags);
-
-extern void ota_check_update(void);
+extern esp_err_t ota_update_event_handler(esp_http_client_event_t *evt);
+extern void ota_update_prepare_data(char *buf, int len);
+extern void ota_update(void);
 
 #endif /* INC_USER_OTA_UPDATE_H_ */
