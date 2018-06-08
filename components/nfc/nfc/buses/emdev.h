@@ -9,6 +9,7 @@
 #define LIBNFC_EMDEV_H__
 
 #include "nfc-internal.h"
+
 extern nfc_emdev emdev;
 
 extern void emdev_init(void);

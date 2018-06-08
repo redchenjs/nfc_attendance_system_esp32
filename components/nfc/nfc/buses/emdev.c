@@ -13,14 +13,14 @@
 
 nfc_emdev emdev;
 
-#define TAG "libnfc"
+#define TAG "libnfc-emdev"
 
 void mopen(void) {}
 
 int mreceive(uint8_t *pbtRx, const size_t szRx, int timeout)
 {
     int err;
-    err = uart_read_bytes(EX_UART_NUM, pbtRx, szRx, timeout / portTICK_RATE_MS);
+    err = uart_read_bytes(NFC_UART_NUM, pbtRx, szRx, timeout / portTICK_RATE_MS);
     if (err == -1) {
         ESP_LOGE(TAG, "uart receive timeout\n");
         return -1;
@@ -30,7 +30,7 @@ int mreceive(uint8_t *pbtRx, const size_t szRx, int timeout)
 
 int msend(const uint8_t *pbtTx, const size_t szTx, int timeout)
 {
-    uart_write_bytes(EX_UART_NUM, (const char*)pbtTx, szTx);
+    uart_write_bytes(NFC_UART_NUM, (const char*)pbtTx, szTx);
     return 0;
 }
 
