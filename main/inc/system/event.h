@@ -18,22 +18,22 @@ typedef enum system_event_group_bits {
 } system_event_group_bits_t;
 
 typedef enum daemon_event_group_bits {
-    NFC_DAEMON_READY_BIT          = BIT0,
-    KEY_DAEMON_READY_BIT          = BIT1,
-    GUI_DAEMON_RELOAD_BIT         = BIT2,
-    AUDIO_DAEMON_READY_BIT        = BIT3,
+    NFC_DAEMON_READY_BIT         = BIT0,
+    KEY_DAEMON_READY_BIT         = BIT1,
+    GUI_DAEMON_RELOAD_BIT        = BIT2,
+    AUDIO_DAEMON_READY_BIT       = BIT3,
 
-    NTP_DAEMON_READY_BIT          = BIT4,
-    NTP_DAEMON_FINISH_BIT         = BIT5,
+    NTP_DAEMON_READY_BIT         = BIT4,
+    NTP_DAEMON_FINISH_BIT        = BIT5,
 
-    HTTP2_DAEMON_OTA_RUN_BIT      = BIT6,
-    HTTP2_DAEMON_OTA_READY_BIT    = BIT7,
-    HTTP2_DAEMON_OTA_FINISH_BIT   = BIT8,
-    HTTP2_DAEMON_OTA_FAILED_BIT   = BIT9,
+    HTTP_DAEMON_OTA_RUN_BIT      = BIT6,
+    HTTP_DAEMON_OTA_READY_BIT    = BIT7,
+    HTTP_DAEMON_OTA_FINISH_BIT   = BIT8,
+    HTTP_DAEMON_OTA_FAILED_BIT   = BIT9,
 
-    HTTP2_DAEMON_TOKEN_READY_BIT  = BIT10,
-    HTTP2_DAEMON_TOKEN_FINISH_BIT = BIT11,
-    HTTP2_DAEMON_TOKEN_FAILED_BIT = BIT12
+    HTTP_DAEMON_TOKEN_READY_BIT  = BIT10,
+    HTTP_DAEMON_TOKEN_FINISH_BIT = BIT11,
+    HTTP_DAEMON_TOKEN_FAILED_BIT = BIT12
 } daemon_event_group_bits_t;
 
 #include <stdint.h>
