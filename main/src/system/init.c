@@ -15,8 +15,10 @@
 
 void device_init(void)
 {
-    nvs0_init();
-    wifi0_init();
+    nvs_init();
+
+    wifi_init();
+
     uart1_init();
 
 #if defined(CONFIG_ENABLE_AUDIO)
