@@ -74,7 +74,7 @@ void ntp_daemon(void *pvParameter)
         time(&now);
         localtime_r(&now, &timeinfo);
         if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
-            ota_check_update();
+            ota_update();
         }
     }
 }
