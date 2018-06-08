@@ -8,9 +8,9 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
-#define TAG "nvs-0"
+#define TAG "nvs"
 
-void nvs0_init(void)
+void nvs_init(void)
 {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES) {

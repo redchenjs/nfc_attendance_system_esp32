@@ -10,11 +10,11 @@
 #include "esp_log.h"
 #include "esp_wifi.h"
 
-char wifi0_mac_str[18] = {0};
+char wifi_mac_str[18] = {0};
 
-#define TAG "wifi-0"
+#define TAG "wifi"
 
-void wifi0_init(void)
+void wifi_init(void)
 {
     wifi_config_t wifi_config = {
         .sta = {
@@ -62,7 +62,7 @@ void wifi0_init(void)
         ESP_LOGW(TAG, "no wifi configuration available");
     }
     esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
-    uint8_t wifi0_mac[6] = {0};
-    ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi0_mac));
-    snprintf(wifi0_mac_str, sizeof(wifi0_mac_str), MACSTR, MAC2STR(wifi0_mac));
+    uint8_t wifi_mac[6] = {0};
+    ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi_mac));
+    snprintf(wifi_mac_str, sizeof(wifi_mac_str), MACSTR, MAC2STR(wifi_mac));
 }
