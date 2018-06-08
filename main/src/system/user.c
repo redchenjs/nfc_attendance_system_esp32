@@ -14,7 +14,7 @@
 #include "user/led_daemon.h"
 #include "user/nfc_daemon.h"
 #include "user/audio_daemon.h"
-#include "user/http2_daemon.h"
+#include "user/http_daemon.h"
 
 void user_init(void)
 {
@@ -37,5 +37,5 @@ void user_init(void)
     xTaskCreate(audio_daemon, "audio_daemon", 8448, NULL, 7, NULL);
 #endif
 
-    xTaskCreate(http2_daemon, "http2_daemon", 19200, NULL, 7, NULL);
+    xTaskCreate(http_daemon, "http_daemon", 19200, NULL, 7, NULL);
 }
