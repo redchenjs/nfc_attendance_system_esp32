@@ -1,5 +1,5 @@
 /*
- * token_verify.c
+ * token.c
  *
  *  Created on: 2018-04-06 15:09
  *      Author: Jack Chen <redchenjs@live.com>
@@ -12,19 +12,19 @@
 #include "esp_ota_ops.h"
 #include "esp_http_client.h"
 
+#include "user/gui.h"
+#include "user/nfc.h"
+#include "user/led.h"
+#include "user/audio.h"
 #include "device/wifi.h"
 #include "system/event.h"
 #include "system/firmware.h"
-#include "user/gui_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/led_daemon.h"
-#include "user/audio_daemon.h"
 
 #define TAG "token"
 
 static char *data_ptr = NULL;
 
-esp_err_t token_verify_event_handler(esp_http_client_event_t *evt)
+esp_err_t token_event_handler(esp_http_client_event_t *evt)
 {
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
@@ -72,7 +72,7 @@ esp_err_t token_verify_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-void token_verify_prepare_data(char *buf, int len)
+void token_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();

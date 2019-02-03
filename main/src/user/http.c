@@ -1,5 +1,5 @@
 /*
- * http_daemon.c
+ * http.c
  *
  *  Created on: 2018-02-17 18:51
  *      Author: Jack Chen <redchenjs@live.com>
@@ -10,16 +10,16 @@
 #include "esp_log.h"
 #include "esp_http_client.h"
 
+#include "user/gui.h"
+#include "user/nfc.h"
+#include "user/led.h"
+#include "user/ota.h"
+#include "user/http.h"
+#include "user/token.h"
+#include "user/audio.h"
 #include "device/wifi.h"
 #include "system/event.h"
 #include "system/firmware.h"
-#include "user/gui_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/led_daemon.h"
-#include "user/ota_update.h"
-#include "user/token_verify.h"
-#include "user/audio_daemon.h"
-#include "user/http_daemon.h"
 
 #define TAG "http"
 
@@ -57,15 +57,15 @@ void http_daemon(void *pvParameter)
 #endif
 
         if (uxBits & HTTP_DAEMON_TOKEN_READY_BIT) {
-            config.event_handler = token_verify_event_handler;
-            token_verify_prepare_data(post_data, sizeof(post_data));
+            config.event_handler = token_event_handler;
+            token_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 daemon_event_group,
                 HTTP_DAEMON_TOKEN_FAILED_BIT | HTTP_DAEMON_TOKEN_FINISH_BIT
             );
         } else {
-            config.event_handler = ota_update_event_handler;
-            ota_update_prepare_data(post_data, sizeof(post_data));
+            config.event_handler = ota_event_handler;
+            ota_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 daemon_event_group,
                 HTTP_DAEMON_OTA_FAILED_BIT | HTTP_DAEMON_OTA_FINISH_BIT | HTTP_DAEMON_OTA_RUN_BIT

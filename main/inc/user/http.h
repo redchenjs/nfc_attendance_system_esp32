@@ -1,12 +1,12 @@
 /*
- * http_daemon.h
+ * http.h
  *
  *  Created on: 2018-02-17 18:51
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_USER_HTTP_DAEMON_H_
-#define INC_USER_HTTP_DAEMON_H_
+#ifndef INC_USER_HTTP_H_
+#define INC_USER_HTTP_H_
 
 #include <stdint.h>
 
@@ -16,4 +16,4 @@ extern const char cert0_pem_end[] asm("_binary_cert0_pem_end");
 
 extern void http_daemon(void *pvParameter);
 
-#endif /* INC_USER_HTTP_DAEMON_H_ */
+#endif /* INC_USER_HTTP_H_ */

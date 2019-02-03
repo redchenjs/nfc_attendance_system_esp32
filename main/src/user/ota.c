@@ -1,5 +1,5 @@
 /*
- * ota_update.c
+ * ota.c
  *
  *  Created on: 2018-04-06 15:12
  *      Author: Jack Chen <redchenjs@live.com>
@@ -12,17 +12,17 @@
 #include "esp_ota_ops.h"
 #include "esp_http_client.h"
 
+#include "user/gui.h"
+#include "user/nfc.h"
+#include "user/led.h"
+#include "user/audio.h"
 #include "device/wifi.h"
 #include "system/event.h"
 #include "system/firmware.h"
-#include "user/gui_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/led_daemon.h"
-#include "user/audio_daemon.h"
 
 #define TAG "ota"
 
-esp_err_t ota_update_event_handler(esp_http_client_event_t *evt)
+esp_err_t ota_event_handler(esp_http_client_event_t *evt)
 {
     static const esp_partition_t *update_partition = NULL;
     static esp_ota_handle_t update_handle = 0;
@@ -105,7 +105,7 @@ exit:
     return ESP_OK;
 }
 
-void ota_update_prepare_data(char *buf, int len)
+void ota_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();
