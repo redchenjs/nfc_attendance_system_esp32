@@ -1,5 +1,5 @@
 /*
- * nfc_daemon.c
+ * nfc.c
  *
  *  Created on: 2018-02-13 21:50
  *      Author: Jack Chen <redchenjs@live.com>
@@ -10,14 +10,14 @@
 #include "esp_log.h"
 #include "buses/emdev.h"
 
-#include "driver/pn532.h"
+#include "user/gui.h"
+#include "user/ntp.h"
+#include "user/nfc.h"
+#include "user/led.h"
+#include "user/audio.h"
+#include "user/token.h"
 #include "system/event.h"
-#include "user/gui_daemon.h"
-#include "user/ntp_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/led_daemon.h"
-#include "user/audio_daemon.h"
-#include "user/token_verify.h"
+#include "driver/pn532.h"
 
 #define TAG "nfc"
 

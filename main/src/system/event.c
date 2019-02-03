@@ -13,13 +13,13 @@
 #include "esp_smartconfig.h"
 #include "freertos/event_groups.h"
 
+#include "user/ota.h"
+#include "user/gui.h"
+#include "user/led.h"
+#include "user/nfc.h"
+#include "user/ntp.h"
+#include "user/audio.h"
 #include "system/event.h"
-#include "user/ota_update.h"
-#include "user/gui_daemon.h"
-#include "user/led_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/ntp_daemon.h"
-#include "user/audio_daemon.h"
 
 #define TAG "event"
 

@@ -1,0 +1,5 @@
+set(COMPONENT_SRCDIRS "nfc nfc/buses nfc/chips nfc/drivers")
+set(COMPONENT_ADD_INCLUDEDIRS "include nfc")
+set(COMPONENT_REQUIRES "main")
+
+register_component()

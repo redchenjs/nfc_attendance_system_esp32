@@ -8,13 +8,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "user/gui_daemon.h"
-#include "user/key_daemon.h"
-#include "user/ntp_daemon.h"
-#include "user/led_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/audio_daemon.h"
-#include "user/http_daemon.h"
+#include "user/gui.h"
+#include "user/key.h"
+#include "user/ntp.h"
+#include "user/led.h"
+#include "user/nfc.h"
+#include "user/http.h"
+#include "user/audio.h"
 
 void user_init(void)
 {

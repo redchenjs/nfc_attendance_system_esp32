@@ -1,5 +1,5 @@
 /*
- * gui_daemon.c
+ * gui.c
  *
  *  Created on: 2018-02-13 22:57
  *      Author: Jack Chen <redchenjs@live.com>
@@ -8,8 +8,8 @@
 #include "gfx.h"
 #include "esp_log.h"
 
+#include "user/gui.h"
 #include "system/event.h"
-#include "user/gui_daemon.h"
 
 #define TAG "gui"
 

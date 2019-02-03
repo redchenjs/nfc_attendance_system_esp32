@@ -1,5 +1,5 @@
 /*
- * key_daemon.c
+ * key.c
  *
  *  Created on: 2018-05-31 14:07
  *      Author: Jack Chen <redchenjs@live.com>
@@ -14,11 +14,11 @@
 
 #include "driver/gpio.h"
 
+#include "user/gui.h"
+#include "user/led.h"
+#include "user/nfc.h"
+#include "user/audio.h"
 #include "system/event.h"
-#include "user/gui_daemon.h"
-#include "user/led_daemon.h"
-#include "user/nfc_daemon.h"
-#include "user/audio_daemon.h"
 #include "user/smart_config.h"
 
 #define TAG "key"

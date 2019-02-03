@@ -15,8 +15,8 @@
 #include "esp_system.h"
 #include "esp_smartconfig.h"
 
+#include "user/led.h"
 #include "system/event.h"
-#include "user/led_daemon.h"
 
 #define TAG "smart_config"
 
