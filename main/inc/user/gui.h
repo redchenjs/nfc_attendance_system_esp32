@@ -1,12 +1,12 @@
 /*
- * gui_daemon.h
+ * gui.h
  *
  *  Created on: 2018-02-13 22:57
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_USER_GUI_DAEMON_H_
-#define INC_USER_GUI_DAEMON_H_
+#ifndef INC_USER_GUI_H_
+#define INC_USER_GUI_H_
 
 #include <stdint.h>
 
@@ -71,4 +71,4 @@ extern const char ani8_160x80_gif_end[] asm("_binary_ani8_160x80_gif_end");
 extern void gui_daemon(void *pvParameter);
 extern void gui_show_image(uint8_t filename_index);
 
-#endif /* INC_USER_GUI_DAEMON_H_ */
+#endif /* INC_USER_GUI_H_ */

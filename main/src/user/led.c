@@ -1,5 +1,5 @@
 /*
- * led_daemon.c
+ * led.c
  *
  *  Created on: 2018-02-13 15:43
  *      Author: Jack Chen <redchenjs@live.com>

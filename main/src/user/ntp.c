@@ -1,17 +1,17 @@
 /*
- * ntp_daemon.c
+ * ntp.c
  *
  *  Created on: 2018-02-16 17:50
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "apps/sntp/sntp.h"
+#include "lwip/apps/sntp.h"
 #include "esp_log.h"
 
+#include "user/gui.h"
+#include "user/led.h"
+#include "user/ota.h"
 #include "system/event.h"
-#include "user/gui_daemon.h"
-#include "user/led_daemon.h"
-#include "user/ota_update.h"
 
 #define TAG "ntp"
 

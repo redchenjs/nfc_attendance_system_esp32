@@ -1,5 +1,5 @@
 /*
- * audio_daemon.c
+ * audio.c
  *
  *  Created on: 2018-02-12 20:13
  *      Author: Jack Chen <redchenjs@live.com>
@@ -15,8 +15,8 @@
 
 #include "driver/i2s.h"
 
+#include "user/audio.h"
 #include "system/event.h"
-#include "user/audio_daemon.h"
 
 #define TAG "audio"
 
