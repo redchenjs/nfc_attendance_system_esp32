@@ -151,7 +151,7 @@ config LED_PIN
 
 config FIRMWARE_VERSION
     string "Firmware Version"
-    default "v5.0"
+    default "v6.0.0"
     help
         Set firmware version.
 
