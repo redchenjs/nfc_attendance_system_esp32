@@ -42,7 +42,7 @@ void ntp_daemon(void *pvParameter)
     struct tm timeinfo = {0};
     char strftime_buf[64];
     int retry = 1;
-    const int retry_count = 10;
+    const int retry_count = 15;
 
     while (1) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
