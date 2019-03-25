@@ -5,7 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "lwip/apps/sntp.h"
+#include "apps/sntp/sntp.h"
 #include "esp_log.h"
 
 #include "user/gui.h"
