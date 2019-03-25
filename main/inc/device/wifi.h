@@ -8,7 +8,7 @@
 #ifndef DEVICE_WIFI_H_
 #define DEVICE_WIFI_H_
 
-extern char wifi_mac_str[13];
+extern char wifi_mac_string[18];
 
 extern void wifi_init(void);
 

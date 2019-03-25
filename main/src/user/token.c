@@ -78,7 +78,7 @@ void token_prepare_data(char *buf, int len)
     root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "request", 100);
     cJSON_AddStringToObject(root, "token", data_ptr);
-    cJSON_AddStringToObject(root, "mac", wifi_mac_str);
+    cJSON_AddStringToObject(root, "mac", wifi_mac_string);
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);
 }
