@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-IDF_PATH ?= $(PWD)/esp-idf
+IDF_PATH := $(PWD)/esp-idf
 
 PROJECT_NAME := nfc_attendance_system
 
