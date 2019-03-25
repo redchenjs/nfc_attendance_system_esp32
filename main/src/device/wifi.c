@@ -10,7 +10,9 @@
 #include "esp_log.h"
 #include "esp_wifi.h"
 
-char wifi_mac_str[18] = {0};
+char wifi_hostname[40] = {0};
+char wifi_mac_string[18] = {0};
+char wifi_mac_address[6] = {0};
 
 #define TAG "wifi"
 
@@ -36,7 +38,6 @@ void wifi_init(void)
         ESP_LOGI(TAG, "use stored wifi configuration, ssid: %s", wifi_stored_config.sta.ssid);
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_stored_config));
         ESP_ERROR_CHECK(esp_wifi_start());
-        ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, CONFIG_WIFI_HOSTNAME));
     } else if (strlen(CONFIG_WIFI_SSID) != 0) {
 #else
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
@@ -57,12 +58,16 @@ void wifi_init(void)
         ESP_LOGI(TAG, "use default wifi configuration, ssid: %s", wifi_config.sta.ssid);
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
         ESP_ERROR_CHECK(esp_wifi_start());
-        ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, CONFIG_WIFI_HOSTNAME));
     } else {
         ESP_LOGW(TAG, "no wifi configuration available");
     }
     esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
-    uint8_t wifi_mac[6] = {0};
-    ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, wifi_mac));
-    snprintf(wifi_mac_str, sizeof(wifi_mac_str), MACSTR, MAC2STR(wifi_mac));
+    esp_wifi_get_mac(ESP_IF_WIFI_STA, (uint8_t *)wifi_mac_address);
+    snprintf(wifi_hostname, sizeof(wifi_hostname), "%s_%X%X%X",
+                CONFIG_WIFI_HOSTNAME_PREFIX,
+                wifi_mac_address[3],
+                wifi_mac_address[4],
+                wifi_mac_address[5]);
+    tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, wifi_hostname);
+    snprintf(wifi_mac_string, sizeof(wifi_mac_string), MACSTR, MAC2STR(wifi_mac_address));
 }

@@ -111,7 +111,7 @@ void ota_prepare_data(char *buf, int len)
     root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "request", 105);
     cJSON_AddStringToObject(root, "version", firmware_get_version());
-    cJSON_AddStringToObject(root, "mac", wifi_mac_str);
+    cJSON_AddStringToObject(root, "mac", wifi_mac_string);
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);
 }

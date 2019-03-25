@@ -14,11 +14,11 @@ config WIFI_PASSWORD
     help
         WiFi password (WPA or WPA2) for the device to use.
 
-config WIFI_HOSTNAME
-    string "WiFi Hostname"
-    default "nas-01"
+config WIFI_HOSTNAME_PREFIX
+    string "WiFi Hostname Prefix"
+    default "NAS"
     help
-        WiFi hostname for the device to use.
+        WiFi hostname prefix for the device to use.
 
 config ENABLE_SMART_CONFIG
     bool "Enable Smart Config"
