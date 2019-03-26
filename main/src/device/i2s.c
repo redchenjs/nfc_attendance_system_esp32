@@ -8,7 +8,7 @@
 #include "freertos/FreeRTOS.h"
 #include "driver/i2s.h"
 
-static int i2s0_sample_rate = 44100;
+static int i2s0_sample_rate = 48000;
 static int i2s0_bits_per_sample = 16;
 
 void i2s0_init(void)
