@@ -40,36 +40,29 @@ static uint8_t img_file_index = 0;
 
 void gui_daemon(void *pvParameter)
 {
+    gdispImage gfx_image;
+
     gfxInit();
 
     while (1) {
-        gdispImage gfx_image;
+        xEventGroupWaitBits(
+            daemon_event_group,
+            GUI_DAEMON_RELOAD_BIT,
+            pdTRUE,
+            pdFALSE,
+            portMAX_DELAY
+        );
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, Black);
             while (1) {
                 if (xEventGroupGetBits(daemon_event_group) & GUI_DAEMON_RELOAD_BIT) {
-                    xEventGroupClearBits(daemon_event_group, GUI_DAEMON_RELOAD_BIT);
                     break;
                 }
                 if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
-                    xEventGroupWaitBits(
-                        daemon_event_group,
-                        GUI_DAEMON_RELOAD_BIT,
-                        pdTRUE,
-                        pdFALSE,
-                        portMAX_DELAY
-                    );
                     break;
                 }
                 delaytime_t delay = gdispImageNext(&gfx_image);
                 if (delay == TIME_INFINITE) {
-                    xEventGroupWaitBits(
-                        daemon_event_group,
-                        GUI_DAEMON_RELOAD_BIT,
-                        pdTRUE,
-                        pdFALSE,
-                        portMAX_DELAY
-                    );
                     break;
                 }
                 if (delay != TIME_IMMEDIATE) {
