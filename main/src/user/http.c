@@ -83,8 +83,10 @@ void http_daemon(void *pvParameter)
 #else
             ESP_LOGE(TAG, "error perform https request %s", esp_err_to_name(err));
 #endif
-            gui_show_image(6);
-            audio_play_file(5);
+            if (config.event_handler != ota_event_handler) {
+                gui_show_image(6);
+                audio_play_file(5);
+            }
         }
         esp_http_client_cleanup(client);
 
