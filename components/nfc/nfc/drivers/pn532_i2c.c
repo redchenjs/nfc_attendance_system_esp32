@@ -104,7 +104,6 @@ static int pn532_i2c_wait_rdyframe(nfc_device *pnd, uint8_t *pbtData, const size
  * table 320. I2C timing specification, page 211, rev. 3.2 - 2007-12-07.
  */
 #define PN532_BUS_FREE_TIME 5
-static struct timespec __transaction_stop;
 
 /**
  * @brief Wrapper around i2c_read to ensure proper timing by respecting the
@@ -118,20 +117,14 @@ static struct timespec __transaction_stop;
  * @param len length of the buffer
  * @return length (in bytes) of read data, or driver error code (negative value)
  */
-static ssize_t pn532_i2c_read(const uint8_t addr,
+static ssize_t pn532_i2c_read(const i2c_port_t port,
                               uint8_t *buf, const size_t len)
 {
-  struct timespec transaction_start, bus_free_time = { 0, 0 };
   ssize_t ret;
 
-  clock_gettime(CLOCK_MONOTONIC, &transaction_start);
-  bus_free_time.tv_nsec = (PN532_BUS_FREE_TIME * 1000 * 1000) -
-                          (transaction_start.tv_nsec - __transaction_stop.tv_nsec);
-  // nanosleep(&bus_free_time, NULL);
-  usleep(bus_free_time.tv_nsec / 1000);
+  vTaskDelay(PN532_BUS_FREE_TIME / portTICK_RATE_MS);
+  ret = i2c_read(port, buf, len);
 
-  ret = i2c_read(addr, buf, len);
-  clock_gettime(CLOCK_MONOTONIC, &__transaction_stop);
   return ret;
 }
 
@@ -147,20 +140,14 @@ static ssize_t pn532_i2c_read(const uint8_t addr,
  * @param len length of the buffer
  * @return NFC_SUCCESS on success, otherwise driver error code
  */
-static ssize_t pn532_i2c_write(const uint8_t addr,
+static ssize_t pn532_i2c_write(const i2c_port_t port,
                                const uint8_t *buf, const size_t len)
 {
-  struct timespec transaction_start, bus_free_time = { 0, 0 };
   ssize_t ret;
 
-  clock_gettime(CLOCK_MONOTONIC, &transaction_start);
-  bus_free_time.tv_nsec = (PN532_BUS_FREE_TIME * 1000 * 1000) -
-                          (transaction_start.tv_nsec - __transaction_stop.tv_nsec);
-  // nanosleep(&bus_free_time, NULL);
-  usleep(bus_free_time.tv_nsec / 1000);
+  vTaskDelay(PN532_BUS_FREE_TIME / portTICK_RATE_MS);
+  ret = i2c_write(port, buf, len);
 
-  ret = i2c_write(addr, buf, len);
-  clock_gettime(CLOCK_MONOTONIC, &__transaction_stop);
   return ret;
 }
 

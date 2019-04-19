@@ -27,9 +27,6 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#define LOG
-#define DEBUG 1
-
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
 #endif // HAVE_CONFIG_H

@@ -69,13 +69,12 @@ void
 i2c_open(i2c_port_t port, uint8_t addr)
 {
   i2c_dev_addr = addr;
-  ESP_LOGW(LOG_CATEGORY, "i2c_open addr %1x:%2x", port, addr);
 }
 
 void
 i2c_close(i2c_port_t port)
 {
-  ESP_LOGW(LOG_CATEGORY, "i2c_close %1x", port);
+
 }
 
 /**
@@ -88,8 +87,6 @@ i2c_close(i2c_port_t port)
 ssize_t
 i2c_read(i2c_port_t port, uint8_t *pbtRx, const size_t szRx)
 {
-  ssize_t res;
-
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
   i2c_master_start(cmd);
   i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_READ, 1);
@@ -98,16 +95,18 @@ i2c_read(i2c_port_t port, uint8_t *pbtRx, const size_t szRx)
   }
   i2c_master_read_byte(cmd, pbtRx + szRx - 1, 1);
   i2c_master_stop(cmd);
-  res = i2c_master_cmd_begin(port, cmd, 1000 / portTICK_RATE_MS);
+  int res = i2c_master_cmd_begin(port, cmd, 500 / portTICK_RATE_MS);
   i2c_cmd_link_delete(cmd);
 
+  LOG_HEX(LOG_GROUP, "RX", pbtRx, szRx);
   if (res == ESP_OK) {
-    ESP_LOGW(LOG_CATEGORY, "i2c_read %4x", szRx);
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG,
-            "read %d bytes successfully.", (int)szRx);
-    return NFC_SUCCESS;
+            "read %d bytes successfully.", szRx);
+    return szRx;
+  } else if (res == ESP_ERR_TIMEOUT) {
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Error: read timeout.");
+    return NFC_ETIMEOUT;
   } else {
-    ESP_LOGE(LOG_CATEGORY, "i2c_read error");
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Error: read error.");
     return NFC_EIO;
   }
@@ -125,23 +124,22 @@ i2c_write(i2c_port_t port, const uint8_t *pbtTx, const size_t szTx)
 {
   LOG_HEX(LOG_GROUP, "TX", pbtTx, szTx);
 
-  ssize_t res;
-
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
   i2c_master_start(cmd);
   i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_WRITE, 1);
   i2c_master_write(cmd, (uint8_t *)pbtTx, szTx, 1);
   i2c_master_stop(cmd);
-  res = i2c_master_cmd_begin(port, cmd, 1000 / portTICK_RATE_MS);
+  int res = i2c_master_cmd_begin(port, cmd, 500 / portTICK_RATE_MS);
   i2c_cmd_link_delete(cmd);
 
   if (res == ESP_OK) {
-    ESP_LOGW(LOG_CATEGORY, "i2c_write %4x", szTx);
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG,
             "wrote %d bytes successfully.", (int)szTx);
     return NFC_SUCCESS;
+  } else if (res == ESP_ERR_TIMEOUT) {
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Error: write timeout.");
+    return NFC_ETIMEOUT;
   } else {
-    ESP_LOGE(LOG_CATEGORY, "i2c_write error");
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Error: write error.");
     return NFC_EIO;
   }
