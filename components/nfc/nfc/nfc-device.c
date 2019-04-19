@@ -33,19 +33,22 @@
 #include <string.h>
 
 #ifdef HAVE_CONFIG_H
-#include "libconfig.h"
+#  include "config.h"
 #endif // HAVE_CONFIG_H
 
 #include "nfc-internal.h"
 
 nfc_device *
-nfc_device_new(void)
+nfc_device_new(const nfc_context *context, const nfc_connstring connstring)
 {
   nfc_device *res = malloc(sizeof(*res));
 
   if (!res) {
     return NULL;
   }
+
+  // Store associated context
+  res->context = context;
 
   // Variables initiatialization
   // Note: Actually, these initialization will be overwritten while the device
@@ -57,6 +60,7 @@ nfc_device_new(void)
   res->bInfiniteSelect = false;
   res->bAutoIso14443_4 = false;
   res->last_error  = 0;
+  memcpy(res->connstring, connstring, sizeof(res->connstring));
   res->driver_data = NULL;
   res->chip_data   = NULL;
 

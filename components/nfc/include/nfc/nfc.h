@@ -28,45 +28,68 @@
  * @file nfc.h
  * @brief libnfc interface
  *
- * Provide all usefull functions (API) to handle NFC devices.
+ * Provide all useful functions (API) to handle NFC devices.
  */
 
 #ifndef _LIBNFC_H_
-#define _LIBNFC_H_
+#  define _LIBNFC_H_
 
-//#include <sys/time.h>
+#  include <stdint.h>
+#  include <stdbool.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#  ifdef _WIN32
+/* Windows platform */
+#    ifndef _WINDLL
+/* CMake compilation */
+#      ifdef nfc_EXPORTS
+#        define  NFC_EXPORT __declspec(dllexport)
+#      else
+/* nfc_EXPORTS */
+#        define  NFC_EXPORT __declspec(dllimport)
+#      endif
+/* nfc_EXPORTS */
+#    else
+/* _WINDLL */
+/* Manual makefile */
+#      define NFC_EXPORT
+#    endif
+/* _WINDLL */
+#  else
+/* _WIN32 */
+#    define NFC_EXPORT
+#  endif
+/* _WIN32 */
 
-#define NFC_EXPORT
+#  include <nfc/nfc-types.h>
 
-#include "nfc-types.h"
+#  ifndef __has_attribute
+#    define __has_attribute(x) 0
+#  endif
 
-#ifndef __has_attribute
-#define __has_attribute(x) 0
-#endif
+#  if __has_attribute(nonnull) || defined(__GNUC__)
+#    define __has_attribute_nonnull 1
+#  endif
 
-#if __has_attribute(nonnull) || defined(__GNUC__)
-#define __has_attribute_nonnull 1
-#endif
+#  if __has_attribute_nonnull
+#    define ATTRIBUTE_NONNULL( param ) __attribute__((nonnull (param)))
+#  else
+#  define ATTRIBUTE_NONNULL( param )
+#  endif
 
-#if __has_attribute_nonnull
-#define ATTRIBUTE_NONNULL( param ) __attribute__((nonnull (param)))
-#else
-#define ATTRIBUTE_NONNULL( param )
-#endif
-
-#ifdef __cplusplus
+#  ifdef __cplusplus
 extern  "C" {
-#endif                        // __cplusplus
+#  endif                        // __cplusplus
 
-NFC_EXPORT nfc_device *pn532_open(nfc_emdev *emdev);
+/* Library initialization/deinitialization */
+NFC_EXPORT void nfc_init(nfc_context **context) ATTRIBUTE_NONNULL(1);
+NFC_EXPORT void nfc_exit(nfc_context *context) ATTRIBUTE_NONNULL(1);
+NFC_EXPORT int nfc_register_driver(const nfc_driver *driver);
 
 /* NFC Device/Hardware manipulation */
-NFC_EXPORT nfc_device *nfc_open(nfc_emdev *emdev) ATTRIBUTE_NONNULL(1);
+NFC_EXPORT nfc_device *nfc_open(nfc_context *context, const nfc_connstring connstring) ATTRIBUTE_NONNULL(1);
 NFC_EXPORT void nfc_close(nfc_device *pnd);
 NFC_EXPORT int nfc_abort_command(nfc_device *pnd);
+NFC_EXPORT size_t nfc_list_devices(nfc_context *context, nfc_connstring connstrings[], size_t connstrings_len) ATTRIBUTE_NONNULL(1);
 NFC_EXPORT int nfc_idle(nfc_device *pnd);
 
 /* NFC initiator: act as "reader" */
@@ -102,6 +125,7 @@ NFC_EXPORT const char *nfc_device_get_name(nfc_device *pnd);
 NFC_EXPORT const char *nfc_device_get_connstring(nfc_device *pnd);
 NFC_EXPORT int nfc_device_get_supported_modulation(nfc_device *pnd, const nfc_mode mode,  const nfc_modulation_type **const supported_mt);
 NFC_EXPORT int nfc_device_get_supported_baud_rate(nfc_device *pnd, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br);
+NFC_EXPORT int nfc_device_get_supported_baud_rate_target_mode(nfc_device *pnd, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br);
 
 /* Properties accessors */
 NFC_EXPORT int nfc_device_set_property_int(nfc_device *pnd, const nfc_property property, const int value);

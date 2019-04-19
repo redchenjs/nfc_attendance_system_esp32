@@ -28,8 +28,9 @@
 #define __LOG_INTERNAL_H__
 
 #ifdef HAVE_CONFIG_H
-#include "libconfig.h"
+#  include "config.h"
 #endif // HAVE_CONFIG_H
+
 #include <stdarg.h>
 
 // Internal methods so different platforms can route the logging
@@ -39,4 +40,3 @@ void log_put_internal(const char *format, ...);
 void log_vput_internal(const char *format, va_list args);
 
 #endif // __LOG_INTERNAL_H__
-

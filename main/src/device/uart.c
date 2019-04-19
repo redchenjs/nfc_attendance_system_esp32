@@ -10,9 +10,6 @@
 #include "driver/uart.h"
 #include "device/uart.h"
 
-#define NFC_UART_TXD_PIN   CONFIG_PN532_RXD_PIN
-#define NFC_UART_RXD_PIN   CONFIG_PN532_TXD_PIN
-
 #define BUF_SIZE (128)
 
 static const char *TAG = "uart-1";
@@ -34,7 +31,7 @@ void uart1_init()
     // Install UART driver, and get the queue
     uart_driver_install(NFC_UART_NUM, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
     // Set UART pins
-    uart_set_pin(NFC_UART_NUM, NFC_UART_TXD_PIN, NFC_UART_RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_set_pin(NFC_UART_NUM, CONFIG_PN532_RX_SCL_PIN, CONFIG_PN532_TX_SDA_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     // Flush UART RX Buffer
     uart_flush_input(NFC_UART_NUM);
 }

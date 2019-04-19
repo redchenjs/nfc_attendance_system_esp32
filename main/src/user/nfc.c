@@ -8,7 +8,6 @@
 #include <string.h>
 
 #include "esp_log.h"
-#include "buses/emdev.h"
 
 #include "user/gui.h"
 #include "user/ntp.h"
@@ -18,6 +17,8 @@
 #include "user/token.h"
 #include "system/event.h"
 #include "driver/pn532.h"
+
+#include "nfc/nfc.h"
 
 #define TAG "nfc"
 
@@ -35,13 +36,18 @@ static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05, 0xF2, 0x
 void nfc_daemon(void *pvParameter)
 {
     nfc_target nt;
-    nfc_device *pnd = NULL;
+    nfc_device *pnd;
+    nfc_context *context;
     nfc_modulation nm = {
         .nmt = NMT_ISO14443A,
         .nbr = NBR_106
     };
 
-    emdev_init();
+    nfc_init(&context);
+    if (context == NULL) {
+        ESP_LOGE(TAG, "unable to init libnfc (malloc)");
+        goto err;
+    }
 
     while (1) {
         xEventGroupWaitBits(
@@ -52,11 +58,16 @@ void nfc_daemon(void *pvParameter)
             portMAX_DELAY
         );
         // Open NFC device
-        while ((pnd = nfc_open(&emdev)) == NULL) {
+#if defined(CONFIG_PN532_IFCE_UART)
+        while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
+#elif defined(CONFIG_PN532_IFCE_I2C)
+        while ((pnd = nfc_open(context, "pn532_i2c:i2c0")) == NULL) {
+#endif
             ESP_LOGE(TAG, "device error");
             pn532_setpin_reset(0);
-            vTaskDelay(1 / portTICK_RATE_MS);
+            vTaskDelay(5 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
+            vTaskDelay(500 / portTICK_RATE_MS);
         }
         // Transceive some bytes if target available
         int res = 0;
@@ -92,6 +103,9 @@ void nfc_daemon(void *pvParameter)
         // Task Delay
         vTaskDelay(100 / portTICK_RATE_MS);
     }
+err:
+    ESP_LOGE(TAG, "task failed, rebooting...");
+    esp_restart();
 }
 
 void nfc_set_mode(uint8_t mode)

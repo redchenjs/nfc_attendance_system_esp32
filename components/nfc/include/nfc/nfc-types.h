@@ -37,6 +37,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#ifndef NFC_BUFSIZE_CONNSTRING
+#define NFC_BUFSIZE_CONNSTRING 1024
+#endif
+
+/**
+ * NFC context
+ */
+typedef struct nfc_context nfc_context;
 
 /**
  * NFC device
@@ -48,7 +56,10 @@ typedef struct nfc_device nfc_device;
  */
 typedef struct nfc_driver nfc_driver;
 
-typedef struct nfc_emdev  nfc_emdev;
+/**
+ * Connection string
+ */
+typedef char nfc_connstring[NFC_BUFSIZE_CONNSTRING];
 
 /**
  * Properties
@@ -251,6 +262,15 @@ typedef struct {
 } nfc_jewel_info;
 
 /**
+ * @struct nfc_barcode_info
+ * @brief Thinfilm NFC Barcode information
+ */
+typedef struct {
+  size_t   szDataLen;
+  uint8_t  abtData[32];
+} nfc_barcode_info;
+
+/**
  * @union nfc_target_info
  * @brief Union between all kind of tags information structures.
  */
@@ -262,6 +282,7 @@ typedef union {
   nfc_iso14443b2sr_info nsi;
   nfc_iso14443b2ct_info nci;
   nfc_jewel_info nji;
+  nfc_barcode_info nti; // "t" for Thinfilm, "b" already used
   nfc_dep_info ndi;
 } nfc_target_info;
 
@@ -282,15 +303,15 @@ typedef enum {
  * @brief NFC modulation type enumeration
  */
 typedef enum {
-  NMT_UNDEFINED = 0,
   NMT_ISO14443A = 1,
   NMT_JEWEL,
+  NMT_BARCODE,    // Thinfilm NFC Barcode
   NMT_ISO14443B,
   NMT_ISO14443BI, // pre-ISO14443B aka ISO/IEC 14443 B' or Type B'
   NMT_ISO14443B2SR, // ISO14443-2B ST SRx
   NMT_ISO14443B2CT, // ISO14443-2B ASK CTx
   NMT_FELICA,
-  NMT_DEP,
+  NMT_DEP,        // DEP should be kept last one as it's used as end-of-enum
 } nfc_modulation_type;
 
 /**

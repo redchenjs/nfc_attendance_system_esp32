@@ -22,50 +22,34 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
  */
 
 /**
- * @file nfc-emulation.h
- * @brief Provide a small API to ease emulation in libnfc
+ * @file uart.h
+ * @brief UART driver header
  */
 
-#ifndef __NFC_EMULATION_H__
-#define __NFC_EMULATION_H__
+#ifndef __NFC_BUS_UART_H__
+#  define __NFC_BUS_UART_H__
 
-#include <sys/types.h>
-#include <nfc/nfc.h>
+#  include <sys/time.h>
 
-#ifdef __cplusplus
-extern  "C" {
-#endif /* __cplusplus */
+#  include <stdio.h>
+#  include <string.h>
+#  include <stdlib.h>
 
-struct nfc_emulator;
-struct nfc_emulation_state_machine;
+#  include <nfc/nfc-types.h>
 
-/**
- * @struct nfc_emulator
- * @brief NFC emulator structure
- */
-struct nfc_emulator {
-  nfc_target *target;
-  struct nfc_emulation_state_machine *state_machine;
-  void *user_data;
-};
+#  include "driver/uart.h"
 
-/**
- * @struct nfc_emulation_state_machine
- * @brief  NFC emulation state machine structure
- */
-struct nfc_emulation_state_machine {
-  int (*io)(struct nfc_emulator *emulator, const uint8_t *data_in, const size_t data_in_len, uint8_t *data_out, const size_t data_out_len);
-  void *data;
-};
+void    uart_open(uart_port_t port);
+void    uart_close(uart_port_t port);
 
-NFC_EXPORT int    nfc_emulate_target(nfc_device *pnd, struct nfc_emulator *emulator, const int timeout);
+void    uart_set_speed(uart_port_t port, const uint32_t uiPortSpeed);
+uint32_t uart_get_speed(const uart_port_t port);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+int     uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout);
+int     uart_send(uart_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout);
 
-
-#endif /* __NFC_EMULATION_H__ */
+#endif // __NFC_BUS_UART_H__

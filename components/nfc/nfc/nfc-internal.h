@@ -33,7 +33,10 @@
 #define __NFC_INTERNAL_H__
 
 #include <stdbool.h>
+#include <sys/time.h>
+
 #include "nfc/nfc.h"
+
 #include "log.h"
 
 /**
@@ -118,8 +121,8 @@ typedef enum {
 struct nfc_driver {
   const char *name;
   const scan_type_enum scan_type;
-  size_t (*scan)(nfc_emdev *emdev);
-  struct nfc_device *(*open)(nfc_emdev *emdev);
+  size_t (*scan)(const nfc_context *context, nfc_connstring connstrings[], const size_t connstrings_len);
+  struct nfc_device *(*open)(const nfc_context *context, const nfc_connstring connstring);
   void (*close)(struct nfc_device *pnd);
   const char *(*strerror)(const struct nfc_device *pnd);
 
@@ -144,7 +147,7 @@ struct nfc_driver {
   int (*device_set_property_bool)(struct nfc_device *pnd, const nfc_property property, const bool bEnable);
   int (*device_set_property_int)(struct nfc_device *pnd, const nfc_property property, const int value);
   int (*get_supported_modulation)(struct nfc_device *pnd, const nfc_mode mode, const nfc_modulation_type **const supported_mt);
-  int (*get_supported_baud_rate)(struct nfc_device *pnd, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br);
+  int (*get_supported_baud_rate)(struct nfc_device *pnd, const nfc_mode mode, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br);
   int (*device_get_information_about)(struct nfc_device *pnd, char **buf);
 
   int (*abort_command)(struct nfc_device *pnd);
@@ -152,31 +155,47 @@ struct nfc_driver {
   int (*powerdown)(struct nfc_device *pnd);
 };
 
-#define DEVICE_NAME_LENGTH  256
-#define DEVICE_PORT_LENGTH  64
+#  define DEVICE_NAME_LENGTH  256
+#  define DEVICE_PORT_LENGTH  64
 
 #define MAX_USER_DEFINED_DEVICES 4
 
-struct  nfc_emdev{
-	void (*open)(void);
-	int (*receive) (uint8_t *pbtRx, const size_t szRx, int timeout);
-	int (*send) (const uint8_t *pbtTx, const size_t szTx, int timeout);
-	void (*close)(void);
+struct nfc_user_defined_device {
+  char name[DEVICE_NAME_LENGTH];
+  nfc_connstring connstring;
+  bool optional;
 };
+
+/**
+ * @struct nfc_context
+ * @brief NFC library context
+ * Struct which contains internal options, references, pointers, etc. used by library
+ */
+struct nfc_context {
+  bool allow_autoscan;
+  bool allow_intrusive_scan;
+  uint32_t  log_level;
+  struct nfc_user_defined_device user_defined_devices[MAX_USER_DEFINED_DEVICES];
+  unsigned int user_defined_device_count;
+};
+
+nfc_context *nfc_context_new(void);
+void nfc_context_free(nfc_context *context);
 
 /**
  * @struct nfc_device
  * @brief NFC device information
  */
 struct nfc_device {
+  const nfc_context *context;
   const struct nfc_driver *driver;
-  const struct  nfc_emdev *emdev;
   void *driver_data;
   void *chip_data;
 
   /** Device name string, including device wrapper firmware */
   char    name[DEVICE_NAME_LENGTH];
   /** Device connection string */
+  nfc_connstring connstring;
   /** Is the CRC automaticly added, checked and removed from the frames */
   bool    bCrc;
   /** Does the chip handle parity bits, all parities are handled as data */
@@ -194,7 +213,7 @@ struct nfc_device {
   int     last_error;
 };
 
-nfc_device *nfc_device_new(void);
+nfc_device *nfc_device_new(const nfc_context *context, const nfc_connstring connstring);
 void        nfc_device_free(nfc_device *dev);
 
 void string_as_boolean(const char *s, bool *value);
@@ -203,6 +222,6 @@ void iso14443_cascade_uid(const uint8_t abtUID[], const size_t szUID, uint8_t *p
 
 void prepare_initiator_data(const nfc_modulation nm, uint8_t **ppbtInitiatorData, size_t *pszInitiatorData);
 
-//int connstring_decode(const nfc_connstring connstring, const char *driver_name, const char *bus_name, char **pparam1, char **pparam2);
+int connstring_decode(const nfc_connstring connstring, const char *driver_name, const char *bus_name, char **pparam1, char **pparam2);
 
 #endif // __NFC_INTERNAL_H__

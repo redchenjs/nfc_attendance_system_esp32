@@ -29,8 +29,8 @@
  * @brief Provide a small API to ease emulation in libnfc
  */
 
-#include "nfc/nfc.h"
-#include "nfc/nfc-emulation.h"
+#include <nfc/nfc.h>
+#include <nfc/nfc-emulation.h>
 
 #include "iso7816.h"
 
@@ -73,3 +73,4 @@ nfc_emulate_target(nfc_device *pnd, struct nfc_emulator *emulator, const int tim
   }
   return io_res;
 }
+

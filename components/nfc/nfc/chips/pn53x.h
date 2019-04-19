@@ -32,7 +32,7 @@
 #ifndef __NFC_CHIPS_PN53X_H__
 #  define __NFC_CHIPS_PN53X_H__
 
-#  include "nfc/nfc-types.h"
+#  include <nfc/nfc-types.h>
 #  include "pn53x-internal.h"
 
 // Registers and symbols masks used to covers parts within a register
@@ -210,6 +210,7 @@ struct pn53x_data {
   /** Supported modulation type */
   nfc_modulation_type *supported_modulation_as_initiator;
   nfc_modulation_type *supported_modulation_as_target;
+  bool progressive_field;
 };
 
 #define CHIP_DATA(pnd) ((struct pn53x_data*)(pnd->chip_data))
@@ -231,6 +232,8 @@ typedef enum {
   PM_ISO14443B_106 = 0x03,
   /** Jewel Topaz (Innovision Research & Development) (Not supported by PN531) */
   PM_JEWEL_106 = 0x04,
+  /** Thinfilm NFC Barcode (Not supported by PN531) */
+  PM_BARCODE_106 = 0x05,
   /** ISO14443-B http://en.wikipedia.org/wiki/ISO/IEC_14443 (Not supported by PN531 nor PN532) */
   PM_ISO14443B_212 = 0x06,
   /** ISO14443-B http://en.wikipedia.org/wiki/ISO/IEC_14443 (Not supported by PN531 nor PN532) */
@@ -392,11 +395,10 @@ int    pn53x_check_ack_frame(struct nfc_device *pnd, const uint8_t *pbtRxFrame, 
 int    pn53x_check_error_frame(struct nfc_device *pnd, const uint8_t *pbtRxFrame, const size_t szRxFrameLen);
 int    pn53x_build_frame(uint8_t *pbtFrame, size_t *pszFrame, const uint8_t *pbtData, const size_t szData);
 int    pn53x_get_supported_modulation(nfc_device *pnd, const nfc_mode mode, const nfc_modulation_type **const supported_mt);
-int    pn53x_get_supported_baud_rate(nfc_device *pnd, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br);
+int    pn53x_get_supported_baud_rate(nfc_device *pnd, const nfc_mode mode, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br);
 int    pn53x_get_information_about(nfc_device *pnd, char **pbuf);
 
 void   *pn53x_data_new(struct nfc_device *pnd, const struct pn53x_io *io);
 void    pn53x_data_free(struct nfc_device *pnd);
 
 #endif // __NFC_CHIPS_PN53X_H__
-

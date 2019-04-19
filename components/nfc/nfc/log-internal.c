@@ -33,7 +33,7 @@
 void
 log_vput_internal(const char *format, va_list args)
 {
-  vprintf(format, args);
+  vfprintf(stderr, format, args);
 }
 
 void
@@ -41,6 +41,6 @@ log_put_internal(const char *format, ...)
 {
   va_list va;
   va_start(va, format);
-  vprintf(format, va);
+  vfprintf(stderr, format, va);
   va_end(va);
 }

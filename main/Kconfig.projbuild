@@ -77,7 +77,25 @@ config ENABLE_SERVER_CERT_VERIFY
 
 endmenu
 
-menu "Pin Configuration"
+menu "NFC Configuration"
+
+choice PN532_IFCE
+    prompt "PN532 Interface Type"
+    default PN532_IFCE_UART
+    help
+        Select the interface type to communicate with PN532.
+
+config PN532_IFCE_UART
+    bool "UART"
+    help
+        Select this to use uart interface.
+
+config PN532_IFCE_I2C
+    bool "I2C"
+    help
+        Select this to use i2c interface.
+
+endchoice
 
 config PN532_RST_PIN
     int "PN532 Reset Pin"
@@ -85,17 +103,17 @@ config PN532_RST_PIN
     help
         PN532 Reset Pin.
 
-config PN532_TXD_PIN
-    int "PN532 TXD Pin"
+config PN532_TX_SDA_PIN
+    int "PN532 TX/SDA Pin"
     default 17
     help
-        PN532 TXD Pin.
+        PN532 TX/SDA Pin.
 
-config PN532_RXD_PIN
-    int "PN532 RXD Pin"
+config PN532_RX_SCL_PIN
+    int "PN532 RX/SCL Pin"
     default 16
     help
-        PN532 RXD Pin.
+        PN532 RX/SCL Pin.
 
 endmenu
 

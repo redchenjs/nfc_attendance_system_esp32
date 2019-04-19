@@ -27,14 +27,14 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
+#define LOG
+#define DEBUG 1
+
 #ifdef HAVE_CONFIG_H
-#include "libconfig.h"
+#  include "config.h"
 #endif // HAVE_CONFIG_H
 
 #include "nfc-internal.h"
-
-//#define LOG
-//#define DEBUG
 
 #define NFC_LOG_PRIORITY_NONE   0
 #define NFC_LOG_PRIORITY_ERROR  1
@@ -66,24 +66,24 @@ const char *log_priority_to_str(const int priority);
 
 #if defined LOG
 
-#ifndef __has_attribute
-#define __has_attribute(x) 0
-#endif
+#  ifndef __has_attribute
+#    define __has_attribute(x) 0
+#  endif
 
-#if __has_attribute(format) || defined(__GNUC__)
-#define __has_attribute_format 1
-#endif
+#  if __has_attribute(format) || defined(__GNUC__)
+#    define __has_attribute_format 1
+#  endif
 
-void log_init(void);
+void log_init(const nfc_context *context);
 void log_exit(void);
 void log_put(const uint8_t group, const char *category, const uint8_t priority, const char *format, ...)
-#if __has_attribute_format
+#  if __has_attribute_format
 __attribute__((format(printf, 4, 5)))
-#endif
+#  endif
 ;
 #else
 // No logging
-#define log_init(void) ((void) 0)
+#define log_init(nfc_context) ((void) 0)
 #define log_exit() ((void) 0)
 #define log_put(group, category, priority, format, ...) do {} while (0)
 
@@ -94,8 +94,8 @@ __attribute__((format(printf, 4, 5)))
  * @brief Log a byte-array in hexadecimal format
  * Max values:  pcTag of 121 bytes + ": " + 300 bytes of data+ "\0" => acBuf of 1024 bytes
  */
-#ifdef LOG
-#define LOG_HEX(group, pcTag, pbtData, szBytes) do { \
+#  ifdef LOG
+#    define LOG_HEX(group, pcTag, pbtData, szBytes) do { \
     size_t	 __szPos; \
     char	 __acBuf[1024]; \
     size_t	 __szBuf = 0; \
@@ -113,13 +113,13 @@ __attribute__((format(printf, 4, 5)))
     } \
     log_put (group, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%s", __acBuf); \
   } while (0);
-#else
-#define LOG_HEX(group, pcTag, pbtData, szBytes) do { \
+#  else
+#    define LOG_HEX(group, pcTag, pbtData, szBytes) do { \
     (void) group; \
     (void) pcTag; \
     (void) pbtData; \
     (void) szBytes; \
   } while (0);
-#endif
+#  endif
 
 #endif // __LOG_H__
