@@ -76,21 +76,13 @@ struct pn532_i2c_data {
 };
 
 /* Private Functions Prototypes */
-
 static nfc_device *pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring);
-
 static void pn532_i2c_close(nfc_device *pnd);
-
 static int pn532_i2c_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, int timeout);
-
 static int pn532_i2c_ack(nfc_device *pnd);
-
 static int pn532_i2c_abort_command(nfc_device *pnd);
-
 static int pn532_i2c_wakeup(nfc_device *pnd);
-
 static int pn532_i2c_wait_rdyframe(nfc_device *pnd, int timeout);
-
 
 #define DRIVER_DATA(pnd) ((struct pn532_i2c_data*)(pnd->driver_data))
 
@@ -98,6 +90,7 @@ static void
 pn532_i2c_close(nfc_device *pnd)
 {
   pn53x_idle(pnd);
+
   i2c_close(DRIVER_DATA(pnd)->port);
 
   pn53x_data_free(pnd);
@@ -176,7 +169,7 @@ pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring)
 
   // Check communication using "Diagnose" command, with "Communication test" (0x00)
   if (pn53x_check_communication(pnd) < 0) {
-    nfc_perror(pnd, "pn53x_check_communication");
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "pn53x_check_communication error");
     pn532_i2c_close(pnd);
     return NULL;
   }

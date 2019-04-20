@@ -58,6 +58,7 @@
 
 // Internal data structs
 const struct pn53x_io pn532_uart_io;
+
 struct pn532_uart_data {
   uart_port_t port;
   volatile bool abort_flag;
@@ -157,6 +158,7 @@ pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
     nfc_device_free(pnd);
     return NULL;
   }
+
   // SAMConfiguration command if needed to wakeup the chip and pn53x_SAMConfiguration check if the chip is a PN532
   CHIP_DATA(pnd)->type = PN532;
   // This device starts in LowVBat mode
@@ -194,6 +196,7 @@ static int
 pn532_uart_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, int timeout)
 {
   int res = 0;
+
   // Before sending anything, we need to discard from any junk bytes
   uart_flush_input(DRIVER_DATA(pnd)->port);
 
