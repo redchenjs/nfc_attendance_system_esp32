@@ -36,23 +36,7 @@
 #endif // HAVE_CONFIG_H
 #include "i2c.h"
 
-#include <sys/ioctl.h>
-#include <sys/select.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <limits.h>
-#include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <time.h>
-
-#include <nfc/nfc.h>
+#include "nfc/nfc.h"
 #include "nfc-internal.h"
 
 #include "esp_log.h"
