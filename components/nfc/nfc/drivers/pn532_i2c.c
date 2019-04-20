@@ -107,15 +107,16 @@ pn532_i2c_close(nfc_device *pnd)
 static nfc_device *
 pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring)
 {
-  char *i2c_devname;
+  char *port_s;
   nfc_device *pnd;
 
-  int connstring_decode_level = connstring_decode(connstring, PN532_I2C_DRIVER_NAME, NULL, &i2c_devname, NULL);
+  int connstring_decode_level = connstring_decode(connstring, PN532_I2C_DRIVER_NAME, NULL, &port_s, NULL);
 
   switch (connstring_decode_level) {
     case 2:
       break;
     case 1:
+      return NULL;
       break;
     case 0:
       return NULL;
@@ -123,12 +124,12 @@ pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring)
 
   i2c_port_t port;
 
-  const char *devname[] = {"i2c0", "i2c1"};
-  if (strncmp("i2c0", i2c_devname, strlen(devname[0])) == 0) {
+  if (strcmp("i2c0", port_s) == 0) {
     port = I2C_NUM_0;
-  } else if (strncmp("i2c1", i2c_devname, strlen(devname[1])) == 0) {
+  } else if (strcmp("i2c1", port_s) == 0) {
     port = I2C_NUM_1;
   } else {
+    free(port_s);
     return NULL;
   }
 
@@ -137,10 +138,12 @@ pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring)
   pnd = nfc_device_new(context, connstring);
   if (!pnd) {
     perror("malloc");
+    free(port_s);
     i2c_close(port);
     return NULL;
   }
-  snprintf(pnd->name, sizeof(pnd->name), "%s:%s", PN532_I2C_DRIVER_NAME, i2c_devname);
+  snprintf(pnd->name, sizeof(pnd->name), "%s:%s", PN532_I2C_DRIVER_NAME, port_s);
+  free(port_s);
 
   pnd->driver_data = malloc(sizeof(struct pn532_i2c_data));
   if (!pnd->driver_data) {

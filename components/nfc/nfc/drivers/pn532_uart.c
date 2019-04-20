@@ -69,11 +69,6 @@ int     pn532_uart_wakeup(nfc_device *pnd);
 
 #define DRIVER_DATA(pnd) ((struct pn532_uart_data*)(pnd->driver_data))
 
-struct pn532_uart_descriptor {
-  char *port;
-  uint32_t speed;
-};
-
 static void
 pn532_uart_close(nfc_device *pnd)
 {
@@ -89,53 +84,62 @@ pn532_uart_close(nfc_device *pnd)
 static nfc_device *
 pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
 {
-  struct pn532_uart_descriptor ndd;
+  char *port_s;
   char *speed_s;
-  int connstring_decode_level = connstring_decode(connstring, PN532_UART_DRIVER_NAME, NULL, &ndd.port, &speed_s);
-  if (connstring_decode_level == 3) {
-    ndd.speed = 0;
-    if (sscanf(speed_s, "%10"PRIu32, &ndd.speed) != 1) {
-      // speed_s is not a number
-      free(ndd.port);
-      free(speed_s);
-      return NULL;
-    }
-    free(speed_s);
-  }
-  if (connstring_decode_level < 2) {
-    return NULL;
-  }
-  if (connstring_decode_level < 3) {
-    ndd.speed = PN532_UART_DEFAULT_SPEED;
-  }
-  uart_port_t port;
-  nfc_device *pnd = NULL;
+  uint32_t speed;
+  nfc_device *pnd;
 
-  if (strcmp("uart0", ndd.port) == 0) {
+  int connstring_decode_level = connstring_decode(connstring, PN532_UART_DRIVER_NAME, NULL, &port_s, &speed_s);
+
+  switch (connstring_decode_level) {
+    case 3:
+      speed = 0;
+      if (sscanf(speed_s, "%10"PRIu32, &speed) != 1) {
+        // speed_s is not a number
+        free(port_s);
+        free(speed_s);
+        return NULL;
+      }
+      free(speed_s);
+      break;
+    case 2:
+      speed = PN532_UART_DEFAULT_SPEED;
+      break;
+    case 1:
+      return NULL;
+      break;
+    case 0:
+      return NULL;
+  }
+
+  uart_port_t port;
+
+  if (strcmp("uart0", port_s) == 0) {
     port = UART_NUM_0;
-  } else if (strcmp("uart1", ndd.port) == 0) {
+  } else if (strcmp("uart1", port_s) == 0) {
     port = UART_NUM_1;
   } else {
+    free(port_s);
     return NULL;
   }
 
-  log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Attempt to open: %s at %d baud.", ndd.port, ndd.speed);
+  log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Attempt to open: %s at %d baud.", port_s, speed);
   uart_open(port);
 
   // We need to flush input to be sure first reply does not comes from older byte transceive
   uart_flush_input(port);
-  uart_set_speed(port, ndd.speed);
+  uart_set_speed(port, speed);
 
   // We have a connection
   pnd = nfc_device_new(context, connstring);
   if (!pnd) {
     perror("malloc");
-    free(ndd.port);
+    free(port_s);
     uart_close(port);
     return NULL;
   }
-  snprintf(pnd->name, sizeof(pnd->name), "%s:%s", PN532_UART_DRIVER_NAME, ndd.port);
-  free(ndd.port);
+  snprintf(pnd->name, sizeof(pnd->name), "%s:%s", PN532_UART_DRIVER_NAME, port_s);
+  free(port_s);
 
   pnd->driver_data = malloc(sizeof(struct pn532_uart_data));
   if (!pnd->driver_data) {
