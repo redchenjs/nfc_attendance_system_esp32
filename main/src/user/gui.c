@@ -44,8 +44,6 @@ void gui_daemon(void *pvParameter)
 
     gfxInit();
 
-    gui_show_image(0);
-
     while (1) {
         xEventGroupWaitBits(
             daemon_event_group,
