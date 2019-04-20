@@ -64,7 +64,7 @@ void nfc_daemon(void *pvParameter)
 #elif defined(CONFIG_PN532_IFCE_I2C)
         while ((pnd = nfc_open(context, "pn532_i2c:i2c0")) == NULL) {
 #endif
-            ESP_LOGE(TAG, "device error");
+            ESP_LOGE(TAG, "device reset");
             pn532_setpin_reset(0);
             vTaskDelayUntil(&xLastWakeTime, 400 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
@@ -73,40 +73,39 @@ void nfc_daemon(void *pvParameter)
         }
         // Transceive some bytes if target available
         int res = 0;
+        memset(abtRx, 0, sizeof(abtRx));
         if (nfc_initiator_init(pnd) >= 0) {
             if (nfc_initiator_select_passive_target(pnd, nm, NULL, 0, &nt) >= 0) {
                 if ((res = nfc_initiator_transceive_bytes(pnd, abtTx, TX_FRAME_LEN, abtRx, RX_FRAME_LEN, -1)) >= 0) {
                     abtRx[res] = 0x00;
                 } else {
-                    ESP_LOGW(TAG, "not a valid target");
+                    ESP_LOGW(TAG, "transceive failed");
                 }
             } else {
-                ESP_LOGI(TAG, "waiting for target");
+                ESP_LOGI(TAG, "%u bytes mem left", heap_caps_get_free_size(MALLOC_CAP_32BIT));
             }
         } else {
-            ESP_LOGE(TAG, "init nfc device failed");
+            ESP_LOGE(TAG, "setup device failed");
         }
         // Close NFC device
         nfc_close(pnd);
         // Match received bytes and verify the token if available
         if (res > 0) {
-            if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL) {
-                if (strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
-                    ESP_LOGW(TAG, "total free mem %u", heap_caps_get_free_size(MALLOC_CAP_32BIT));
-                    audio_play_file(0);
-                    token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
-                } else {
-                    ESP_LOGW(TAG, "invalid frame data");
-                }
+            if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL &&
+                strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
+                ESP_LOGW(TAG, "token %32s", (char *)(abtRx + RX_FRAME_PRFX_LEN));
+                audio_play_file(0);
+                token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
             } else {
-                ESP_LOGW(TAG, "invalid frame prefix");
+                ESP_LOGW(TAG, "unexpected frame");
             }
         }
         // Task Delay
         vTaskDelayUntil(&xLastWakeTime, 500 / portTICK_RATE_MS);
     }
 err:
-    ESP_LOGE(TAG, "task failed, rebooting...");
+    nfc_exit(context);
+    ESP_LOGE(TAG, "task failed");
     esp_restart();
 }
 
