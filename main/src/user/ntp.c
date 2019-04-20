@@ -53,7 +53,7 @@ void ntp_daemon(void *pvParameter)
             break;
         }
         if (++retry > retry_count) {
-            ESP_LOGE(TAG, "can not wait to reboot...");
+            ESP_LOGE(TAG, "timeout");
             gui_show_image(4);
             vTaskDelay(2000 / portTICK_RATE_MS);
             esp_restart();

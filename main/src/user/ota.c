@@ -62,7 +62,7 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
             }
             esp_err_t err = esp_ota_write(update_handle, (const void *)evt->data, evt->data_len);
             if (err != ESP_OK) {
-                ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
+                ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
                 xEventGroupSetBits(daemon_event_group, HTTP_DAEMON_OTA_FAILED_BIT);
                 goto exit;
             }
@@ -78,15 +78,15 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
             esp_ota_end(update_handle);
         } else if (binary_file_length != 0) {
             if (esp_ota_end(update_handle) != ESP_OK) {
-                ESP_LOGE(TAG, "esp_ota_end failed!");
+                ESP_LOGE(TAG, "esp_ota_end failed");
                 goto exit;
             }
             esp_err_t err = esp_ota_set_boot_partition(update_partition);
             if (err != ESP_OK) {
-                ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)!", esp_err_to_name(err));
+                ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)", esp_err_to_name(err));
                 goto exit;
             }
-            ESP_LOGW(TAG, "prepare to restart system!");
+            ESP_LOGW(TAG, "prepare to restart system");
             gui_show_image(4);
             vTaskDelay(2000 / portTICK_RATE_MS);
             esp_restart();

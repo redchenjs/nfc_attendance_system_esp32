@@ -76,7 +76,7 @@ void gui_daemon(void *pvParameter)
             break;
         }
     }
-    ESP_LOGE(TAG, "task failed, rebooting...");
+    ESP_LOGE(TAG, "task failed");
     esp_restart();
 }
 

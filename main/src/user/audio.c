@@ -77,7 +77,7 @@ err:
     free(synth);
     free(frame);
     free(stream);
-    ESP_LOGE(TAG, "task failed, rebooting...");
+    ESP_LOGE(TAG, "task failed");
     esp_restart();
 }
 
