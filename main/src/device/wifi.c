@@ -22,7 +22,6 @@ void wifi_init(void)
         .sta = {
             .scan_method = WIFI_ALL_CHANNEL_SCAN,
             .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-            .threshold.rssi = -127,
             .threshold.authmode = WIFI_AUTH_WPA2_PSK
         },
     };
@@ -61,13 +60,13 @@ void wifi_init(void)
     } else {
         ESP_LOGW(TAG, "no wifi configuration available");
     }
-    esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
-    esp_wifi_get_mac(ESP_IF_WIFI_STA, (uint8_t *)wifi_mac_address);
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MIN_MODEM));
+    ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, (uint8_t *)wifi_mac_address));
     snprintf(wifi_hostname, sizeof(wifi_hostname), "%s_%X%X%X",
                 CONFIG_WIFI_HOSTNAME_PREFIX,
                 wifi_mac_address[3],
                 wifi_mac_address[4],
                 wifi_mac_address[5]);
-    tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, wifi_hostname);
+    ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, wifi_hostname));
     snprintf(wifi_mac_string, sizeof(wifi_mac_string), MACSTR, MAC2STR(wifi_mac_address));
 }

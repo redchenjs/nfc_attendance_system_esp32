@@ -23,23 +23,22 @@ void i2s0_init(void)
         .bits_per_sample = i2s0_bits_per_sample,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,                           // 2-channels
         .dma_buf_count = 8,
-        .dma_buf_len = 64,
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1                                // Interrupt level 1
+        .dma_buf_len = 64
     };
-    i2s_driver_install(0, &i2s_config, 0, NULL);
     i2s_pin_config_t pin_config = {
         .bck_io_num = 22,
         .ws_io_num = 21,
         .data_out_num = 19,
         .data_in_num = -1                                                       // Not used
     };
-    i2s_set_pin(0, &pin_config);
+    ESP_ERROR_CHECK(i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL));
+    ESP_ERROR_CHECK(i2s_set_pin(I2S_NUM_0, &pin_config));
 }
 
 void i2s0_set_sample_rate(int rate)
 {
     if (rate != i2s0_sample_rate) {
-        i2s_set_sample_rates(0, rate);
+        i2s_set_sample_rates(I2S_NUM_0, rate);
         i2s0_sample_rate = rate;
     }
 }

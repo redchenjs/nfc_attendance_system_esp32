@@ -8,8 +8,6 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
-#define TAG "nvs"
-
 void nvs_init(void)
 {
     esp_err_t ret = nvs_flash_init();

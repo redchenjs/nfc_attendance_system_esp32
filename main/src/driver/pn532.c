@@ -15,15 +15,6 @@
 void pn532_setpin_reset(uint8_t rst)
 {
     gpio_set_level(CONFIG_PN532_RST_PIN, rst);
-    if (rst != 0) {
-#if defined(CONFIG_PN532_IFCE_UART)
-        uart_flush_input(NFC_UART_NUM);
-#elif defined(CONFIG_PN532_IFCE_I2C)
-        i2c_reset_tx_fifo(NFC_I2C_NUM);
-        i2c_reset_rx_fifo(NFC_I2C_NUM);
-#endif
-        vTaskDelay(10 / portTICK_RATE_MS);
-    }
 }
 
 void pn532_init(void)
