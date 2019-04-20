@@ -57,6 +57,7 @@ void nfc_daemon(void *pvParameter)
             pdTRUE,
             portMAX_DELAY
         );
+        portTickType xLastWakeTime = xTaskGetTickCount();
         // Open NFC device
 #if defined(CONFIG_PN532_IFCE_UART)
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
@@ -65,9 +66,10 @@ void nfc_daemon(void *pvParameter)
 #endif
             ESP_LOGE(TAG, "device error");
             pn532_setpin_reset(0);
-            vTaskDelay(5 / portTICK_RATE_MS);
+            vTaskDelayUntil(&xLastWakeTime, 400 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
-            vTaskDelay(500 / portTICK_RATE_MS);
+            vTaskDelayUntil(&xLastWakeTime, 100 / portTICK_RATE_MS);
+            xLastWakeTime = xTaskGetTickCount();
         }
         // Transceive some bytes if target available
         int res = 0;
@@ -101,7 +103,7 @@ void nfc_daemon(void *pvParameter)
             }
         }
         // Task Delay
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelayUntil(&xLastWakeTime, 500 / portTICK_RATE_MS);
     }
 err:
     ESP_LOGE(TAG, "task failed, rebooting...");
