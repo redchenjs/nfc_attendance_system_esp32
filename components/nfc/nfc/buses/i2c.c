@@ -47,12 +47,14 @@
 #define LOG_GROUP    NFC_LOG_GROUP_COM
 #define LOG_CATEGORY "libnfc.bus.i2c"
 
+static portTickType xLastWakeTime;
+
 /*
  * Bus free time (in ms) between a STOP condition and START condition. See
  * tBuf in the PN532 data sheet, section 12.25: Timing for the I2C interface,
- * table 320. I2C timing specification, page 211, rev. 3.2 - 2007-12-07.
+ * table 320. I2C timing specification, page 211, rev. 3.6 - 2017-11-28.
  */
-#define PN532_BUS_FREE_TIME 5
+#define PN532_BUS_FREE_TIME 2
 
 static uint8_t i2c_dev_addr = 0x00;
 
@@ -60,6 +62,7 @@ void
 i2c_open(i2c_port_t port, uint8_t addr)
 {
   i2c_dev_addr = addr;
+  xLastWakeTime = xTaskGetTickCount();
 }
 
 void
@@ -73,7 +76,9 @@ i2c_receive(i2c_port_t port, uint8_t *pbtRx, const size_t szRx, uint8_t mode)
 {
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
   if (mode == 0 || mode == 1) {
-    vTaskDelay(PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
+
+    vTaskDelayUntil(&xLastWakeTime, PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
+
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_READ, 1);
   }
@@ -89,6 +94,8 @@ i2c_receive(i2c_port_t port, uint8_t *pbtRx, const size_t szRx, uint8_t mode)
   }
   int res = i2c_master_cmd_begin(port, cmd, 500 / portTICK_RATE_MS);
   i2c_cmd_link_delete(cmd);
+
+  xLastWakeTime = xTaskGetTickCount();
 
   LOG_HEX(LOG_GROUP, "RX", pbtRx, szRx);
   if (res == ESP_OK) {
@@ -109,14 +116,17 @@ i2c_send(i2c_port_t port, const uint8_t *pbtTx, const size_t szTx)
 {
   LOG_HEX(LOG_GROUP, "TX", pbtTx, szTx);
 
+  vTaskDelayUntil(&xLastWakeTime, PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
+
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-  vTaskDelay(PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
   i2c_master_start(cmd);
   i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_WRITE, 1);
   i2c_master_write(cmd, (uint8_t *)pbtTx, szTx, 1);
   i2c_master_stop(cmd);
   int res = i2c_master_cmd_begin(port, cmd, 500 / portTICK_RATE_MS);
   i2c_cmd_link_delete(cmd);
+
+  xLastWakeTime = xTaskGetTickCount();
 
   if (res == ESP_OK) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG,
