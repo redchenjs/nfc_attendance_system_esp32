@@ -28,7 +28,7 @@
 
 /**
  * @file i2c.c
- * @brief I2C driver (implemented / tested for Linux only currently)
+ * @brief I2C driver
  */
 
 #ifdef HAVE_CONFIG_H
@@ -63,6 +63,13 @@
 #define LOG_GROUP    NFC_LOG_GROUP_COM
 #define LOG_CATEGORY "libnfc.bus.i2c"
 
+/*
+ * Bus free time (in ms) between a STOP condition and START condition. See
+ * tBuf in the PN532 data sheet, section 12.25: Timing for the I2C interface,
+ * table 320. I2C timing specification, page 211, rev. 3.2 - 2007-12-07.
+ */
+#define PN532_BUS_FREE_TIME 5
+
 static uint8_t i2c_dev_addr = 0x00;
 
 void
@@ -77,24 +84,25 @@ i2c_close(i2c_port_t port)
 
 }
 
-/**
- * @brief Read a frame from the I2C device and copy data to \a pbtRx
- *
- * @param pbtRx pointer on buffer used to store data
- * @param szRx length of the buffer
- * @return length (in bytes) of read data, or driver error code  (negative value)
- */
-ssize_t
-i2c_read(i2c_port_t port, uint8_t *pbtRx, const size_t szRx)
+int
+i2c_receive(i2c_port_t port, uint8_t *pbtRx, const size_t szRx, uint8_t mode)
 {
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-  i2c_master_start(cmd);
-  i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_READ, 1);
-  if (szRx > 1) {
-      i2c_master_read(cmd, pbtRx, szRx - 1, 0);
+  if (mode == 0 || mode == 1) {
+    vTaskDelay(PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_READ, 1);
   }
-  i2c_master_read_byte(cmd, pbtRx + szRx - 1, 1);
-  i2c_master_stop(cmd);
+  if (mode == 1 || mode == 2) {
+    i2c_master_read(cmd, pbtRx, szRx, 0);
+  }
+  if (mode == 0 || mode == 3) {
+    if (szRx > 1) {
+      i2c_master_read(cmd, pbtRx, szRx - 1, 0);
+    }
+    i2c_master_read_byte(cmd, pbtRx + szRx - 1, 1);
+    i2c_master_stop(cmd);
+  }
   int res = i2c_master_cmd_begin(port, cmd, 500 / portTICK_RATE_MS);
   i2c_cmd_link_delete(cmd);
 
@@ -102,7 +110,7 @@ i2c_read(i2c_port_t port, uint8_t *pbtRx, const size_t szRx)
   if (res == ESP_OK) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG,
             "read %d bytes successfully.", szRx);
-    return szRx;
+    return NFC_SUCCESS;
   } else if (res == ESP_ERR_TIMEOUT) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Error: read timeout.");
     return NFC_ETIMEOUT;
@@ -112,19 +120,13 @@ i2c_read(i2c_port_t port, uint8_t *pbtRx, const size_t szRx)
   }
 }
 
-/**
- * @brief Write a frame to I2C device containing \a pbtTx content
- *
- * @param pbtTx pointer on buffer containing data
- * @param szTx length of the buffer
- * @return NFC_SUCCESS on success, otherwise driver error code
- */
 int
-i2c_write(i2c_port_t port, const uint8_t *pbtTx, const size_t szTx)
+i2c_send(i2c_port_t port, const uint8_t *pbtTx, const size_t szTx)
 {
   LOG_HEX(LOG_GROUP, "TX", pbtTx, szTx);
 
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+  vTaskDelay(PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
   i2c_master_start(cmd);
   i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_WRITE, 1);
   i2c_master_write(cmd, (uint8_t *)pbtTx, szTx, 1);
@@ -134,7 +136,7 @@ i2c_write(i2c_port_t port, const uint8_t *pbtTx, const size_t szTx)
 
   if (res == ESP_OK) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG,
-            "wrote %d bytes successfully.", (int)szTx);
+            "wrote %d bytes successfully.", szTx);
     return NFC_SUCCESS;
   } else if (res == ESP_ERR_TIMEOUT) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Error: write timeout.");

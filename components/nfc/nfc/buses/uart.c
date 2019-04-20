@@ -92,11 +92,6 @@ uart_close(const uart_port_t port)
 
 }
 
-/**
- * @brief Receive data from UART and copy data to \a pbtRx
- *
- * @return 0 on success, otherwise driver error code
- */
 int
 uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout)
 {
@@ -108,11 +103,6 @@ uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p,
     return NFC_EIO;
 }
 
-/**
- * @brief Send \a pbtTx content to UART
- *
- * @return 0 on success, otherwise a driver error is returned
- */
 int
 uart_send(uart_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout)
 {

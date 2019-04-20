@@ -432,4 +432,3 @@ const struct nfc_driver pn532_uart_driver = {
   .idle           = pn53x_idle,
   .powerdown      = pn53x_PowerDown,
 };
-
