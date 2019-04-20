@@ -75,10 +75,6 @@ struct pn532_i2c_data {
   volatile bool abort_flag;
 };
 
-/* preamble and start bytes, see pn532-internal.h for details */
-const uint8_t pn53x_preamble_and_start[] = { 0x00, 0x00, 0xff };
-#define PN53X_PREAMBLE_AND_START_LEN	(sizeof(pn53x_preamble_and_start) / sizeof(pn53x_preamble_and_start[0]))
-
 /* Private Functions Prototypes */
 
 static nfc_device *pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring);
@@ -235,7 +231,7 @@ pn532_i2c_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, int
   }
 
   for (retries = PN532_SEND_RETRIES; retries > 0; retries--) {
-    res = i2c_send(DRIVER_DATA(pnd)->port, abtFrame, szFrame);
+    res = i2c_send(DRIVER_DATA(pnd)->port, abtFrame, szFrame, timeout);
     if (res >= 0)
       break;
 
@@ -251,7 +247,7 @@ pn532_i2c_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, int
   uint8_t abtRxBuf[PN53x_ACK_FRAME__LEN];
   res = pn532_i2c_wait_rdyframe(pnd, timeout);
   if (res == NFC_SUCCESS) {
-    res = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, sizeof(abtRxBuf), 3);
+    res = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, sizeof(abtRxBuf), 0, timeout, 3);
   }
   if (res != 0) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%s", "Unable to read ACK");
@@ -289,7 +285,7 @@ pn532_i2c_wait_rdyframe(nfc_device *pnd, int timeout)
   }
 
   do {
-    res = i2c_receive(DRIVER_DATA(pnd)->port, &rdy, 1, 1);
+    res = i2c_receive(DRIVER_DATA(pnd)->port, &rdy, 1, 0, timeout, 1);
 
     if (DRIVER_DATA(pnd)->abort_flag) {
       // Reset abort flag
@@ -301,14 +297,14 @@ pn532_i2c_wait_rdyframe(nfc_device *pnd, int timeout)
     }
 
     if (res != NFC_SUCCESS) {
-      i2c_receive(DRIVER_DATA(pnd)->port, &rdy, 1, 3);
+      i2c_receive(DRIVER_DATA(pnd)->port, &rdy, 1, 0, timeout, 3);
       done = true;
     } else {
       if (rdy & 1) {
         done = true;
       } else {
         /* Not ready yet. Check for elapsed timeout. */
-        i2c_receive(DRIVER_DATA(pnd)->port, &rdy, 1, 3);
+        i2c_receive(DRIVER_DATA(pnd)->port, &rdy, 1, 0, timeout, 3);
         if (timeout > 0) {
           gettimeofday(&cur_tv, NULL);
           duration = (cur_tv.tv_sec - start_tv.tv_sec) * 1000000L
@@ -340,7 +336,7 @@ pn532_i2c_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, int
 
   pnd->last_error = pn532_i2c_wait_rdyframe(pnd, timeout);
   if (pnd->last_error == NFC_SUCCESS) {
-    pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 5, 2);
+    pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 5, abort_p, timeout, 2);
   } else {
     return pnd->last_error;
   }
@@ -363,13 +359,13 @@ pn532_i2c_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, int
 
   if ((0x01 == abtRxBuf[3]) && (0xff == abtRxBuf[4])) {
     // Error frame
-    i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 3, 2);
+    i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 3, 0, timeout, 2);
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Application level error detected");
     pnd->last_error = NFC_EIO;
     goto error;
   } else if ((0xff == abtRxBuf[3]) && (0xff == abtRxBuf[4])) {
     // Extended frame
-    pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 3, 2);
+    pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 3, 0, timeout, 2);
     if (pnd->last_error != 0) {
       log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Unable to receive data. (RX)");
       goto error;
@@ -401,7 +397,7 @@ pn532_i2c_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, int
   }
 
   // TFI + PD0 (CC+1)
-  pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 2, 2);
+  pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 2, 0, timeout, 2);
   if (pnd->last_error != 0) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Unable to receive data. (RX)");
     goto error;
@@ -420,14 +416,14 @@ pn532_i2c_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, int
   }
 
   if (len) {
-    pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, pbtData, len, 2);
+    pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, pbtData, len, 0, timeout, 2);
     if (pnd->last_error != 0) {
       log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Unable to receive data. (RX)");
       goto error;
     }
   }
 
-  pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 2, 3);
+  pnd->last_error = i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 2, 0, timeout, 3);
   if (pnd->last_error != 0) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Unable to receive data. (RX)");
     goto error;
@@ -453,14 +449,14 @@ pn532_i2c_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, int
   // The PN53x command is done and we successfully received the reply
   return len;
 error:
-  i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 1, 3);
+  i2c_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 1, 0, timeout, 3);
   return pnd->last_error;
 }
 
 int
 pn532_i2c_ack(nfc_device *pnd)
 {
-  return i2c_send(DRIVER_DATA(pnd)->port, pn53x_ack_frame, sizeof(pn53x_ack_frame));
+  return i2c_send(DRIVER_DATA(pnd)->port, pn53x_ack_frame, sizeof(pn53x_ack_frame), 0);
 }
 
 static int
