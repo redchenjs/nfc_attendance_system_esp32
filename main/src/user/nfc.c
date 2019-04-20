@@ -66,10 +66,9 @@ void nfc_daemon(void *pvParameter)
 #endif
             ESP_LOGE(TAG, "device reset");
             pn532_setpin_reset(0);
-            vTaskDelayUntil(&xLastWakeTime, 400 / portTICK_RATE_MS);
+            vTaskDelay(100 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
-            vTaskDelayUntil(&xLastWakeTime, 100 / portTICK_RATE_MS);
-            xLastWakeTime = xTaskGetTickCount();
+            vTaskDelay(100 / portTICK_RATE_MS);
         }
         // Transceive some bytes if target available
         int res = 0;
@@ -113,6 +112,7 @@ void nfc_set_mode(uint8_t mode)
 {
     if (mode != 0) {
         pn532_setpin_reset(1);
+        vTaskDelay(100 / portTICK_RATE_MS);
         xEventGroupSetBits(daemon_event_group, NFC_DAEMON_READY_BIT);
     } else {
         xEventGroupClearBits(daemon_event_group, NFC_DAEMON_READY_BIT);
