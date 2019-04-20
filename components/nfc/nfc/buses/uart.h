@@ -43,13 +43,13 @@
 
 #  include "driver/uart.h"
 
-void    uart_open(uart_port_t port);
-void    uart_close(uart_port_t port);
+void     uart_open(uart_port_t port);
+void     uart_close(uart_port_t port);
 
-void    uart_set_speed(uart_port_t port, const uint32_t uiPortSpeed);
+void     uart_set_speed(uart_port_t port, const uint32_t uiPortSpeed);
 uint32_t uart_get_speed(const uart_port_t port);
 
-int     uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout);
-int     uart_send(uart_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout);
+int      uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout);
+int      uart_send(uart_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout);
 
 #endif // __NFC_BUS_UART_H__
