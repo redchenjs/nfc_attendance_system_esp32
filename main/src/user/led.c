@@ -34,13 +34,15 @@ void led_daemon(void *pvParameter)
 
     gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
 
+    portTickType xLastWakeTime = xTaskGetTickCount();
+
     while (1) {
-        portTickType xLastWakeTime = xTaskGetTickCount();
         if (i++ % led_mode_table[led_mode_index][1]) {
             gpio_set_level(CONFIG_LED_PIN, 0);
         } else {
             gpio_set_level(CONFIG_LED_PIN, 1);
         }
+
         vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
 }

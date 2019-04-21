@@ -76,9 +76,6 @@ i2c_receive(i2c_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, i
 {
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
   if (mode == 0 || mode == 1) {
-
-    vTaskDelayUntil(&xLastWakeTime, PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
-
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_READ, 1);
   }
@@ -92,10 +89,16 @@ i2c_receive(i2c_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, i
     i2c_master_read_byte(cmd, pbtRx + szRx - 1, 1);
     i2c_master_stop(cmd);
   }
-  int res = i2c_master_cmd_begin(port, cmd, timeout / portTICK_RATE_MS);
-  i2c_cmd_link_delete(cmd);
 
-  xLastWakeTime = xTaskGetTickCount();
+  if (mode == 0 || mode == 1) {
+    vTaskDelayUntil(&xLastWakeTime, PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
+  }
+  int res = i2c_master_cmd_begin(port, cmd, timeout / portTICK_RATE_MS);
+  if (mode == 0 || mode == 3) {
+    xLastWakeTime = xTaskGetTickCount();
+  }
+
+  i2c_cmd_link_delete(cmd);
 
   LOG_HEX(LOG_GROUP, "RX", pbtRx, szRx);
   if (res == ESP_OK) {
@@ -116,17 +119,17 @@ i2c_send(i2c_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout)
 {
   LOG_HEX(LOG_GROUP, "TX", pbtTx, szTx);
 
-  vTaskDelayUntil(&xLastWakeTime, PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
-
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();
   i2c_master_start(cmd);
   i2c_master_write_byte(cmd, i2c_dev_addr << 1 | I2C_MASTER_WRITE, 1);
   i2c_master_write(cmd, (uint8_t *)pbtTx, szTx, 1);
   i2c_master_stop(cmd);
-  int res = i2c_master_cmd_begin(port, cmd, timeout / portTICK_RATE_MS);
-  i2c_cmd_link_delete(cmd);
 
+  vTaskDelayUntil(&xLastWakeTime, PN532_BUS_FREE_TIME / portTICK_PERIOD_MS);
+  int res = i2c_master_cmd_begin(port, cmd, timeout / portTICK_RATE_MS);
   xLastWakeTime = xTaskGetTickCount();
+
+  i2c_cmd_link_delete(cmd);
 
   if (res == ESP_OK) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG,

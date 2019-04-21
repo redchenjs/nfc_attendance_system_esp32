@@ -54,6 +54,8 @@ void key_daemon(void *pvParameter)
     xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
     xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
 
+    portTickType xLastWakeTime = xTaskGetTickCount();
+
     while (1) {
         xEventGroupWaitBits(
             daemon_event_group,
@@ -62,8 +64,6 @@ void key_daemon(void *pvParameter)
             pdFALSE,
             portMAX_DELAY
         );
-
-        portTickType xLastWakeTime = xTaskGetTickCount();
 
         if (!gpio_get_level(CONFIG_SC_KEY_PIN)) {
             if (count[0]++ == 1) {

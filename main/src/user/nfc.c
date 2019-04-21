@@ -49,6 +49,8 @@ void nfc_daemon(void *pvParameter)
         goto err;
     }
 
+    portTickType xLastWakeTime = xTaskGetTickCount();
+
     while (1) {
         xEventGroupWaitBits(
             daemon_event_group,
@@ -57,7 +59,6 @@ void nfc_daemon(void *pvParameter)
             pdTRUE,
             portMAX_DELAY
         );
-        portTickType xLastWakeTime = xTaskGetTickCount();
         // Open NFC device
 #if defined(CONFIG_PN532_IFCE_UART)
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
