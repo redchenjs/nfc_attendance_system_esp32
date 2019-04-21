@@ -5,15 +5,16 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "mad.h"
-#include "stream.h"
-#include "frame.h"
-#include "synth.h"
+#include "esp_log.h"
+#include "esp_system.h"
 
 #include "freertos/FreeRTOS.h"
-#include "esp_log.h"
-
 #include "driver/i2s.h"
+
+#include "mad.h"
+#include "frame.h"
+#include "synth.h"
+#include "stream.h"
 
 #include "user/audio.h"
 #include "system/event.h"

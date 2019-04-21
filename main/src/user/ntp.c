@@ -5,8 +5,11 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "lwip/apps/sntp.h"
+#include <time.h>
+
 #include "esp_log.h"
+
+#include "lwip/apps/sntp.h"
 
 #include "user/gui.h"
 #include "user/led.h"
