@@ -19,8 +19,8 @@ config WIFI_HOSTNAME_PREFIX
     help
         WiFi hostname prefix for the device to use.
 
-config ENABLE_SMART_CONFIG
-    bool "Enable Smart Config"
+config ENABLE_SMARTCONFIG
+    bool "Enable SmartConfig"
     default y
     help
         Select this to enable wifi smartconfig.
@@ -28,16 +28,16 @@ config ENABLE_SMART_CONFIG
 config STORE_WIFI_TO_NVS
     bool "Store WiFi Configuration to NVS Flash"
     default y
-    depends on ENABLE_SMART_CONFIG
+    depends on ENABLE_SMARTCONFIG
     help
         Select this to store wifi configuration to nvs flash.
 
 choice SC_KEY_MODE
     prompt "SmartConfig Key Mode"
     default SC_KEY_MODE_LOW
-    depends on ENABLE_SMART_CONFIG
+    depends on ENABLE_SMARTCONFIG
     help
-        Smart Config Key Mode.
+        SmartConfig Key Mode.
 
 config SC_KEY_MODE_HIGH
     bool "High level is pressed"
@@ -53,9 +53,9 @@ endchoice
 config SC_KEY_PIN
     int "SmartConfig Key Pin"
     default 0
-    depends on ENABLE_SMART_CONFIG
+    depends on ENABLE_SMARTCONFIG
     help
-        Smart Config Key Pin.
+        SmartConfig Key Pin.
 endmenu
 
 menu "Server Configuration"

@@ -29,7 +29,7 @@ void wifi_init(void)
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-#if defined(CONFIG_ENABLE_SMART_CONFIG) && defined(CONFIG_STORE_WIFI_TO_NVS)
+#if defined(CONFIG_ENABLE_SMARTCONFIG) && defined(CONFIG_STORE_WIFI_TO_NVS)
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
     wifi_config_t wifi_stored_config;
     ESP_ERROR_CHECK(esp_wifi_get_config(ESP_IF_WIFI_STA, &wifi_stored_config));

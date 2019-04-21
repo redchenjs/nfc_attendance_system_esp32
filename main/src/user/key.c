@@ -19,7 +19,7 @@
 #include "user/nfc.h"
 #include "user/audio.h"
 #include "system/event.h"
-#include "user/smart_config.h"
+#include "user/smartconfig.h"
 
 #define TAG "key"
 
@@ -41,7 +41,7 @@ static void key_smartconfig_handle(void)
     audio_play_file(7);
 
     ESP_ERROR_CHECK(esp_smartconfig_set_type(SC_TYPE_ESPTOUCH));
-    ESP_ERROR_CHECK(esp_smartconfig_start(smart_config_callback));
+    ESP_ERROR_CHECK(esp_smartconfig_start(smartconfig_callback));
 }
 
 void key_daemon(void *pvParameter)

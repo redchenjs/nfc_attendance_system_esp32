@@ -1,5 +1,5 @@
 /*
- * smart_config.c
+ * smartconfig.c
  *
  *  Created on: 2018-04-01 15:04
  *      Author: Jack Chen <redchenjs@live.com>
@@ -18,15 +18,14 @@
 #include "user/led.h"
 #include "system/event.h"
 
-#define TAG "smart_config"
+#define TAG "smartconfig"
 
-void smart_config_callback(smartconfig_status_t status, void *pdata)
+void smartconfig_callback(smartconfig_status_t status, void *pdata)
 {
     static wifi_config_t wifi_config = {
         .sta = {
             .scan_method = WIFI_ALL_CHANNEL_SCAN,
             .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-            .threshold.rssi = -127,
             .threshold.authmode = WIFI_AUTH_WPA2_PSK
         },
     };
