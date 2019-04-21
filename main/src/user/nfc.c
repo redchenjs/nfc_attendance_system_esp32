@@ -8,6 +8,9 @@
 #include <string.h>
 
 #include "esp_log.h"
+#include "esp_system.h"
+
+#include "nfc/nfc.h"
 
 #include "user/gui.h"
 #include "user/ntp.h"
@@ -17,8 +20,6 @@
 #include "user/token.h"
 #include "system/event.h"
 #include "driver/pn532.h"
-
-#include "nfc/nfc.h"
 
 #define TAG "nfc"
 

@@ -5,10 +5,10 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "esp_log.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "driver/gpio.h"
 
 static const uint16_t led_mode_table[][2] = {

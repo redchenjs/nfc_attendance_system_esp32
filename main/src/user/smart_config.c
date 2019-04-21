@@ -7,13 +7,13 @@
 
 #include <string.h>
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "esp_smartconfig.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "user/led.h"
 #include "system/event.h"

@@ -5,8 +5,10 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "gfx.h"
 #include "esp_log.h"
+#include "esp_system.h"
+
+#include "gfx.h"
 
 #include "user/gui.h"
 #include "system/event.h"

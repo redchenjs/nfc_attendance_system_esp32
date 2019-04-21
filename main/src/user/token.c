@@ -7,10 +7,11 @@
 
 #include <string.h>
 
-#include "cJSON.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
 #include "esp_http_client.h"
+
+#include "cJSON.h"
 
 #include "user/gui.h"
 #include "user/nfc.h"
