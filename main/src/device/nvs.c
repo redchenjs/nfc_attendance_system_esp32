@@ -5,7 +5,6 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "esp_log.h"
 #include "nvs_flash.h"
 
 void nvs_init(void)

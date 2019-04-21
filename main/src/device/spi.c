@@ -6,6 +6,7 @@
  */
 
 #include "driver/spi_master.h"
+
 #include "driver/ssd1331.h"
 #include "driver/st7735.h"
 

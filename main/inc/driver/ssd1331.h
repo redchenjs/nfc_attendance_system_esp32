@@ -12,8 +12,8 @@
 
 #include "device/spi.h"
 
-#define SSD1331_SCREEN_WIDTH   96
-#define SSD1331_SCREEN_HEIGHT  64
+#define SSD1331_SCREEN_WIDTH  96
+#define SSD1331_SCREEN_HEIGHT 64
 
 extern void ssd1331_init_board(void);
 extern void ssd1331_setpin_dc(spi_transaction_t *);

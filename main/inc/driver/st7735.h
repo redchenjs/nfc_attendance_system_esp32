@@ -12,8 +12,8 @@
 
 #include "device/spi.h"
 
-#define ST7735_SCREEN_WIDTH   80
-#define ST7735_SCREEN_HEIGHT  160
+#define ST7735_SCREEN_WIDTH  80
+#define ST7735_SCREEN_HEIGHT 160
 
 extern void st7735_init_board(void);
 extern void st7735_setpin_dc(spi_transaction_t *);
