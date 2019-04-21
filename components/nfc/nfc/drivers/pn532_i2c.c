@@ -117,11 +117,7 @@ pn532_i2c_open(const nfc_context *context, const nfc_connstring connstring)
 
   i2c_port_t port;
 
-  if (strcmp("i2c0", port_s) == 0) {
-    port = I2C_NUM_0;
-  } else if (strcmp("i2c1", port_s) == 0) {
-    port = I2C_NUM_1;
-  } else {
+  if (sscanf(port_s, "i2c%1u", &port) != 1) {
     free(port_s);
     return NULL;
   }

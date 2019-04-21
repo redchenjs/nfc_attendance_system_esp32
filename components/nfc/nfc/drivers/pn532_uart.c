@@ -115,11 +115,7 @@ pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
 
   uart_port_t port;
 
-  if (strcmp("uart0", port_s) == 0) {
-    port = UART_NUM_0;
-  } else if (strcmp("uart1", port_s) == 0) {
-    port = UART_NUM_1;
-  } else {
+  if (sscanf(port_s, "uart%1u", &port) != 1) {
     free(port_s);
     return NULL;
   }
