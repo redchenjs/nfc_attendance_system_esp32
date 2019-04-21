@@ -5,8 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "esp_log.h"
-
+#include "freertos/FreeRTOS.h"
 #include "driver/uart.h"
 
 #include "device/uart.h"
