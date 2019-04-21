@@ -12,8 +12,8 @@
 #include "device/spi.h"
 #include "driver/st7735.h"
 
-#define ST7735_GPIO_PIN_DC  23
-#define ST7735_GPIO_PIN_RST 14
+#define ST7735_GPIO_PIN_DC  CONFIG_SCREEN_PANEL_DC_PIN
+#define ST7735_GPIO_PIN_RST CONFIG_SCREEN_PANEL_RST_PIN
 
 spi_transaction_t spi1_trans[6];
 

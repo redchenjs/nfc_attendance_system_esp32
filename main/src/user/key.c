@@ -49,7 +49,12 @@ void key_daemon(void *pvParameter)
     uint8_t count[1] = {0};
 
     gpio_set_direction(CONFIG_SC_KEY_PIN, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(CONFIG_SC_KEY_PIN, GPIO_PULLUP_ONLY);
+
+#if defined(CONFIG_SC_KEY_MODE_HIGH)
+    gpio_pulldown_en(CONFIG_SC_KEY_PIN);
+#else
+    gpio_pullup_en(CONFIG_SC_KEY_PIN);
+#endif
 
     xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
     xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
@@ -65,7 +70,11 @@ void key_daemon(void *pvParameter)
             portMAX_DELAY
         );
 
+#if defined(CONFIG_SC_KEY_MODE_HIGH)
+        if (gpio_get_level(CONFIG_SC_KEY_PIN)) {
+#else
         if (!gpio_get_level(CONFIG_SC_KEY_PIN)) {
+#endif
             if (count[0]++ == 1) {
                 count[0] = 0;
                 key_smartconfig_handle();

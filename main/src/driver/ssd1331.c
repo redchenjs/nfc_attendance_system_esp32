@@ -12,8 +12,8 @@
 #include "device/spi.h"
 #include "driver/ssd1331.h"
 
-#define SSD1331_GPIO_PIN_DC  23
-#define SSD1331_GPIO_PIN_RST 14
+#define SSD1331_GPIO_PIN_DC  CONFIG_SCREEN_PANEL_DC_PIN
+#define SSD1331_GPIO_PIN_RST CONFIG_SCREEN_PANEL_RST_PIN
 
 spi_transaction_t spi1_trans[3];
 

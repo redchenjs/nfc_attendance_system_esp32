@@ -26,10 +26,10 @@ void i2s0_init(void)
         .dma_buf_len = 64
     };
     i2s_pin_config_t pin_config = {
-        .bck_io_num = 22,
-        .ws_io_num = 21,
-        .data_out_num = 19,
-        .data_in_num = -1                                                       // Not used
+        .bck_io_num   = CONFIG_I2S_BCLK_PIN,
+        .ws_io_num    = CONFIG_I2S_LRCK_PIN,
+        .data_out_num = CONFIG_I2S_DOUT_PIN,
+        .data_in_num  = -1                                                     // Not used
     };
     ESP_ERROR_CHECK(i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL));
     ESP_ERROR_CHECK(i2s_set_pin(I2S_NUM_0, &pin_config));

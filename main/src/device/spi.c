@@ -16,8 +16,8 @@ void spi1_init(void)
 {
     spi_bus_config_t buscfg={
         .miso_io_num = -1,
-        .mosi_io_num = 18,
-        .sclk_io_num = 5,
+        .mosi_io_num = CONFIG_SPI_MOSI_PIN,
+        .sclk_io_num = CONFIG_SPI_SCLK_PIN,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
@@ -28,7 +28,7 @@ void spi1_init(void)
     };
     spi_device_interface_config_t devcfg={
         .mode = 0,                                // SPI mode 0
-        .spics_io_num = 27,                       // CS pin
+        .spics_io_num = CONFIG_SPI_CS_PIN,        // CS pin
 #if defined(CONFIG_SCREEN_PANEL_SSD1331)
         .clock_speed_hz = 26000000,               // Clock out at 26 MHz
         .queue_size = 3,                          // We want to be able to queue 3 transactions at a time

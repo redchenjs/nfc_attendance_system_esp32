@@ -38,11 +38,17 @@ void led_daemon(void *pvParameter)
 
     while (1) {
         if (i++ % led_mode_table[led_mode_index][1]) {
+#if defined(CONFIG_LED_MODE_HIGH)
             gpio_set_level(CONFIG_LED_PIN, 0);
         } else {
             gpio_set_level(CONFIG_LED_PIN, 1);
         }
-
+#else
+            gpio_set_level(CONFIG_LED_PIN, 1);
+        } else {
+            gpio_set_level(CONFIG_LED_PIN, 0);
+        }
+#endif
         vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
 }
