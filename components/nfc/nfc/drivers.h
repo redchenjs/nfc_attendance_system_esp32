@@ -42,4 +42,6 @@ extern const struct nfc_driver_list *nfc_drivers;
     #define DRIVER_PN532_I2C_ENABLED
 #endif
 
+#define PACKAGE_VERSION "libnfc-1.7.1"
+
 #endif // __NFC_DRIVERS_H__
