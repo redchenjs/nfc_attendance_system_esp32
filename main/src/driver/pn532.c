@@ -5,12 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "driver/i2c.h"
-#include "driver/uart.h"
 #include "driver/gpio.h"
-
-#include "device/i2c.h"
-#include "device/uart.h"
 
 void pn532_setpin_reset(uint8_t rst)
 {

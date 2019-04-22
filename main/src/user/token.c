@@ -54,17 +54,21 @@ esp_err_t token_event_handler(esp_http_client_event_t *evt)
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
-                gui_show_image(6);
-                audio_play_file(6);
                 xEventGroupSetBits(daemon_event_group, HTTP_DAEMON_TOKEN_FAILED_BIT);
             }
             cJSON_Delete(root);
         }
         break;
     }
-    case HTTP_EVENT_ON_FINISH:
+    case HTTP_EVENT_ON_FINISH: {
+        EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
+        if (uxBits & HTTP_DAEMON_TOKEN_FAILED_BIT) {
+            gui_show_image(6);
+            audio_play_file(6);
+        }
         xEventGroupClearBits(daemon_event_group, HTTP_DAEMON_TOKEN_READY_BIT);
         break;
+    }
     case HTTP_EVENT_DISCONNECTED:
         break;
     default:

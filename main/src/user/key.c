@@ -22,6 +22,7 @@
 
 #define TAG "key"
 
+#ifdef CONFIG_ENABLE_SMARTCONFIG
 static void key_smartconfig_handle(void)
 {
     EventBits_t uxBits = xEventGroupGetBits(system_event_group);
@@ -46,10 +47,11 @@ static void key_smartconfig_handle(void)
 void key_daemon(void *pvParameter)
 {
     uint8_t count[1] = {0};
+    portTickType xLastWakeTime;
 
     gpio_set_direction(CONFIG_SC_KEY_PIN, GPIO_MODE_INPUT);
 
-#if defined(CONFIG_SC_KEY_MODE_HIGH)
+#ifdef CONFIG_SC_KEY_MODE_HIGH
     gpio_pulldown_en(CONFIG_SC_KEY_PIN);
 #else
     gpio_pullup_en(CONFIG_SC_KEY_PIN);
@@ -57,8 +59,6 @@ void key_daemon(void *pvParameter)
 
     xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
     xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
-
-    portTickType xLastWakeTime = xTaskGetTickCount();
 
     while (1) {
         xEventGroupWaitBits(
@@ -69,7 +69,9 @@ void key_daemon(void *pvParameter)
             portMAX_DELAY
         );
 
-#if defined(CONFIG_SC_KEY_MODE_HIGH)
+        xLastWakeTime = xTaskGetTickCount();
+
+#ifdef CONFIG_SC_KEY_MODE_HIGH
         if (gpio_get_level(CONFIG_SC_KEY_PIN)) {
 #else
         if (!gpio_get_level(CONFIG_SC_KEY_PIN)) {
@@ -83,3 +85,4 @@ void key_daemon(void *pvParameter)
         vTaskDelayUntil(&xLastWakeTime, 10 / portTICK_RATE_MS);
     }
 }
+#endif

@@ -21,19 +21,19 @@ void user_init(void)
     xTaskCreate(nfc_daemon, "nfc_daemon", 5120, NULL, 5, NULL);
     xTaskCreate(ntp_daemon, "ntp_daemon", 2048, NULL, 5, NULL);
 
-#if defined(CONFIG_ENABLE_SMART_CONFIG)
+#ifdef CONFIG_ENABLE_SMARTCONFIG
     xTaskCreate(key_daemon, "key_daemon", 2048, NULL, 5, NULL);
 #endif
 
-#if defined(CONFIG_ENABLE_LED)
+#ifdef CONFIG_ENABLE_LED
     xTaskCreate(led_daemon, "led_daemon", 1024, NULL, 6, NULL);
 #endif
 
-#if defined(CONFIG_ENABLE_GUI)
+#ifdef CONFIG_ENABLE_GUI
     xTaskCreate(gui_daemon, "gui_daemon", 1024, NULL, 6, NULL);
 #endif
 
-#if defined(CONFIG_ENABLE_AUDIO)
+#ifdef CONFIG_ENABLE_AUDIO
     xTaskCreate(audio_daemon, "audio_daemon", 8448, NULL, 7, NULL);
 #endif
 

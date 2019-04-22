@@ -15,8 +15,9 @@
 
 #define TAG "gui"
 
+#ifdef CONFIG_ENABLE_GUI
 static const char *img_file_ptr[][2] = {
-#if defined(CONFIG_SCREEN_PANEL_SSD1331)
+#ifdef CONFIG_SCREEN_PANEL_SSD1331
     {ani0_96x64_gif_ptr, ani0_96x64_gif_end}, // "WiFi"
     {ani1_96x64_gif_ptr, ani1_96x64_gif_end}, // "Loading"
     {ani2_96x64_gif_ptr, ani2_96x64_gif_end}, // "Success"
@@ -26,7 +27,7 @@ static const char *img_file_ptr[][2] = {
     {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
     {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Config"
     {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#else
     {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
     {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
     {ani2_160x80_gif_ptr, ani2_160x80_gif_end}, // "Success"
@@ -79,10 +80,11 @@ void gui_daemon(void *pvParameter)
     ESP_LOGE(TAG, "task failed");
     esp_restart();
 }
+#endif
 
 void gui_show_image(uint8_t filename_index)
 {
-#if defined(CONFIG_ENABLE_GUI)
+#ifdef CONFIG_ENABLE_GUI
     if (filename_index >= (sizeof(img_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;

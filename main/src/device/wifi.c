@@ -29,7 +29,6 @@ void wifi_init(void)
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-#if defined(CONFIG_ENABLE_SMARTCONFIG) && defined(CONFIG_STORE_WIFI_TO_NVS)
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
     wifi_config_t wifi_stored_config;
     ESP_ERROR_CHECK(esp_wifi_get_config(ESP_IF_WIFI_STA, &wifi_stored_config));
@@ -38,10 +37,6 @@ void wifi_init(void)
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_stored_config));
         ESP_ERROR_CHECK(esp_wifi_start());
     } else if (strlen(CONFIG_WIFI_SSID) != 0) {
-#else
-    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-    if (strlen(CONFIG_WIFI_SSID) != 0) {
-#endif
         strncpy(
             (char *)wifi_config.sta.ssid,
             (char *)CONFIG_WIFI_SSID,
@@ -69,4 +64,5 @@ void wifi_init(void)
                 wifi_mac_address[5]);
     tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, wifi_hostname);
     snprintf(wifi_mac_string, sizeof(wifi_mac_string), MACSTR, MAC2STR(wifi_mac_address));
+    ESP_LOGI(TAG, "wifi initialized.");
 }

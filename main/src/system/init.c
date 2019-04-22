@@ -20,17 +20,17 @@ void device_init(void)
 
     wifi_init();
 
-#if defined(CONFIG_PN532_IFCE_UART)
+#ifdef CONFIG_PN532_IFCE_UART
     uart1_init();
-#elif defined(CONFIG_PN532_IFCE_I2C)
+#else
     i2c0_init();
 #endif
 
-#if defined(CONFIG_ENABLE_AUDIO)
+#ifdef CONFIG_ENABLE_AUDIO
     i2s0_init();
 #endif
 
-#if defined(CONFIG_ENABLE_GUI)
+#ifdef CONFIG_ENABLE_GUI
     spi1_init();
 #endif
 }

@@ -11,6 +11,9 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
+#define TAG "led"
+
+#ifdef CONFIG_ENABLE_LED
 static const uint16_t led_mode_table[][2] = {
 /*  { delay, count}  */
     {     0,     2},   // 0, Keep off
@@ -26,19 +29,18 @@ static const uint16_t led_mode_table[][2] = {
 };
 static uint8_t led_mode_index = 7;
 
-#define TAG "led"
-
 void led_daemon(void *pvParameter)
 {
     uint16_t i = 0;
+    portTickType xLastWakeTime;
 
     gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
 
-    portTickType xLastWakeTime = xTaskGetTickCount();
-
     while (1) {
+        xLastWakeTime = xTaskGetTickCount();
+
         if (i++ % led_mode_table[led_mode_index][1]) {
-#if defined(CONFIG_LED_MODE_HIGH)
+#ifdef CONFIG_LED_MODE_HIGH
             gpio_set_level(CONFIG_LED_PIN, 0);
         } else {
             gpio_set_level(CONFIG_LED_PIN, 1);
@@ -49,13 +51,15 @@ void led_daemon(void *pvParameter)
             gpio_set_level(CONFIG_LED_PIN, 0);
         }
 #endif
+
         vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
 }
+#endif
 
 void led_set_mode(uint8_t mode_index)
 {
-#if defined(CONFIG_ENABLE_LED)
+#ifdef CONFIG_ENABLE_LED
     if (mode_index >= (sizeof(led_mode_table) / 2)) {
         ESP_LOGE(TAG, "invalid mode index");
         return;

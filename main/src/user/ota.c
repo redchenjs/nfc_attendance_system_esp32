@@ -120,7 +120,7 @@ void ota_prepare_data(char *buf, int len)
 
 void ota_update(void)
 {
-#if defined(CONFIG_ENABLE_OTA)
+#ifdef CONFIG_ENABLE_OTA
     xEventGroupClearBits(system_event_group, INPUT_READY_BIT);
     ESP_LOGI(TAG, "check firmware update, running %s", firmware_get_version());
     EventBits_t uxBits = xEventGroupSync(

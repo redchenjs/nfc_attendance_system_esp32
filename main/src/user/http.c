@@ -45,14 +45,14 @@ void http_daemon(void *pvParameter)
         memset(post_data, 0, sizeof(post_data));
         memset(server_url, 0, sizeof(server_url));
 
-#if defined(CONFIG_TRANSFER_PROTOCOL_HTTP)
+#ifdef CONFIG_TRANSFER_PROTOCOL_HTTP
         strcpy(server_url, "http://");
 #else
         strcpy(server_url, "https://");
 #endif
         strcat(server_url, CONFIG_SERVER_URL);
         config.url = (const char *)server_url;
-#if defined(CONFIG_ENABLE_SERVER_CERT_VERIFY)
+#ifdef CONFIG_VERIFY_SERVER_CERT
         config.cert_pem = cert0_pem_ptr;
 #endif
 
@@ -78,11 +78,7 @@ void http_daemon(void *pvParameter)
 
         esp_err_t err = esp_http_client_perform(client);
         if (err != ESP_OK) {
-#if defined(CONFIG_TRANSFER_PROTOCOL_HTTP)
-            ESP_LOGE(TAG, "error perform http request %s", esp_err_to_name(err));
-#else
-            ESP_LOGE(TAG, "error perform https request %s", esp_err_to_name(err));
-#endif
+            ESP_LOGE(TAG, "error perform http(s) request %s", esp_err_to_name(err));
             if (config.event_handler != ota_event_handler) {
                 gui_show_image(6);
                 audio_play_file(5);

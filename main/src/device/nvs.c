@@ -5,7 +5,11 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include "esp_log.h"
+
 #include "nvs_flash.h"
+
+#define TAG "nvs"
 
 void nvs_init(void)
 {
@@ -15,4 +19,5 @@ void nvs_init(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    ESP_LOGI(TAG, "nvs initialized.");
 }

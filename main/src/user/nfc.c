@@ -43,14 +43,13 @@ void nfc_daemon(void *pvParameter)
         .nmt = NMT_ISO14443A,
         .nbr = NBR_106
     };
+    portTickType xLastWakeTime;
 
     nfc_init(&context);
     if (context == NULL) {
         ESP_LOGE(TAG, "unable to init libnfc (malloc)");
         goto err;
     }
-
-    portTickType xLastWakeTime = xTaskGetTickCount();
 
     while (1) {
         xEventGroupWaitBits(
@@ -60,10 +59,11 @@ void nfc_daemon(void *pvParameter)
             pdTRUE,
             portMAX_DELAY
         );
+        xLastWakeTime = xTaskGetTickCount();
         // Open NFC device
-#if defined(CONFIG_PN532_IFCE_UART)
+#ifdef CONFIG_PN532_IFCE_UART
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
-#elif defined(CONFIG_PN532_IFCE_I2C)
+#else
         while ((pnd = nfc_open(context, "pn532_i2c:i2c0")) == NULL) {
 #endif
             ESP_LOGE(TAG, "device reset");

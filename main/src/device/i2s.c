@@ -5,9 +5,14 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include "esp_log.h"
+
 #include "freertos/FreeRTOS.h"
 #include "driver/i2s.h"
 
+#define TAG "i2s"
+
+#ifdef CONFIG_ENABLE_AUDIO
 static int i2s0_sample_rate = 48000;
 static int i2s0_bits_per_sample = 16;
 
@@ -33,6 +38,7 @@ void i2s0_init(void)
     };
     ESP_ERROR_CHECK(i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL));
     ESP_ERROR_CHECK(i2s_set_pin(I2S_NUM_0, &pin_config));
+    ESP_LOGI(TAG, "i2s-0 initialized.");
 }
 
 void i2s0_set_sample_rate(int rate)
@@ -42,3 +48,4 @@ void i2s0_set_sample_rate(int rate)
         i2s0_sample_rate = rate;
     }
 }
+#endif

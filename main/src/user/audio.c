@@ -35,7 +35,7 @@ static uint8_t mp3_file_index = 0;
 
 void audio_daemon(void *pvParameters)
 {
-    //Allocate structs needed for mp3 decoding
+    // Allocate structs needed for mp3 decoding
     struct mad_stream *stream = malloc(sizeof(struct mad_stream));
     struct mad_frame  *frame  = malloc(sizeof(struct mad_frame));
     struct mad_synth  *synth  = malloc(sizeof(struct mad_synth));
@@ -47,7 +47,7 @@ void audio_daemon(void *pvParameters)
     while (1) {
         xEventGroupWaitBits(daemon_event_group, AUDIO_DAEMON_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
 
-        //Initialize mp3 parts
+        // Initialize mp3 parts
         mad_stream_init(stream);
         mad_frame_init(frame);
         mad_synth_init(synth);
@@ -84,7 +84,7 @@ err:
 
 void audio_play_file(uint8_t filename_index)
 {
-#if defined(CONFIG_ENABLE_AUDIO)
+#ifdef CONFIG_ENABLE_AUDIO
     if (filename_index >= (sizeof(mp3_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;

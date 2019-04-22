@@ -5,10 +5,14 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include "esp_log.h"
+
 #include "freertos/FreeRTOS.h"
 #include "driver/uart.h"
 
 #include "device/uart.h"
+
+#define TAG "uart"
 
 #define BUF_SIZE (128)
 
@@ -25,4 +29,5 @@ void uart1_init()
     ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0));
     ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, CONFIG_PN532_RX_SCL_PIN, CONFIG_PN532_TX_SDA_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
     ESP_ERROR_CHECK(uart_flush_input(UART_NUM_1));
+    ESP_LOGI(TAG, "uart-1 initialized.");
 }

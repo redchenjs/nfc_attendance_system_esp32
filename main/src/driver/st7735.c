@@ -12,6 +12,8 @@
 #include "device/spi.h"
 #include "driver/st7735.h"
 
+#ifdef CONFIG_SCREEN_PANEL_ST7735
+
 #define ST7735_GPIO_PIN_DC  CONFIG_SCREEN_PANEL_DC_PIN
 #define ST7735_GPIO_PIN_RST CONFIG_SCREEN_PANEL_RST_PIN
 
@@ -98,3 +100,4 @@ void st7735_refresh_gram(uint8_t *gram)
         spi_device_queue_trans(spi1, &spi1_trans[x], portMAX_DELAY);
     }
 }
+#endif
