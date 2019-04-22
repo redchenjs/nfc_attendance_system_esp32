@@ -15,7 +15,6 @@ choice TRANSFER_PROTOCOL
 
 config TRANSFER_PROTOCOL_HTTP
     bool "http"
-
 config TRANSFER_PROTOCOL_HTTPS
     bool "https"
 endchoice
@@ -68,7 +67,6 @@ choice SC_KEY_MODE
 
 config SC_KEY_MODE_HIGH
     bool "High level is pressed"
-
 config SC_KEY_MODE_LOW
     bool "Low level is pressed"
 endchoice
@@ -90,7 +88,6 @@ choice PN532_IFCE
 
 config PN532_IFCE_UART
     bool "UART"
-
 config PN532_IFCE_I2C
     bool "I2C"
 endchoice
@@ -130,7 +127,6 @@ choice SCREEN_PANEL
 
 config SCREEN_PANEL_SSD1331
     bool "SSD1331 96x64 OLED Panel"
-
 config SCREEN_PANEL_ST7735
     bool "ST7735 160x80 LCD Panel"
 endchoice
@@ -177,7 +173,6 @@ choice LED_MODE
 
 config LED_MODE_HIGH
     bool "High level is on"
-
 config LED_MODE_LOW
     bool "Low level is on"
 endchoice
