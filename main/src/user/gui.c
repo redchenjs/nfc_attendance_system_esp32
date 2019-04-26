@@ -27,7 +27,7 @@ static const char *img_file_ptr[][2] = {
     {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
     {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Config"
     {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
-#else
+#elif defined(CONFIG_SCREEN_PANEL_ST7735)
     {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
     {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
     {ani2_160x80_gif_ptr, ani2_160x80_gif_end}, // "Success"
@@ -37,6 +37,16 @@ static const char *img_file_ptr[][2] = {
     {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
     {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
     {ani8_160x80_gif_ptr, ani8_160x80_gif_end}  // "Updating"
+#elif defined(CONFIG_SCREEN_PANEL_ST7789)
+    {ani0_240x135_gif_ptr, ani0_240x135_gif_end}, // "WiFi"
+    {ani1_240x135_gif_ptr, ani1_240x135_gif_end}, // "Loading"
+    {ani2_240x135_gif_ptr, ani2_240x135_gif_end}, // "Success"
+    {ani3_240x135_gif_ptr, ani3_240x135_gif_end}, // "NFC"
+    {ani4_240x135_gif_ptr, ani4_240x135_gif_end}, // "PowerOff"
+    {ani5_240x135_gif_ptr, ani5_240x135_gif_end}, // "Clock"
+    {ani6_240x135_gif_ptr, ani6_240x135_gif_end}, // "Error"
+    {ani7_240x135_gif_ptr, ani7_240x135_gif_end}, // "Config"
+    {ani8_240x135_gif_ptr, ani8_240x135_gif_end}  // "Updating"
 #endif
 };
 static uint8_t img_file_index = 0;
