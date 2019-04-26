@@ -159,23 +159,23 @@
 
 #define GDISP_TOTAL_DISPLAYS                         1
 
-#define GDISP_DRIVER_LIST                            GDISPVMT_ST7735
+#define GDISP_DRIVER_LIST
    #ifdef GDISP_DRIVER_LIST
-       // For code and speed optimization define as TRUE or FALSE if all controllers have the same capability
-      //  #define GDISP_HARDWARE_STREAM_WRITE          TRUE
-      //  #define GDISP_HARDWARE_STREAM_READ           TRUE
-      //  #define GDISP_HARDWARE_STREAM_POS            FALSE
-      //  #define GDISP_HARDWARE_DRAWPIXEL             FALSE
-      //  #define GDISP_HARDWARE_CLEARS                FALSE
-      //  #define GDISP_HARDWARE_FILLS                 TRUE
-      //  #define GDISP_HARDWARE_BITFILLS              FALSE
-      //  #define GDISP_HARDWARE_SCROLL                FALSE
-      //  #define GDISP_HARDWARE_PIXELREAD             FALSE
-      //  #define GDISP_HARDWARE_CONTROL               TRUE
-      //  #define GDISP_HARDWARE_QUERY                 FALSE
-      //  #define GDISP_HARDWARE_CLIP                  FALSE
+      // For code and speed optimization define as TRUE or FALSE if all controllers have the same capability
+      // #define GDISP_HARDWARE_STREAM_WRITE          FALSE
+      // #define GDISP_HARDWARE_STREAM_READ           FALSE
+      // #define GDISP_HARDWARE_STREAM_POS            FALSE
+      // #define GDISP_HARDWARE_DRAWPIXEL             FALSE
+      // #define GDISP_HARDWARE_CLEARS                FALSE
+      // #define GDISP_HARDWARE_FILLS                 FALSE
+      // #define GDISP_HARDWARE_BITFILLS              FALSE
+      // #define GDISP_HARDWARE_SCROLL                FALSE
+      // #define GDISP_HARDWARE_PIXELREAD             FALSE
+      // #define GDISP_HARDWARE_CONTROL               FALSE
+      // #define GDISP_HARDWARE_QUERY                 FALSE
+      // #define GDISP_HARDWARE_CLIP                  FALSE
 
-       #define GDISP_PIXELFORMAT                     GDISP_PIXELFORMAT_RGB565
+      #define GDISP_PIXELFORMAT                     GDISP_PIXELFORMAT_RGB565
    #endif
 
 //#define GDISP_USE_GFXNET                             FALSE
