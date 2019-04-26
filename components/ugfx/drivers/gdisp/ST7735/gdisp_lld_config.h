@@ -1,8 +1,3 @@
-/*
- * Created by Oleg Gerasimov <ogerasimov@gmail.com>
- * 10.08.2016
-*/
-
 #ifndef _GDISP_LLD_CONFIG_H
 #define _GDISP_LLD_CONFIG_H
 

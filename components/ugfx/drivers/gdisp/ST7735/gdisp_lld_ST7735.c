@@ -1,10 +1,3 @@
-/*
- * This file is subject to the terms of the GFX License. If a copy of
- * the license was not distributed with this file, you can obtain one at:
- *
- *              http://ugfx.org/license.html
- */
-
 #include "gfx.h"
 
 #if GFX_USE_GDISP
@@ -19,27 +12,27 @@
     #undef GDISP_SCREEN_HEIGHT
 #endif
 
-#define GDISP_DRIVER_VMT			GDISPVMT_ST7735
+#define GDISP_DRIVER_VMT            GDISPVMT_ST7735
 #include "gdisp_lld_config.h"
 #include "../../../src/gdisp/gdisp_driver.h"
 
-#include "board_ST7735.h"
+#include "gdisp_lld_board.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
 
 #ifndef GDISP_SCREEN_HEIGHT
-    #define GDISP_SCREEN_HEIGHT		160
+    #define GDISP_SCREEN_HEIGHT     ST7735_SCREEN_HEIGHT
 #endif
 #ifndef GDISP_SCREEN_WIDTH
-    #define GDISP_SCREEN_WIDTH		80
+    #define GDISP_SCREEN_WIDTH      ST7735_SCREEN_WIDTH
 #endif
 #ifndef GDISP_INITIAL_CONTRAST
-    #define GDISP_INITIAL_CONTRAST	100
+    #define GDISP_INITIAL_CONTRAST  100
 #endif
 #ifndef GDISP_INITIAL_BACKLIGHT
-    #define GDISP_INITIAL_BACKLIGHT	100
+    #define GDISP_INITIAL_BACKLIGHT 100
 #endif
 
 #define GDISP_FLG_NEEDFLUSH         (GDISP_FLG_DRIVER<<0)
@@ -47,7 +40,7 @@
 #include "ST7735.h"
 
 // Some common routines and macros
-#define write_reg(g, reg, data)		{ write_cmd(g, reg); write_data(g, data); }
+#define write_reg(g, reg, data)     { write_cmd(g, reg); write_data(g, data); }
 
 LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     g->priv = gfxAlloc(GDISP_SCREEN_HEIGHT * GDISP_SCREEN_WIDTH * 2);
@@ -55,7 +48,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         gfxHalt("GDISP ST7735: Failed to allocate private memory");
     }
 
-    for(int i=0; i < GDISP_SCREEN_HEIGHT * GDISP_SCREEN_WIDTH * 2; i++) {
+    for (int i=0; i<GDISP_SCREEN_HEIGHT*GDISP_SCREEN_WIDTH*2; i++) {
         *((uint8_t *)g->priv + i) = 0x00;
     }
 
@@ -109,9 +102,9 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     write_cmd(g, ST7735_INVON);     // 13: Invert display, no args, no delay
     write_cmd(g, ST7735_MADCTL);    // 14: Memory access control (directions), 1 arg:
         write_data(g, 0x68);
-    write_cmd(g, ST7735_COLMOD);    // 15: set color mode, 1 arg, no delay:
+    write_cmd(g, ST7735_COLMOD);    // 15: Set color mode, 1 arg, no delay:
         write_data(g, 0x05);
-    write_cmd(g, ST7735_GMCTRP1);   // 16: Magical unicorn dust, 16 args, no delay:
+    write_cmd(g, ST7735_GAMCTRP1);  // 16: Magical unicorn dust, 16 args, no delay:
         write_data(g, 0x0B);
         write_data(g, 0x17);
         write_data(g, 0x0A);
@@ -128,7 +121,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         write_data(g, 0x09);
         write_data(g, 0x05);
         write_data(g, 0x10);
-    write_cmd(g, ST7735_GMCTRN1);   // 17: Sparkles and rainbows, 16 args, no delay:
+    write_cmd(g, ST7735_GAMCTRN1);  // 17: Sparkles and rainbows, 16 args, no delay:
         write_data(g, 0x0C);
         write_data(g, 0x19);
         write_data(g, 0x09);
@@ -145,17 +138,16 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         write_data(g, 0x09);
         write_data(g, 0x05);
         write_data(g, 0x10);
-    gfxSleepMilliseconds(120);
-    write_cmd(g, ST7735_NORON);     // 18: Normal display on, no args, w/delay
-    write_cmd(g, ST7735_DISPON);    // 19: Main screen turn on, no args w/delay
+    write_cmd(g, ST7735_NORON);     // 18: Normal display on, no args, no delay
+    write_cmd(g, ST7735_DISPON);    // 19: Main screen turn on, no args, no delay
 
     /* Initialise the GDISP structure */
+    g->g.Width  = GDISP_SCREEN_HEIGHT;
     g->g.Height = GDISP_SCREEN_WIDTH;
-    g->g.Width = GDISP_SCREEN_HEIGHT;
     g->g.Orientation = GDISP_ROTATE_0;
     g->g.Powermode = powerOn;
     g->g.Backlight = GDISP_INITIAL_BACKLIGHT;
-    g->g.Contrast = GDISP_INITIAL_CONTRAST;
+    g->g.Contrast  = GDISP_INITIAL_CONTRAST;
     return TRUE;
 }
 
@@ -174,13 +166,13 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     static int16_t stream_write_cx = 0;
     static int16_t stream_write_y  = 0;
     static int16_t stream_write_cy = 0;
-    LLDSPEC	void gdisp_lld_write_start(GDisplay *g) {
+    LLDSPEC    void gdisp_lld_write_start(GDisplay *g) {
         stream_write_x  = g->p.x;
         stream_write_cx = g->p.cx;
         stream_write_y  = g->p.y;
         stream_write_cy = g->p.cy;
     }
-    LLDSPEC	void gdisp_lld_write_color(GDisplay *g) {
+    LLDSPEC    void gdisp_lld_write_color(GDisplay *g) {
         LLDCOLOR_TYPE c = gdispColor2Native(g->p.color);
         *((uint8_t *)g->priv + (stream_write_x + stream_write_y * g->g.Width) * 2 + 0) = c >> 8;
         *((uint8_t *)g->priv + (stream_write_x + stream_write_y * g->g.Width) * 2 + 1) = c;
@@ -195,7 +187,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
             }
         }
     }
-    LLDSPEC	void gdisp_lld_write_stop(GDisplay *g) {
+    LLDSPEC    void gdisp_lld_write_stop(GDisplay *g) {
         stream_write_x  = 0;
         stream_write_cx = 0;
         stream_write_y  = 0;
@@ -209,13 +201,13 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     static int16_t stream_read_cx = 0;
     static int16_t stream_read_y  = 0;
     static int16_t stream_read_cy = 0;
-    LLDSPEC	void gdisp_lld_read_start(GDisplay *g) {
+    LLDSPEC    void gdisp_lld_read_start(GDisplay *g) {
         stream_read_x  = g->p.x;
         stream_read_cx = g->p.cx;
         stream_read_y  = g->p.y;
         stream_read_cy = g->p.cy;
     }
-    LLDSPEC	color_t gdisp_lld_read_color(GDisplay *g) {
+    LLDSPEC    color_t gdisp_lld_read_color(GDisplay *g) {
         LLDCOLOR_TYPE c = (*((uint8_t *)g->priv + (stream_read_x + stream_read_y * g->g.Width) * 2 + 0) << 8)
                         | (*((uint8_t *)g->priv + (stream_read_x + stream_read_y * g->g.Width) * 2 + 1));
         stream_read_x++;
@@ -230,7 +222,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         }
         return c;
     }
-    LLDSPEC	void gdisp_lld_read_stop(GDisplay *g) {
+    LLDSPEC    void gdisp_lld_read_stop(GDisplay *g) {
         stream_read_x  = 0;
         stream_read_cx = 0;
         stream_read_y  = 0;
@@ -260,9 +252,21 @@ LLDSPEC void gdisp_lld_control(GDisplay *g) {
             return;
         switch((orientation_t)g->p.ptr) {
             case GDISP_ROTATE_0:
+                g->g.Height = GDISP_SCREEN_HEIGHT;
+                g->g.Width  = GDISP_SCREEN_WIDTH;
+                break;
             case GDISP_ROTATE_90:
+                g->g.Height = GDISP_SCREEN_WIDTH;
+                g->g.Width  = GDISP_SCREEN_HEIGHT;
+                break;
             case GDISP_ROTATE_180:
+                g->g.Height = GDISP_SCREEN_HEIGHT;
+                g->g.Width  = GDISP_SCREEN_WIDTH;
+                break;
             case GDISP_ROTATE_270:
+                g->g.Height = GDISP_SCREEN_WIDTH;
+                g->g.Width  = GDISP_SCREEN_HEIGHT;
+                break;
             default:
                 return;
         }

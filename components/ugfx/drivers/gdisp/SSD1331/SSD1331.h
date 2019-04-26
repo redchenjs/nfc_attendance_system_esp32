@@ -1,5 +1,5 @@
-#ifndef SSD1331_H
-#define SSD1331_H
+#ifndef _SSD1331_H
+#define _SSD1331_H
 
 #define SSD1331_COLUMN_ADDRESS                  0x15        // 2 data: startx endx
 #define SSD1331_ROW_ADDRESS                     0x75        // 2 data: starty endy
@@ -86,4 +86,4 @@
 #define SSD1331_SCROLL_STOP                     0x2E        // 0 data
 #define SSD1331_SCROLL_START                    0x2F        // 0 data
 
-#endif // SSD1331_H
+#endif  // _SSD1331_H
