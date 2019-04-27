@@ -8,6 +8,6 @@
 #ifndef INC_USER_KEY_H_
 #define INC_USER_KEY_H_
 
-extern void key_daemon(void *pvParameter);
+extern void key_task(void *pvParameter);
 
 #endif /* INC_USER_KEY_H_ */

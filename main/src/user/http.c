@@ -10,6 +10,9 @@
 #include "esp_log.h"
 #include "esp_http_client.h"
 
+#include "os/event.h"
+#include "os/firmware.h"
+#include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/nfc.h"
 #include "user/led.h"
@@ -17,13 +20,10 @@
 #include "user/http.h"
 #include "user/token.h"
 #include "user/audio.h"
-#include "device/wifi.h"
-#include "system/event.h"
-#include "system/firmware.h"
 
 #define TAG "http"
 
-void http_daemon(void *pvParameter)
+void http_task(void *pvParameter)
 {
     char post_data[128] = {0};
     char server_url[80] = {0};
@@ -31,8 +31,8 @@ void http_daemon(void *pvParameter)
 
     while (1) {
         EventBits_t uxBits = xEventGroupWaitBits(
-            daemon_event_group,
-            HTTP_DAEMON_TOKEN_READY_BIT | HTTP_DAEMON_OTA_READY_BIT,
+            user_event_group,
+            HTTP_TOKEN_READY_BIT | HTTP_OTA_READY_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY
@@ -56,19 +56,19 @@ void http_daemon(void *pvParameter)
         config.cert_pem = cert0_pem_ptr;
 #endif
 
-        if (uxBits & HTTP_DAEMON_TOKEN_READY_BIT) {
+        if (uxBits & HTTP_TOKEN_READY_BIT) {
             config.event_handler = token_event_handler;
             token_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
-                daemon_event_group,
-                HTTP_DAEMON_TOKEN_FAILED_BIT | HTTP_DAEMON_TOKEN_FINISH_BIT
+                user_event_group,
+                HTTP_TOKEN_FAILED_BIT | HTTP_TOKEN_FINISH_BIT
             );
         } else {
             config.event_handler = ota_event_handler;
             ota_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
-                daemon_event_group,
-                HTTP_DAEMON_OTA_FAILED_BIT | HTTP_DAEMON_OTA_FINISH_BIT | HTTP_DAEMON_OTA_RUN_BIT
+                user_event_group,
+                HTTP_OTA_FAILED_BIT | HTTP_OTA_FINISH_BIT | HTTP_OTA_RUN_BIT
             );
         }
         esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -91,12 +91,12 @@ void http_daemon(void *pvParameter)
         led_set_mode(1);
         gui_show_image(3);
 
-        if (uxBits & HTTP_DAEMON_TOKEN_READY_BIT) {
-            xEventGroupSetBits(daemon_event_group, HTTP_DAEMON_TOKEN_FINISH_BIT);
-            xEventGroupClearBits(daemon_event_group, HTTP_DAEMON_TOKEN_READY_BIT);
+        if (uxBits & HTTP_TOKEN_READY_BIT) {
+            xEventGroupSetBits(user_event_group, HTTP_TOKEN_FINISH_BIT);
+            xEventGroupClearBits(user_event_group, HTTP_TOKEN_READY_BIT);
         } else {
-            xEventGroupSetBits(daemon_event_group, HTTP_DAEMON_OTA_FINISH_BIT);
-            xEventGroupClearBits(daemon_event_group, HTTP_DAEMON_OTA_READY_BIT);
+            xEventGroupSetBits(user_event_group, HTTP_OTA_FINISH_BIT);
+            xEventGroupClearBits(user_event_group, HTTP_OTA_READY_BIT);
         }
     }
 }

@@ -15,8 +15,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "os/event.h"
 #include "user/led.h"
-#include "system/event.h"
 
 #define TAG "smartconfig"
 
@@ -63,8 +63,8 @@ void smartconfig_callback(smartconfig_status_t status, void *pdata)
                 ESP_LOGI(TAG, "phone ip is %d.%d.%d.%d", phone_ip[0], phone_ip[1], phone_ip[2], phone_ip[3]);
             }
             esp_smartconfig_stop();
-            xEventGroupClearBits(system_event_group, WIFI_CONFIG_BIT);
-            xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
+            xEventGroupClearBits(os_event_group, WIFI_CONFIG_BIT);
+            xEventGroupSetBits(user_event_group, KEY_READY_BIT);
             break;
         default:
             break;

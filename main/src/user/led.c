@@ -29,7 +29,7 @@ static const uint16_t led_mode_table[][2] = {
 };
 static uint8_t led_mode_index = 7;
 
-void led_daemon(void *pvParameter)
+void led_task(void *pvParameter)
 {
     uint16_t i = 0;
     portTickType xLastWakeTime;

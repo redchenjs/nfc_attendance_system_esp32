@@ -9,8 +9,8 @@
 
 #include "driver/spi_master.h"
 
-#include "device/spi.h"
-#include "driver/ssd1331.h"
+#include "chip/spi.h"
+#include "board/ssd1331.h"
 
 #ifdef CONFIG_SCREEN_PANEL_SSD1331
 

@@ -16,8 +16,8 @@
 #include "synth.h"
 #include "stream.h"
 
+#include "os/event.h"
 #include "user/audio.h"
-#include "system/event.h"
 
 #define TAG "audio"
 
@@ -33,7 +33,7 @@ static const char *mp3_file_ptr[][2] = {
 };
 static uint8_t mp3_file_index = 0;
 
-void audio_daemon(void *pvParameters)
+void audio_task(void *pvParameters)
 {
     // Allocate structs needed for mp3 decoding
     struct mad_stream *stream = malloc(sizeof(struct mad_stream));
@@ -45,7 +45,7 @@ void audio_daemon(void *pvParameters)
     if (synth  == NULL) { ESP_LOGE(TAG, "malloc(synth) failed");  goto err; }
 
     while (1) {
-        xEventGroupWaitBits(daemon_event_group, AUDIO_DAEMON_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
+        xEventGroupWaitBits(user_event_group, AUDIO_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
 
         // Initialize mp3 parts
         mad_stream_init(stream);
@@ -90,6 +90,6 @@ void audio_play_file(uint8_t filename_index)
         return;
     }
     mp3_file_index = filename_index;
-    xEventGroupSetBits(daemon_event_group, AUDIO_DAEMON_READY_BIT);
+    xEventGroupSetBits(user_event_group, AUDIO_READY_BIT);
 #endif
 }

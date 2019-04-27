@@ -13,11 +13,11 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
+#include "os/event.h"
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/nfc.h"
 #include "user/audio.h"
-#include "system/event.h"
 #include "user/smartconfig.h"
 
 #define TAG "key"
@@ -25,15 +25,15 @@
 #ifdef CONFIG_ENABLE_SMARTCONFIG
 static void key_smartconfig_handle(void)
 {
-    EventBits_t uxBits = xEventGroupGetBits(system_event_group);
+    EventBits_t uxBits = xEventGroupGetBits(os_event_group);
     if (uxBits & INPUT_READY_BIT) {
         ESP_LOGI(TAG, "smartconfig key pressed");
-        xEventGroupClearBits(daemon_event_group, KEY_DAEMON_READY_BIT);
+        xEventGroupClearBits(user_event_group, KEY_READY_BIT);
     } else {
         return;
     }
 
-    xEventGroupSetBits(system_event_group, WIFI_CONFIG_BIT);
+    xEventGroupSetBits(os_event_group, WIFI_CONFIG_BIT);
 
     nfc_set_mode(0);
     led_set_mode(7);
@@ -44,7 +44,7 @@ static void key_smartconfig_handle(void)
     ESP_ERROR_CHECK(esp_smartconfig_start(smartconfig_callback));
 }
 
-void key_daemon(void *pvParameter)
+void key_task(void *pvParameter)
 {
     uint8_t count[1] = {0};
     portTickType xLastWakeTime;
@@ -57,13 +57,13 @@ void key_daemon(void *pvParameter)
     gpio_pullup_en(CONFIG_SC_KEY_PIN);
 #endif
 
-    xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
-    xEventGroupSetBits(daemon_event_group, KEY_DAEMON_READY_BIT);
+    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
+    xEventGroupSetBits(user_event_group, KEY_READY_BIT);
 
     while (1) {
         xEventGroupWaitBits(
-            daemon_event_group,
-            KEY_DAEMON_READY_BIT,
+            user_event_group,
+            KEY_READY_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY

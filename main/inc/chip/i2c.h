@@ -5,9 +5,9 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_DEVICE_I2C_C_
-#define INC_DEVICE_I2C_C_
+#ifndef INC_CHIP_I2C_H_
+#define INC_CHIP_I2C_H_
 
 extern void i2c0_init(void);
 
-#endif /* INC_DEVICE_I2C_C_ */
+#endif /* INC_CHIP_I2C_H_ */

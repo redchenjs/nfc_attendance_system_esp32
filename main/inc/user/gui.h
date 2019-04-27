@@ -96,7 +96,7 @@ extern const char ani8_240x135_gif_ptr[] asm("_binary_ani8_240x135_gif_start");
 extern const char ani8_240x135_gif_end[] asm("_binary_ani8_240x135_gif_end");
 #endif
 
-extern void gui_daemon(void *pvParameter);
+extern void gui_task(void *pvParameter);
 extern void gui_show_image(uint8_t filename_index);
 
 #endif /* INC_USER_GUI_H_ */

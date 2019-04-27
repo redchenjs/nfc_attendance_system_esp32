@@ -5,12 +5,12 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_DRIVER_SSD1331_H_
-#define INC_DRIVER_SSD1331_H_
+#ifndef INC_BOARD_SSD1331_H_
+#define INC_BOARD_SSD1331_H_
 
 #include <stdint.h>
 
-#include "device/spi.h"
+#include "chip/spi.h"
 
 #define SSD1331_SCREEN_WIDTH  96
 #define SSD1331_SCREEN_HEIGHT 64
@@ -23,4 +23,4 @@ extern void ssd1331_write_cmd(uint8_t cmd);
 extern void ssd1331_write_data(uint8_t data);
 extern void ssd1331_refresh_gram(uint8_t *gram);
 
-#endif /* INC_DRIVER_SSD1331_H_ */
+#endif /* INC_BOARD_SSD1331_H_ */

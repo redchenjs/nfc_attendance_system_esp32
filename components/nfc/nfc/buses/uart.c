@@ -39,7 +39,7 @@
 #include "nfc/nfc.h"
 #include "nfc-internal.h"
 
-#include "driver/uart.h"
+#include "chip/uart.h"
 
 #define LOG_GROUP    NFC_LOG_GROUP_COM
 #define LOG_CATEGORY "libnfc.bus.uart"

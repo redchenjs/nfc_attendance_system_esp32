@@ -10,8 +10,8 @@
 
 #include "gfx.h"
 
+#include "os/event.h"
 #include "user/gui.h"
-#include "system/event.h"
 
 #define TAG "gui"
 
@@ -51,7 +51,7 @@ static const char *img_file_ptr[][2] = {
 };
 static uint8_t img_file_index = 0;
 
-void gui_daemon(void *pvParameter)
+void gui_task(void *pvParameter)
 {
     gdispImage gfx_image;
 
@@ -59,8 +59,8 @@ void gui_daemon(void *pvParameter)
 
     while (1) {
         xEventGroupWaitBits(
-            daemon_event_group,
-            GUI_DAEMON_RELOAD_BIT,
+            user_event_group,
+            GUI_RELOAD_BIT,
             pdTRUE,
             pdFALSE,
             portMAX_DELAY
@@ -68,7 +68,7 @@ void gui_daemon(void *pvParameter)
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, Black);
             while (1) {
-                if (xEventGroupGetBits(daemon_event_group) & GUI_DAEMON_RELOAD_BIT) {
+                if (xEventGroupGetBits(user_event_group) & GUI_RELOAD_BIT) {
                     break;
                 }
                 if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
@@ -100,6 +100,6 @@ void gui_show_image(uint8_t filename_index)
         return;
     }
     img_file_index = filename_index;
-    xEventGroupSetBits(daemon_event_group, GUI_DAEMON_RELOAD_BIT);
+    xEventGroupSetBits(user_event_group, GUI_RELOAD_BIT);
 #endif
 }

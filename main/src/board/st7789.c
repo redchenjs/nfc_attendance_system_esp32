@@ -9,8 +9,8 @@
 
 #include "driver/spi_master.h"
 
-#include "device/spi.h"
-#include "driver/st7789.h"
+#include "chip/spi.h"
+#include "board/st7789.h"
 
 #ifdef CONFIG_SCREEN_PANEL_ST7789
 

@@ -13,13 +13,13 @@
 
 #include "cJSON.h"
 
+#include "os/event.h"
+#include "os/firmware.h"
+#include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/nfc.h"
 #include "user/led.h"
 #include "user/audio.h"
-#include "device/wifi.h"
-#include "system/event.h"
-#include "system/firmware.h"
 
 #define TAG "token"
 
@@ -54,19 +54,19 @@ esp_err_t token_event_handler(esp_http_client_event_t *evt)
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
-                xEventGroupSetBits(daemon_event_group, HTTP_DAEMON_TOKEN_FAILED_BIT);
+                xEventGroupSetBits(user_event_group, HTTP_TOKEN_FAILED_BIT);
             }
             cJSON_Delete(root);
         }
         break;
     }
     case HTTP_EVENT_ON_FINISH: {
-        EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
-        if (uxBits & HTTP_DAEMON_TOKEN_FAILED_BIT) {
+        EventBits_t uxBits = xEventGroupGetBits(user_event_group);
+        if (uxBits & HTTP_TOKEN_FAILED_BIT) {
             gui_show_image(6);
             audio_play_file(6);
         }
-        xEventGroupClearBits(daemon_event_group, HTTP_DAEMON_TOKEN_READY_BIT);
+        xEventGroupClearBits(user_event_group, HTTP_TOKEN_READY_BIT);
         break;
     }
     case HTTP_EVENT_DISCONNECTED:
@@ -90,16 +90,16 @@ void token_prepare_data(char *buf, int len)
 
 void token_verify(char *token)
 {
-    xEventGroupClearBits(system_event_group, INPUT_READY_BIT);
+    xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     data_ptr = token;
     EventBits_t uxBits = xEventGroupSync(
-        daemon_event_group,
-        HTTP_DAEMON_TOKEN_READY_BIT,
-        HTTP_DAEMON_TOKEN_FINISH_BIT,
+        user_event_group,
+        HTTP_TOKEN_READY_BIT,
+        HTTP_TOKEN_FINISH_BIT,
         30000 / portTICK_RATE_MS
     );
-    if ((uxBits & HTTP_DAEMON_TOKEN_FINISH_BIT) == 0) {
-        xEventGroupClearBits(daemon_event_group, HTTP_DAEMON_TOKEN_READY_BIT);
+    if ((uxBits & HTTP_TOKEN_FINISH_BIT) == 0) {
+        xEventGroupClearBits(user_event_group, HTTP_TOKEN_READY_BIT);
     }
-    xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
+    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 }

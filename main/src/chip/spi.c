@@ -9,9 +9,9 @@
 
 #include "driver/spi_master.h"
 
-#include "driver/ssd1331.h"
-#include "driver/st7735.h"
-#include "driver/st7789.h"
+#include "board/ssd1331.h"
+#include "board/st7735.h"
+#include "board/st7789.h"
 
 #define TAG "spi"
 

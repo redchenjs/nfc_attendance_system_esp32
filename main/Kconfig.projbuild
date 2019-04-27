@@ -75,8 +75,6 @@ config SC_KEY_PIN
     int "SmartConfig Key Pin"
     default 0
     depends on ENABLE_SMARTCONFIG
-    help
-        SmartConfig Key Pin.
 endmenu
 
 menu "NFC Configuration"
@@ -95,20 +93,14 @@ endchoice
 config PN532_RST_PIN
     int "PN532 RST Pin"
     default 26
-    help
-        PN532 RST Pin.
 
 config PN532_TX_SDA_PIN
     int "PN532 TX/SDA Pin"
     default 17
-    help
-        PN532 TX/SDA Pin.
 
 config PN532_RX_SCL_PIN
     int "PN532 RX/SCL Pin"
     default 16
-    help
-        PN532 RX/SCL Pin.
 endmenu
 
 menu "GUI Configuration"
@@ -123,7 +115,7 @@ choice SCREEN_PANEL
     default SCREEN_PANEL_ST7735
     depends on ENABLE_GUI
     help
-        Select to use which screen panel.
+        Select which screen panel to use.
 
 config SCREEN_PANEL_SSD1331
     bool "SSD1331 96x64 OLED Panel"
@@ -183,8 +175,6 @@ config LED_PIN
     int "LED Pin"
     default 25
     depends on ENABLE_LED
-    help
-        LED pin for the device to use.
 endmenu
 
 menu "Audio Configuration"

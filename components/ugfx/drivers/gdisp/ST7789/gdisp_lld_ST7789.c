@@ -150,13 +150,13 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     static int16_t stream_write_cx = 0;
     static int16_t stream_write_y  = 0;
     static int16_t stream_write_cy = 0;
-    LLDSPEC    void gdisp_lld_write_start(GDisplay *g) {
+    LLDSPEC void gdisp_lld_write_start(GDisplay *g) {
         stream_write_x  = g->p.x;
         stream_write_cx = g->p.cx;
         stream_write_y  = g->p.y;
         stream_write_cy = g->p.cy;
     }
-    LLDSPEC    void gdisp_lld_write_color(GDisplay *g) {
+    LLDSPEC void gdisp_lld_write_color(GDisplay *g) {
         LLDCOLOR_TYPE c = gdispColor2Native(g->p.color);
         *((uint8_t *)g->priv + (stream_write_x + stream_write_y * g->g.Width) * 2 + 0) = c >> 8;
         *((uint8_t *)g->priv + (stream_write_x + stream_write_y * g->g.Width) * 2 + 1) = c;
@@ -171,7 +171,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
             }
         }
     }
-    LLDSPEC    void gdisp_lld_write_stop(GDisplay *g) {
+    LLDSPEC void gdisp_lld_write_stop(GDisplay *g) {
         stream_write_x  = 0;
         stream_write_cx = 0;
         stream_write_y  = 0;
@@ -185,13 +185,13 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     static int16_t stream_read_cx = 0;
     static int16_t stream_read_y  = 0;
     static int16_t stream_read_cy = 0;
-    LLDSPEC    void gdisp_lld_read_start(GDisplay *g) {
+    LLDSPEC void gdisp_lld_read_start(GDisplay *g) {
         stream_read_x  = g->p.x;
         stream_read_cx = g->p.cx;
         stream_read_y  = g->p.y;
         stream_read_cy = g->p.cy;
     }
-    LLDSPEC    color_t gdisp_lld_read_color(GDisplay *g) {
+    LLDSPEC color_t gdisp_lld_read_color(GDisplay *g) {
         LLDCOLOR_TYPE c = (*((uint8_t *)g->priv + (stream_read_x + stream_read_y * g->g.Width) * 2 + 0) << 8)
                         | (*((uint8_t *)g->priv + (stream_read_x + stream_read_y * g->g.Width) * 2 + 1));
         stream_read_x++;
@@ -206,7 +206,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         }
         return c;
     }
-    LLDSPEC    void gdisp_lld_read_stop(GDisplay *g) {
+    LLDSPEC void gdisp_lld_read_stop(GDisplay *g) {
         stream_read_x  = 0;
         stream_read_cx = 0;
         stream_read_y  = 0;
@@ -256,6 +256,7 @@ LLDSPEC void gdisp_lld_control(GDisplay *g) {
         }
         g->g.Orientation = (orientation_t)g->p.ptr;
         return;
+
     case GDISP_CONTROL_BACKLIGHT:
         if ((unsigned)g->p.ptr > 100)
             g->p.ptr = (void *)100;

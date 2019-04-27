@@ -9,8 +9,8 @@
 
 #include "driver/spi_master.h"
 
-#include "device/spi.h"
-#include "driver/st7735.h"
+#include "chip/spi.h"
+#include "board/st7735.h"
 
 #ifdef CONFIG_SCREEN_PANEL_ST7735
 

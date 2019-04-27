@@ -12,14 +12,14 @@
 
 #include "nfc/nfc.h"
 
+#include "os/event.h"
+#include "board/pn532.h"
 #include "user/gui.h"
 #include "user/ntp.h"
 #include "user/nfc.h"
 #include "user/led.h"
 #include "user/audio.h"
 #include "user/token.h"
-#include "system/event.h"
-#include "driver/pn532.h"
 
 #define TAG "nfc"
 
@@ -34,7 +34,7 @@
 static uint8_t abtRx[RX_FRAME_LEN + 1] = {0x00};
 static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05, 0xF2, 0x22, 0x22, 0x22, 0x22};
 
-void nfc_daemon(void *pvParameter)
+void nfc_task(void *pvParameter)
 {
     nfc_target nt;
     nfc_device *pnd;
@@ -53,8 +53,8 @@ void nfc_daemon(void *pvParameter)
 
     while (1) {
         xEventGroupWaitBits(
-            daemon_event_group,
-            NFC_DAEMON_READY_BIT,
+            user_event_group,
+            NFC_READY_BIT,
             pdFALSE,
             pdTRUE,
             portMAX_DELAY
@@ -115,9 +115,9 @@ void nfc_set_mode(uint8_t mode)
     if (mode != 0) {
         pn532_setpin_reset(1);
         vTaskDelay(100 / portTICK_RATE_MS);
-        xEventGroupSetBits(daemon_event_group, NFC_DAEMON_READY_BIT);
+        xEventGroupSetBits(user_event_group, NFC_READY_BIT);
     } else {
-        xEventGroupClearBits(daemon_event_group, NFC_DAEMON_READY_BIT);
+        xEventGroupClearBits(user_event_group, NFC_READY_BIT);
         pn532_setpin_reset(0);
     }
 }

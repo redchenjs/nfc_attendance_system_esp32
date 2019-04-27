@@ -1,7 +1,7 @@
 #ifndef _GDISP_LLD_BOARD_H
 #define _GDISP_LLD_BOARD_H
 
-#include "driver/ssd1331.h"
+#include "board/ssd1331.h"
 
 #define init_board(g)           ssd1331_init_board()
 #define setpin_reset(g, rst)    ssd1331_setpin_reset(rst)

@@ -10,8 +10,6 @@
 #include "freertos/FreeRTOS.h"
 #include "driver/uart.h"
 
-#include "device/uart.h"
-
 #define TAG "uart"
 
 #define BUF_SIZE (128)

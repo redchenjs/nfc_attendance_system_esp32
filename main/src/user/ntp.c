@@ -11,18 +11,18 @@
 
 #include "lwip/apps/sntp.h"
 
+#include "os/event.h"
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/ota.h"
-#include "system/event.h"
 
 #define TAG "ntp"
 
-void ntp_daemon(void *pvParameter)
+void ntp_task(void *pvParameter)
 {
     xEventGroupWaitBits(
-        daemon_event_group,
-        NTP_DAEMON_READY_BIT,
+        user_event_group,
+        NTP_READY_BIT,
         pdTRUE,
         pdFALSE,
         portMAX_DELAY
@@ -66,12 +66,12 @@ void ntp_daemon(void *pvParameter)
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
 
-    xEventGroupSetBits(daemon_event_group, NTP_DAEMON_FINISH_BIT);
+    xEventGroupSetBits(user_event_group, NTP_FINISH_BIT);
 
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
-        EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
-        if ((uxBits & NFC_DAEMON_READY_BIT) == 0) {
+        EventBits_t uxBits = xEventGroupGetBits(user_event_group);
+        if ((uxBits & NFC_READY_BIT) == 0) {
             continue;
         }
         time(&now);
@@ -84,17 +84,17 @@ void ntp_daemon(void *pvParameter)
 
 void ntp_sync_time(void)
 {
-    xEventGroupClearBits(system_event_group, INPUT_READY_BIT);
-    EventBits_t uxBits = xEventGroupGetBits(daemon_event_group);
-    if ((uxBits & NTP_DAEMON_FINISH_BIT) == 0) {
-        xEventGroupSetBits(daemon_event_group, NTP_DAEMON_READY_BIT);
+    xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
+    EventBits_t uxBits = xEventGroupGetBits(user_event_group);
+    if ((uxBits & NTP_FINISH_BIT) == 0) {
+        xEventGroupSetBits(user_event_group, NTP_READY_BIT);
         xEventGroupWaitBits(
-            daemon_event_group,
-            NTP_DAEMON_FINISH_BIT,
+            user_event_group,
+            NTP_FINISH_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY
         );
     }
-    xEventGroupSetBits(system_event_group, INPUT_READY_BIT);
+    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 }

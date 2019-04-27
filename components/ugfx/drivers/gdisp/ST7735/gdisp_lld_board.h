@@ -1,7 +1,7 @@
 #ifndef _GDISP_LLD_BOARD_H
 #define _GDISP_LLD_BOARD_H
 
-#include "driver/st7735.h"
+#include "board/st7735.h"
 
 #define init_board(g)           st7735_init_board()
 #define setpin_reset(g, rst)    st7735_setpin_reset(rst)

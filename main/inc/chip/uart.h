@@ -5,9 +5,9 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef DEVICE_UART_H_
-#define DEVICE_UART_H_
+#ifndef INC_CHIP_UART_H_
+#define INC_CHIP_UART_H_
 
 extern void uart1_init(void);
 
-#endif /* DEVICE_UART_H_ */
+#endif /* INC_CHIP_UART_H_ */

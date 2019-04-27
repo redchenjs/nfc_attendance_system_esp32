@@ -5,9 +5,9 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef DEVICE_NVS_H_
-#define DEVICE_NVS_H_
+#ifndef INC_CHIP_NVS_H_
+#define INC_CHIP_NVS_H_
 
 extern void nvs_init(void);
 
-#endif /* DEVICE_NVS_H_ */
+#endif /* INC_CHIP_NVS_H_ */

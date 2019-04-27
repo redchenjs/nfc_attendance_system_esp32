@@ -5,12 +5,12 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_DRIVER_ST7789_H_
-#define INC_DRIVER_ST7789_H_
+#ifndef INC_BOARD_ST7789_H_
+#define INC_BOARD_ST7789_H_
 
 #include <stdint.h>
 
-#include "device/spi.h"
+#include "chip/spi.h"
 
 #define ST7789_SCREEN_WIDTH  135
 #define ST7789_SCREEN_HEIGHT 240
@@ -23,4 +23,4 @@ extern void st7789_write_cmd(uint8_t cmd);
 extern void st7789_write_data(uint8_t data);
 extern void st7789_refresh_gram(uint8_t *gram);
 
-#endif /* INC_DRIVER_ST7789_H_ */
+#endif /* INC_BOARD_ST7789_H_ */

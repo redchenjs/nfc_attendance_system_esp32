@@ -5,12 +5,12 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_DRIVER_ST7735_H_
-#define INC_DRIVER_ST7735_H_
+#ifndef INC_BOARD_ST7735_H_
+#define INC_BOARD_ST7735_H_
 
 #include <stdint.h>
 
-#include "device/spi.h"
+#include "chip/spi.h"
 
 #define ST7735_SCREEN_WIDTH  80
 #define ST7735_SCREEN_HEIGHT 160
@@ -23,4 +23,4 @@ extern void st7735_write_cmd(uint8_t cmd);
 extern void st7735_write_data(uint8_t data);
 extern void st7735_refresh_gram(uint8_t *gram);
 
-#endif /* INC_DRIVER_ST7735_H_ */
+#endif /* INC_BOARD_ST7735_H_ */

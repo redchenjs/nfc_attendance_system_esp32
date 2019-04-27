@@ -1,5 +1,5 @@
 /*
- * event.c
+ * os.c
  *
  *  Created on: 2018-03-04 20:07
  *      Author: Jack Chen <redchenjs@live.com>
@@ -14,20 +14,20 @@
 
 #include "freertos/event_groups.h"
 
+#include "os/event.h"
 #include "user/ota.h"
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/nfc.h"
 #include "user/ntp.h"
 #include "user/audio.h"
-#include "system/event.h"
 
 #define TAG "event"
 
-EventGroupHandle_t system_event_group;
-EventGroupHandle_t daemon_event_group;
+EventGroupHandle_t os_event_group;
+EventGroupHandle_t user_event_group;
 
-static esp_err_t system_event_handler(void *ctx, system_event_t *event)
+esp_err_t os_event_handler(void *ctx, system_event_t *event)
 {
     switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
@@ -35,7 +35,7 @@ static esp_err_t system_event_handler(void *ctx, system_event_t *event)
             ESP_ERROR_CHECK(esp_wifi_connect());
             break;
         case SYSTEM_EVENT_STA_GOT_IP: {
-            xEventGroupSetBits(system_event_group, WIFI_READY_BIT);
+            xEventGroupSetBits(os_event_group, WIFI_READY_BIT);
             ntp_sync_time();
             ota_update();
             gui_show_image(3);
@@ -46,14 +46,14 @@ static esp_err_t system_event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_CONNECTED:
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED: {
-            EventBits_t uxBits = xEventGroupGetBits(system_event_group);
+            EventBits_t uxBits = xEventGroupGetBits(os_event_group);
             if (!(uxBits & WIFI_CONFIG_BIT) && (uxBits & WIFI_READY_BIT)) {
                 nfc_set_mode(0);
                 led_set_mode(7);
                 gui_show_image(0);
             }
             ESP_ERROR_CHECK(esp_wifi_connect());
-            xEventGroupClearBits(system_event_group, WIFI_READY_BIT);
+            xEventGroupClearBits(os_event_group, WIFI_READY_BIT);
             break;
         }
         case SYSTEM_EVENT_SCAN_DONE:
@@ -62,12 +62,4 @@ static esp_err_t system_event_handler(void *ctx, system_event_t *event)
             break;
     }
     return ESP_OK;
-}
-
-void event_init(void)
-{
-    system_event_group = xEventGroupCreate();
-    daemon_event_group = xEventGroupCreate();
-
-    ESP_ERROR_CHECK(esp_event_loop_init(system_event_handler, NULL));
 }

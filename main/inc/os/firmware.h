@@ -5,9 +5,9 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#ifndef INC_SYSTEM_FIRMWARE_H_
-#define INC_SYSTEM_FIRMWARE_H_
+#ifndef INC_OS_FIRMWARE_H_
+#define INC_OS_FIRMWARE_H_
 
 extern const char *firmware_get_version(void);
 
-#endif /* INC_SYSTEM_FIRMWARE_H_ */
+#endif /* INC_OS_FIRMWARE_H_ */
