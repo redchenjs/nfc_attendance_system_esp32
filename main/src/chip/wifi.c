@@ -62,7 +62,6 @@ void wifi_init(void)
                 wifi_mac_address[3],
                 wifi_mac_address[4],
                 wifi_mac_address[5]);
-    tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, wifi_hostname);
     snprintf(wifi_mac_string, sizeof(wifi_mac_string), MACSTR, MAC2STR(wifi_mac_address));
     ESP_LOGI(TAG, "wifi initialized.");
 }

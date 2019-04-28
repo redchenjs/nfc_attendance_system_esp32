@@ -15,6 +15,7 @@
 #include "freertos/event_groups.h"
 
 #include "os/event.h"
+#include "chip/wifi.h"
 #include "user/ota.h"
 #include "user/gui.h"
 #include "user/led.h"
@@ -44,6 +45,7 @@ esp_err_t os_event_handler(void *ctx, system_event_t *event)
             break;
         }
         case SYSTEM_EVENT_STA_CONNECTED:
+            ESP_ERROR_CHECK(tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, wifi_hostname));
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED: {
             EventBits_t uxBits = xEventGroupGetBits(os_event_group);
