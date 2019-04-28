@@ -9,7 +9,6 @@
 
 #include "driver/spi_master.h"
 
-#include "board/ssd1331.h"
 #include "board/st7735.h"
 #include "board/st7789.h"
 
@@ -26,9 +25,7 @@ void spi1_init(void)
         .sclk_io_num = CONFIG_SPI_SCLK_PIN,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-#ifdef CONFIG_SCREEN_PANEL_SSD1331
-        .max_transfer_sz = SSD1331_SCREEN_WIDTH*SSD1331_SCREEN_HEIGHT*2
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#ifdef CONFIG_SCREEN_PANEL_ST7735
         .max_transfer_sz = ST7735_SCREEN_WIDTH*ST7735_SCREEN_HEIGHT*2
 #elif defined(CONFIG_SCREEN_PANEL_ST7789)
         .max_transfer_sz = ST7789_SCREEN_WIDTH*ST7789_SCREEN_HEIGHT*2
@@ -38,10 +35,7 @@ void spi1_init(void)
         .mode = 0,                                // SPI mode 0
         .spics_io_num = CONFIG_SPI_CS_PIN,        // CS pin
         .clock_speed_hz = 26000000,               // Clock out at 26 MHz
-#ifdef CONFIG_SCREEN_PANEL_SSD1331
-        .queue_size = 3,                          // We want to be able to queue 3 transactions at a time
-        .pre_cb = ssd1331_setpin_dc,              // Specify pre-transfer callback to handle D/C line
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#ifdef CONFIG_SCREEN_PANEL_ST7735
         .queue_size = 6,                          // We want to be able to queue 6 transactions at a time
         .pre_cb = st7735_setpin_dc,               // Specify pre-transfer callback to handle D/C line
 #elif defined(CONFIG_SCREEN_PANEL_ST7789)
