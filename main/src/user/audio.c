@@ -68,8 +68,6 @@ void audio_task(void *pvParameters)
             }
             mad_synth_frame(synth, frame);
         }
-        // avoid noise
-        i2s_zero_dma_buffer(0);
 
         mad_synth_finish(synth);
         mad_frame_finish(frame);
