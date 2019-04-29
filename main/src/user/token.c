@@ -66,7 +66,6 @@ esp_err_t token_event_handler(esp_http_client_event_t *evt)
             gui_show_image(6);
             audio_play_file(6);
         }
-        xEventGroupClearBits(user_event_group, HTTP_TOKEN_READY_BIT);
         break;
     }
     case HTTP_EVENT_DISCONNECTED:
@@ -94,12 +93,12 @@ void token_verify(char *token)
     data_ptr = token;
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
+        HTTP_TOKEN_RUN_BIT,
         HTTP_TOKEN_READY_BIT,
-        HTTP_TOKEN_FINISH_BIT,
         30000 / portTICK_RATE_MS
     );
-    if ((uxBits & HTTP_TOKEN_FINISH_BIT) == 0) {
-        xEventGroupClearBits(user_event_group, HTTP_TOKEN_READY_BIT);
+    if ((uxBits & HTTP_TOKEN_READY_BIT) == 0) {
+        xEventGroupClearBits(user_event_group, HTTP_TOKEN_RUN_BIT);
     }
     xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 }

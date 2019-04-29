@@ -28,7 +28,7 @@ static void key_smartconfig_handle(void)
     EventBits_t uxBits = xEventGroupGetBits(os_event_group);
     if (uxBits & INPUT_READY_BIT) {
         ESP_LOGI(TAG, "smartconfig key pressed");
-        xEventGroupClearBits(user_event_group, KEY_READY_BIT);
+        xEventGroupClearBits(user_event_group, KEY_SCAN_BIT);
     } else {
         return;
     }
@@ -58,12 +58,12 @@ void key_task(void *pvParameter)
 #endif
 
     xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
-    xEventGroupSetBits(user_event_group, KEY_READY_BIT);
+    xEventGroupSetBits(user_event_group, KEY_SCAN_BIT);
 
     while (1) {
         xEventGroupWaitBits(
             user_event_group,
-            KEY_READY_BIT,
+            KEY_SCAN_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY

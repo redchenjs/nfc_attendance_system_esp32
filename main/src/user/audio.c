@@ -32,6 +32,7 @@ static const char *mp3_file_ptr[][2] = {
     {snd7_mp3_ptr, snd7_mp3_end}  // "开始配网"
 };
 static uint8_t mp3_file_index = 0;
+static uint8_t playback_delay = 0;
 
 void audio_task(void *pvParameters)
 {
@@ -45,7 +46,7 @@ void audio_task(void *pvParameters)
     if (synth  == NULL) { ESP_LOGE(TAG, "malloc(synth) failed");  goto err; }
 
     while (1) {
-        xEventGroupWaitBits(user_event_group, AUDIO_READY_BIT, pdTRUE, pdTRUE, portMAX_DELAY);
+        xEventGroupWaitBits(user_event_group, AUDIO_RUN_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
         // Initialize mp3 parts
         mad_stream_init(stream);
@@ -73,6 +74,12 @@ void audio_task(void *pvParameters)
         mad_synth_finish(synth);
         mad_frame_finish(frame);
         mad_stream_finish(stream);
+
+        if (playback_delay) {
+            playback_delay = 0;
+        } else {
+            xEventGroupClearBits(user_event_group, AUDIO_RUN_BIT);
+        }
     }
 err:
     free(synth);
@@ -90,6 +97,12 @@ void audio_play_file(uint8_t filename_index)
         return;
     }
     mp3_file_index = filename_index;
-    xEventGroupSetBits(user_event_group, AUDIO_READY_BIT);
+    EventBits_t uxBits = xEventGroupGetBits(user_event_group);
+    if (uxBits & AUDIO_RUN_BIT) {
+        // Previous playback is still not complete
+        playback_delay = 1;
+    } else {
+        xEventGroupSetBits(user_event_group, AUDIO_RUN_BIT);
+    }
 #endif
 }

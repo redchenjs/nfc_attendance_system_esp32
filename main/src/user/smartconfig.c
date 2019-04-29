@@ -64,7 +64,7 @@ void smartconfig_callback(smartconfig_status_t status, void *pdata)
             }
             esp_smartconfig_stop();
             xEventGroupClearBits(os_event_group, WIFI_CONFIG_BIT);
-            xEventGroupSetBits(user_event_group, KEY_READY_BIT);
+            xEventGroupSetBits(user_event_group, KEY_SCAN_BIT);
             break;
         default:
             break;

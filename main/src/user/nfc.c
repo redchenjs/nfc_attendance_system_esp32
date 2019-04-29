@@ -54,9 +54,9 @@ void nfc_task(void *pvParameter)
     while (1) {
         xEventGroupWaitBits(
             user_event_group,
-            NFC_READY_BIT,
+            NFC_RUN_BIT,
             pdFALSE,
-            pdTRUE,
+            pdFALSE,
             portMAX_DELAY
         );
         xLastWakeTime = xTaskGetTickCount();
@@ -115,9 +115,9 @@ void nfc_set_mode(uint8_t mode)
     if (mode != 0) {
         pn532_setpin_reset(1);
         vTaskDelay(100 / portTICK_RATE_MS);
-        xEventGroupSetBits(user_event_group, NFC_READY_BIT);
+        xEventGroupSetBits(user_event_group, NFC_RUN_BIT);
     } else {
-        xEventGroupClearBits(user_event_group, NFC_READY_BIT);
+        xEventGroupClearBits(user_event_group, NFC_RUN_BIT);
         pn532_setpin_reset(0);
     }
 }

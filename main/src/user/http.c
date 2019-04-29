@@ -32,7 +32,7 @@ void http_task(void *pvParameter)
     while (1) {
         EventBits_t uxBits = xEventGroupWaitBits(
             user_event_group,
-            HTTP_TOKEN_READY_BIT | HTTP_OTA_READY_BIT,
+            HTTP_TOKEN_RUN_BIT | HTTP_OTA_RUN_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY
@@ -56,19 +56,19 @@ void http_task(void *pvParameter)
         config.cert_pem = cert0_pem_ptr;
 #endif
 
-        if (uxBits & HTTP_TOKEN_READY_BIT) {
+        if (uxBits & HTTP_TOKEN_RUN_BIT) {
             config.event_handler = token_event_handler;
             token_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 user_event_group,
-                HTTP_TOKEN_FAILED_BIT | HTTP_TOKEN_FINISH_BIT
+                HTTP_TOKEN_FAILED_BIT | HTTP_TOKEN_READY_BIT
             );
         } else {
             config.event_handler = ota_event_handler;
             ota_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 user_event_group,
-                HTTP_OTA_FAILED_BIT | HTTP_OTA_FINISH_BIT | HTTP_OTA_RUN_BIT
+                HTTP_OTA_FAILED_BIT | HTTP_OTA_READY_BIT
             );
         }
         esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -91,12 +91,12 @@ void http_task(void *pvParameter)
         led_set_mode(1);
         gui_show_image(3);
 
-        if (uxBits & HTTP_TOKEN_READY_BIT) {
-            xEventGroupSetBits(user_event_group, HTTP_TOKEN_FINISH_BIT);
-            xEventGroupClearBits(user_event_group, HTTP_TOKEN_READY_BIT);
+        if (uxBits & HTTP_TOKEN_RUN_BIT) {
+            xEventGroupSetBits(user_event_group, HTTP_TOKEN_READY_BIT);
+            xEventGroupClearBits(user_event_group, HTTP_TOKEN_RUN_BIT);
         } else {
-            xEventGroupSetBits(user_event_group, HTTP_OTA_FINISH_BIT);
-            xEventGroupClearBits(user_event_group, HTTP_OTA_READY_BIT);
+            xEventGroupSetBits(user_event_group, HTTP_OTA_READY_BIT);
+            xEventGroupClearBits(user_event_group, HTTP_OTA_RUN_BIT);
         }
     }
 }

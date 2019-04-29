@@ -24,6 +24,8 @@
 
 #define TAG "ota"
 
+static uint8_t first_time = 1;
+
 esp_err_t ota_event_handler(esp_http_client_event_t *evt)
 {
     static const esp_partition_t *update_partition = NULL;
@@ -32,7 +34,6 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
 
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
-        xEventGroupSetBits(user_event_group, HTTP_OTA_FAILED_BIT);
         break;
     case HTTP_EVENT_ON_CONNECTED:
         break;
@@ -42,9 +43,8 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
         break;
     case HTTP_EVENT_ON_DATA: {
         if (evt->data_len) {
-            EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-            if (!(uxBits & HTTP_OTA_RUN_BIT)) {
-                xEventGroupSetBits(user_event_group, HTTP_OTA_RUN_BIT);
+            if (first_time) {
+                first_time = 0;
 
                 led_set_mode(3);
                 gui_show_image(8);
@@ -65,7 +65,6 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
             esp_err_t err = esp_ota_write(update_handle, (const void *)evt->data, evt->data_len);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
-                xEventGroupSetBits(user_event_group, HTTP_OTA_FAILED_BIT);
                 goto exit;
             }
             binary_file_length += evt->data_len;
@@ -74,11 +73,7 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
         break;
     }
     case HTTP_EVENT_ON_FINISH: {
-        EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-        if (uxBits & HTTP_OTA_FAILED_BIT) {
-            ESP_LOGE(TAG, "ota update failed");
-            esp_ota_end(update_handle);
-        } else if (binary_file_length != 0) {
+        if (binary_file_length != 0) {
             if (esp_ota_end(update_handle) != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_end failed");
                 goto exit;
@@ -95,13 +90,13 @@ esp_err_t ota_event_handler(esp_http_client_event_t *evt)
         } else {
             ESP_LOGI(TAG, "no update found");
         }
-exit:
-        xEventGroupClearBits(user_event_group, HTTP_OTA_READY_BIT);
         break;
     }
     case HTTP_EVENT_DISCONNECTED:
         break;
     default:
+exit:
+        xEventGroupSetBits(user_event_group, HTTP_OTA_FAILED_BIT);
         break;
     }
     return ESP_OK;
@@ -125,13 +120,14 @@ void ota_update(void)
     ESP_LOGI(TAG, "check firmware update, running %s", firmware_get_version());
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
+        HTTP_OTA_RUN_BIT,
         HTTP_OTA_READY_BIT,
-        HTTP_OTA_FINISH_BIT,
         60000 / portTICK_RATE_MS
     );
-    if ((uxBits & HTTP_OTA_FINISH_BIT) == 0) {
-        xEventGroupClearBits(user_event_group, HTTP_OTA_READY_BIT);
+    if ((uxBits & HTTP_OTA_READY_BIT) == 0) {
+        xEventGroupClearBits(user_event_group, HTTP_OTA_RUN_BIT);
     }
+    first_time = 1;
     xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 #endif
 }

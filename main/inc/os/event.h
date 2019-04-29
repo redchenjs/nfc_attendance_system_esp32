@@ -20,22 +20,21 @@ typedef enum os_event_group_bits {
 } os_event_group_bits_t;
 
 typedef enum user_event_group_bits {
-    NFC_READY_BIT         = BIT0,
-    KEY_READY_BIT         = BIT1,
-    GUI_RELOAD_BIT        = BIT2,
-    AUDIO_READY_BIT       = BIT3,
+    NTP_RUN_BIT   = BIT0,
+    NTP_READY_BIT = BIT1,
 
-    NTP_READY_BIT         = BIT4,
-    NTP_FINISH_BIT        = BIT5,
+    NFC_RUN_BIT    = BIT2,
+    KEY_SCAN_BIT   = BIT3,
+    AUDIO_RUN_BIT  = BIT4,
+    GUI_RELOAD_BIT = BIT5,
 
-    HTTP_OTA_RUN_BIT      = BIT6,
-    HTTP_OTA_READY_BIT    = BIT7,
-    HTTP_OTA_FINISH_BIT   = BIT8,
-    HTTP_OTA_FAILED_BIT   = BIT9,
+    HTTP_OTA_RUN_BIT    = BIT6,
+    HTTP_OTA_READY_BIT  = BIT7,
+    HTTP_OTA_FAILED_BIT = BIT8,
 
+    HTTP_TOKEN_RUN_BIT    = BIT9,
     HTTP_TOKEN_READY_BIT  = BIT10,
-    HTTP_TOKEN_FINISH_BIT = BIT11,
-    HTTP_TOKEN_FAILED_BIT = BIT12
+    HTTP_TOKEN_FAILED_BIT = BIT11
 } user_event_group_bits_t;
 
 extern EventGroupHandle_t os_event_group;
