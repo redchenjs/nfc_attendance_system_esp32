@@ -91,7 +91,7 @@ err:
 
 void audio_play_file(uint8_t filename_index)
 {
-#ifdef CONFIG_ENABLE_AUDIO
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
     if (filename_index >= (sizeof(mp3_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;

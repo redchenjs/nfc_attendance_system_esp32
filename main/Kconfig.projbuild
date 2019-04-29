@@ -176,26 +176,26 @@ config LED_PIN
 endmenu
 
 menu "Audio Configuration"
-config ENABLE_AUDIO
-    bool "Enable Audio Output"
+config ENABLE_AUDIO_PROMPT
+    bool "Enable Audio Prompt"
     default y
     help
-        Select this to enable audio output.
+        Select this to enable audio prompt.
 
 config I2S_BCLK_PIN
     int "I2S BCLK Pin"
     default 22
-    depends on ENABLE_AUDIO
+    depends on ENABLE_AUDIO_PROMPT
 
 config I2S_LRCK_PIN
     int "I2S LRCK Pin"
     default 21
-    depends on ENABLE_AUDIO
+    depends on ENABLE_AUDIO_PROMPT
 
 config I2S_DOUT_PIN
     int "I2S DOUT Pin"
     default 19
-    depends on ENABLE_AUDIO
+    depends on ENABLE_AUDIO_PROMPT
 endmenu
 
 config FIRMWARE_VERSION

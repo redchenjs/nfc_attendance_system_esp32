@@ -48,7 +48,7 @@ void chip_init(void)
     i2c0_init();
 #endif
 
-#ifdef CONFIG_ENABLE_AUDIO
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
     i2s0_init();
 #endif
 
@@ -80,7 +80,7 @@ void user_init(void)
     xTaskCreate(gui_task, "gui_task", 1024, NULL, 6, NULL);
 #endif
 
-#ifdef CONFIG_ENABLE_AUDIO
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
     xTaskCreate(audio_task, "audio_task", 8448, NULL, 7, NULL);
 #endif
 }
