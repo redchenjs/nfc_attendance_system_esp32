@@ -34,11 +34,12 @@ void spi1_init(void)
     spi_device_interface_config_t devcfg={
         .mode = 0,                                // SPI mode 0
         .spics_io_num = CONFIG_SPI_CS_PIN,        // CS pin
-        .clock_speed_hz = 26000000,               // Clock out at 26 MHz
 #ifdef CONFIG_SCREEN_PANEL_ST7735
+        .clock_speed_hz = 26000000,               // Clock out at 26 MHz
         .queue_size = 6,                          // We want to be able to queue 6 transactions at a time
         .pre_cb = st7735_setpin_dc,               // Specify pre-transfer callback to handle D/C line
 #elif defined(CONFIG_SCREEN_PANEL_ST7789)
+        .clock_speed_hz = 40000000,               // Clock out at 40 MHz
         .queue_size = 6,                          // We want to be able to queue 6 transactions at a time
         .pre_cb = st7789_setpin_dc,               // Specify pre-transfer callback to handle D/C line
 #endif

@@ -1,3 +1,10 @@
+/*
+ * ST7789.h
+ *
+ *  Created on: 2019-04-29 22:04
+ *      Author: Jack Chen <redchenjs@live.com>
+ */
+
 #ifndef _ST7789_H
 #define _ST7789_H
 
@@ -77,7 +84,7 @@
 #define ST7789_VRHS       0xC3
 #define ST7789_VDVSET     0xC4
 #define ST7789_VCMOFSET   0xC5
-#define ST7789_FRCTR2     0xC6
+#define ST7789_FRCTRL2    0xC6
 #define ST7789_CABCCTRL   0xC7
 #define ST7789_REGSEL1    0xC8
 #define ST7789_REGSEL2    0xCA

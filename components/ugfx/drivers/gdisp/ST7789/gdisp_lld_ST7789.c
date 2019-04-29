@@ -1,3 +1,10 @@
+/*
+ * gdisp_lld_ST7789.c
+ *
+ *  Created on: 2019-04-29 22:04
+ *      Author: Jack Chen <redchenjs@live.com>
+ */
+
 #include "gfx.h"
 
 #if GFX_USE_GDISP
@@ -61,39 +68,40 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
     setpin_reset(g, 1);
     gfxSleepMilliseconds(120);
 
-    write_cmd(g, ST7789_SWRESET);
+    write_cmd(g, ST7789_SWRESET);   //  1: Software reset, 0 args, w/delay
     gfxSleepMilliseconds(120);
-    write_cmd(g, ST7789_SLPOUT);
+    write_cmd(g, ST7789_SLPOUT);    //  2: Out of sleep mode, 0 args, w/delay
     gfxSleepMilliseconds(120);
-    write_cmd(g, ST7789_PORCTRL);
+    write_cmd(g, ST7789_PORCTRL);   //  3: Porch setting, 5 args, no delay:
         write_data(g, 0x0C);
         write_data(g, 0x0C);
         write_data(g, 0x00);
         write_data(g, 0x33);
         write_data(g, 0x33);
-    write_cmd(g, ST7789_GCTRL);
+    write_cmd(g, ST7789_GCTRL);     //  4: Gate control, 1 arg, no delay:
         write_data(g, 0x35);
-    write_cmd(g, ST7789_VCOMS);
+    write_cmd(g, ST7789_VCOMS);     //  5: VCOM setting, 1 arg, no delay:
         write_data(g, 0x19);
-    write_cmd(g, ST7789_LCMCTRL);
+    write_cmd(g, ST7789_LCMCTRL);   //  6: LCM control, 1 arg, no delay:
         write_data(g, 0x2C);
-    write_cmd(g, ST7789_VDVVRHEN);
+    write_cmd(g, ST7789_VDVVRHEN);  //  7: VDV and VRH command enable, 1 arg, no delay:
         write_data(g, 0x01);
-    write_cmd(g, ST7789_VRHS);
+    write_cmd(g, ST7789_VRHS);      //  8: VRH setting, 1 arg, no delay:
         write_data(g, 0x12);
-    write_cmd(g, ST7789_VDVSET);
+    write_cmd(g, ST7789_VDVSET);    //  9: VDV setting, 1 arg, no delay:
         write_data(g, 0x20);
-    write_cmd(g, ST7789_FRCTR2);
-        write_data(g, 0x0F);
-    write_cmd(g, ST7789_PWCTRL1);
+    write_cmd(g, ST7789_FRCTRL2);   // 10: Frame rate control - normal mode, 3 args:
+        write_data(g, 0x01);
+    write_cmd(g, ST7789_PWCTRL1);   // 11: Power control 1, 2 args, no delay:
         write_data(g, 0xA4);
         write_data(g, 0xA1);
-    write_cmd(g, ST7789_INVON);
-    write_cmd(g, ST7789_MADCTL);
-        write_data(g, 0x00);
-    write_cmd(g, ST7789_COLMOD);
+    write_cmd(g, ST7789_INVON);     // 12: Display inversion control, 1 arg, no delay:
+    write_cmd(g, ST7789_MADCTL);    // 13: Memory access control (directions), 1 arg:
+        write_data(g, 0x70);
+    write_cmd(g, ST7789_COLMOD);    // 14: Set color mode, 1 arg, no delay:
         write_data(g, 0x05);
-    write_cmd(g, ST7789_PVGAMCTRL);
+    write_cmd(g, ST7789_PVGAMCTRL); // 15: Positive voltage gamma control, 14 args, no delay:
+        write_data(g, 0xD0);
         write_data(g, 0x04);
         write_data(g, 0x0D);
         write_data(g, 0x11);
@@ -107,7 +115,7 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         write_data(g, 0x0B);
         write_data(g, 0x1F);
         write_data(g, 0x23);
-    write_cmd(g, ST7789_NVGAMCTRL);
+    write_cmd(g, ST7789_NVGAMCTRL); // 16: Negative voltage gamma control, 14 args, no delay:
         write_data(g, 0xD0);
         write_data(g, 0x04);
         write_data(g, 0x0C);
@@ -122,8 +130,8 @@ LLDSPEC bool_t gdisp_lld_init(GDisplay *g) {
         write_data(g, 0x1F);
         write_data(g, 0x20);
         write_data(g, 0x23);
-    write_cmd(g, ST7789_NORON);
-    write_cmd(g, ST7789_DISPON);
+    write_cmd(g, ST7789_NORON);     // 17: Normal display on, no args, no delay
+    write_cmd(g, ST7789_DISPON);    // 18: Main screen turn on, no args, no delay
 
     /* Initialise the GDISP structure */
     g->g.Width  = GDISP_SCREEN_HEIGHT;
