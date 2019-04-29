@@ -14,6 +14,6 @@
 extern const char cert0_pem_ptr[] asm("_binary_cert0_pem_start");
 extern const char cert0_pem_end[] asm("_binary_cert0_pem_end");
 
-extern void http_task(void *pvParameter);
+extern void http_init(void);
 
 #endif /* INC_USER_HTTP_H_ */

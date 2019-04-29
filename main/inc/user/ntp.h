@@ -8,7 +8,8 @@
 #ifndef INC_USER_NTP_H_
 #define INC_USER_NTP_H_
 
-extern void ntp_task(void *pvParameter);
 extern void ntp_sync_time(void);
+
+extern void ntp_init(void);
 
 #endif /* INC_USER_NTP_H_ */

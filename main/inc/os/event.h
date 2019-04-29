@@ -42,4 +42,6 @@ extern EventGroupHandle_t user_event_group;
 
 extern esp_err_t os_event_handler(void *ctx, system_event_t *event);
 
+extern void event_init(void);
+
 #endif /* INC_OS_EVENT_H_ */

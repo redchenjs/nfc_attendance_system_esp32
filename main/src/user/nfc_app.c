@@ -1,5 +1,5 @@
 /*
- * nfc.c
+ * nfc_app.c
  *
  *  Created on: 2018-02-13 21:50
  *      Author: Jack Chen <redchenjs@live.com>
@@ -16,12 +16,11 @@
 #include "board/pn532.h"
 #include "user/gui.h"
 #include "user/ntp.h"
-#include "user/nfc.h"
 #include "user/led.h"
 #include "user/audio.h"
 #include "user/token.h"
 
-#define TAG "nfc"
+#define TAG "nfc_app"
 
 #define RX_FRAME_PRFX "f222222222"
 
@@ -34,7 +33,7 @@
 static uint8_t abtRx[RX_FRAME_LEN + 1] = {0x00};
 static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05, 0xF2, 0x22, 0x22, 0x22, 0x22};
 
-void nfc_task(void *pvParameter)
+static void nfc_app_task_handle(void *pvParameter)
 {
     nfc_target nt;
     nfc_device *pnd;
@@ -110,7 +109,7 @@ err:
     esp_restart();
 }
 
-void nfc_set_mode(uint8_t mode)
+void nfc_app_set_mode(uint8_t mode)
 {
     if (mode != 0) {
         pn532_setpin_reset(1);
@@ -120,4 +119,9 @@ void nfc_set_mode(uint8_t mode)
         xEventGroupClearBits(user_event_group, NFC_RUN_BIT);
         pn532_setpin_reset(0);
     }
+}
+
+void nfc_app_init(void)
+{
+    xTaskCreate(nfc_app_task_handle, "nfcAppT", 5120, NULL, 5, NULL);
 }

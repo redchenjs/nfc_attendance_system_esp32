@@ -16,10 +16,10 @@
 
 #include "os/event.h"
 #include "chip/wifi.h"
+#include "user/nfc_app.h"
 #include "user/ota.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/nfc.h"
 #include "user/ntp.h"
 #include "user/audio.h"
 
@@ -41,7 +41,7 @@ esp_err_t os_event_handler(void *ctx, system_event_t *event)
             ota_update();
             gui_show_image(3);
             led_set_mode(1);
-            nfc_set_mode(1);
+            nfc_app_set_mode(1);
             break;
         }
         case SYSTEM_EVENT_STA_CONNECTED:
@@ -50,7 +50,7 @@ esp_err_t os_event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_DISCONNECTED: {
             EventBits_t uxBits = xEventGroupGetBits(os_event_group);
             if (!(uxBits & WIFI_CONFIG_BIT) && (uxBits & WIFI_READY_BIT)) {
-                nfc_set_mode(0);
+                nfc_app_set_mode(0);
                 led_set_mode(7);
                 gui_show_image(0);
             }
@@ -64,4 +64,12 @@ esp_err_t os_event_handler(void *ctx, system_event_t *event)
             break;
     }
     return ESP_OK;
+}
+
+void event_init(void)
+{
+    os_event_group   = xEventGroupCreate();
+    user_event_group = xEventGroupCreate();
+
+    ESP_ERROR_CHECK(esp_event_loop_init(os_event_handler, NULL));
 }

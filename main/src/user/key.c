@@ -14,9 +14,9 @@
 #include "driver/gpio.h"
 
 #include "os/event.h"
+#include "user/nfc_app.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/nfc.h"
 #include "user/audio.h"
 #include "user/smartconfig.h"
 
@@ -35,7 +35,7 @@ static void key_smartconfig_handle(void)
 
     xEventGroupSetBits(os_event_group, WIFI_CONFIG_BIT);
 
-    nfc_set_mode(0);
+    nfc_app_set_mode(0);
     led_set_mode(7);
     gui_show_image(7);
     audio_play_file(7);
@@ -43,9 +43,11 @@ static void key_smartconfig_handle(void)
     ESP_ERROR_CHECK(esp_smartconfig_set_type(SC_TYPE_ESPTOUCH));
     ESP_ERROR_CHECK(esp_smartconfig_start(smartconfig_callback));
 }
+#endif
 
-void key_task(void *pvParameter)
+static void key_task_handle(void *pvParameter)
 {
+#ifdef CONFIG_ENABLE_SMARTCONFIG
     uint8_t count[1] = {0};
     portTickType xLastWakeTime;
 
@@ -84,5 +86,10 @@ void key_task(void *pvParameter)
 
         vTaskDelayUntil(&xLastWakeTime, 10 / portTICK_RATE_MS);
     }
+#endif // CONFIG_ENABLE_SMARTCONFIG
 }
-#endif
+
+void key_init(void)
+{
+   xTaskCreate(key_task_handle, "keyT", 2048, NULL, 5, NULL);
+}

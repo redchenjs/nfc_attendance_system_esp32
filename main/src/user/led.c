@@ -28,9 +28,11 @@ static const uint16_t led_mode_table[][2] = {
     {    25,     0}    // 9, Keep on
 };
 static uint8_t led_mode_index = 7;
+#endif
 
-void led_task(void *pvParameter)
+static void led_task_handle(void *pvParameter)
 {
+#ifdef CONFIG_ENABLE_LED
     uint16_t i = 0;
     portTickType xLastWakeTime;
 
@@ -54,8 +56,8 @@ void led_task(void *pvParameter)
 
         vTaskDelayUntil(&xLastWakeTime, led_mode_table[led_mode_index][0]);
     }
+#endif // CONFIG_ENABLE_LED
 }
-#endif
 
 void led_set_mode(uint8_t mode_index)
 {
@@ -66,4 +68,9 @@ void led_set_mode(uint8_t mode_index)
     }
     led_mode_index = mode_index;
 #endif
+}
+
+void led_init(void)
+{
+    xTaskCreate(led_task_handle, "ledT", 1024, NULL, 6, NULL);
 }

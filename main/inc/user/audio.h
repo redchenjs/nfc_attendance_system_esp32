@@ -35,7 +35,8 @@ extern const char snd6_mp3_end[] asm("_binary_snd6_mp3_end");
 extern const char snd7_mp3_ptr[] asm("_binary_snd7_mp3_start");
 extern const char snd7_mp3_end[] asm("_binary_snd7_mp3_end");
 
-extern void audio_task(void *pvParameter);
 extern void audio_play_file(uint8_t filename_index);
+
+extern void audio_init(void);
 
 #endif /* INC_USER_AUDIO_H_ */

@@ -14,7 +14,6 @@
 #include "os/firmware.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
-#include "user/nfc.h"
 #include "user/led.h"
 #include "user/ota.h"
 #include "user/http.h"
@@ -23,7 +22,7 @@
 
 #define TAG "http"
 
-void http_task(void *pvParameter)
+static void http_task_handle(void *pvParameter)
 {
     char post_data[128] = {0};
     char server_url[80] = {0};
@@ -99,4 +98,9 @@ void http_task(void *pvParameter)
             xEventGroupClearBits(user_event_group, HTTP_OTA_RUN_BIT);
         }
     }
+}
+
+void http_init(void)
+{
+    xTaskCreate(http_task_handle, "httpT", 5120, NULL, 7, NULL);
 }

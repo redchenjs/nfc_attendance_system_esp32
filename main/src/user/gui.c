@@ -15,19 +15,8 @@
 
 #define TAG "gui"
 
-#ifdef CONFIG_ENABLE_GUI
 static const char *img_file_ptr[][2] = {
-#ifdef CONFIG_SCREEN_PANEL_SSD1331
-    {ani0_96x64_gif_ptr, ani0_96x64_gif_end}, // "WiFi"
-    {ani1_96x64_gif_ptr, ani1_96x64_gif_end}, // "Loading"
-    {ani2_96x64_gif_ptr, ani2_96x64_gif_end}, // "Success"
-    {ani3_96x64_gif_ptr, ani3_96x64_gif_end}, // "NFC"
-    {ani4_96x64_gif_ptr, ani4_96x64_gif_end}, // "PowerOff"
-    {ani5_96x64_gif_ptr, ani5_96x64_gif_end}, // "Clock"
-    {ani6_96x64_gif_ptr, ani6_96x64_gif_end}, // "Error"
-    {ani7_96x64_gif_ptr, ani7_96x64_gif_end}, // "Config"
-    {ani8_96x64_gif_ptr, ani8_96x64_gif_end}  // "Updating"
-#elif defined(CONFIG_SCREEN_PANEL_ST7735)
+#ifdef CONFIG_SCREEN_PANEL_ST7735
     {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
     {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
     {ani2_160x80_gif_ptr, ani2_160x80_gif_end}, // "Success"
@@ -51,7 +40,7 @@ static const char *img_file_ptr[][2] = {
 };
 static uint8_t img_file_index = 0;
 
-void gui_task(void *pvParameter)
+static void gui_task_handle(void *pvParameter)
 {
     gdispImage gfx_image;
 
@@ -90,7 +79,6 @@ void gui_task(void *pvParameter)
     ESP_LOGE(TAG, "task failed");
     esp_restart();
 }
-#endif
 
 void gui_show_image(uint8_t filename_index)
 {
@@ -102,4 +90,9 @@ void gui_show_image(uint8_t filename_index)
     img_file_index = filename_index;
     xEventGroupSetBits(user_event_group, GUI_RELOAD_BIT);
 #endif
+}
+
+void gui_init(void)
+{
+    xTaskCreate(gui_task_handle, "guiT", 1024, NULL, 6, NULL);
 }

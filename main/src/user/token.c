@@ -17,7 +17,6 @@
 #include "os/firmware.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
-#include "user/nfc.h"
 #include "user/led.h"
 #include "user/audio.h"
 
