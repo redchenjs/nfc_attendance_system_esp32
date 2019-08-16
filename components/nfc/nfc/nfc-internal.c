@@ -238,7 +238,7 @@ connstring_decode(const nfc_connstring connstring, const char *driver_name, cons
     return 0;
   }
 
-  char format[32];
+  char format[48];
   snprintf(format, sizeof(format), "%%%i[^:]:%%%i[^:]:%%%i[^:]", n - 1, n - 1, n - 1);
   int res = sscanf(connstring, format, param0, param1, param2);
 
