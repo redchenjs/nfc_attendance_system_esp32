@@ -39,6 +39,6 @@ typedef enum user_event_group_bits {
 extern EventGroupHandle_t os_event_group;
 extern EventGroupHandle_t user_event_group;
 
-extern void core_init(void);
+extern void os_core_init(void);
 
 #endif /* INC_OS_CORE_H_ */

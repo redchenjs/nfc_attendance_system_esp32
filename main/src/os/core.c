@@ -123,9 +123,9 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-void core_init(void)
+void os_core_init(void)
 {
-    ESP_LOGW(OS_CORE_TAG, "current firmware version is %s", firmware_get_version());
+    ESP_LOGW(OS_CORE_TAG, "current firmware version is %s", os_firmware_get_version());
 
     os_event_group   = xEventGroupCreate();
     user_event_group = xEventGroupCreate();
