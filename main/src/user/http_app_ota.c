@@ -1,5 +1,5 @@
 /*
- * http_ota.c
+ * http_app_ota.c
  *
  *  Created on: 2018-04-06 15:12
  *      Author: Jack Chen <redchenjs@live.com>
@@ -21,11 +21,11 @@
 #include "user/led.h"
 #include "user/audio_mp3.h"
 
-#define TAG "http_ota"
+#define TAG "http_app_ota"
 
 static uint8_t first_time = 1;
 
-esp_err_t http_ota_event_handler(esp_http_client_event_t *evt)
+esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 {
     static const esp_partition_t *update_partition = NULL;
     static esp_ota_handle_t update_handle = 0;
@@ -95,13 +95,13 @@ esp_err_t http_ota_event_handler(esp_http_client_event_t *evt)
         break;
     default:
 exit:
-        xEventGroupSetBits(user_event_group, HTTP_OTA_FAILED_BIT);
+        xEventGroupSetBits(user_event_group, HTTP_APP_OTA_FAILED_BIT);
         break;
     }
     return ESP_OK;
 }
 
-void http_ota_prepare_data(char *buf, int len)
+void http_app_ota_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();
@@ -112,19 +112,19 @@ void http_ota_prepare_data(char *buf, int len)
     cJSON_Delete(root);
 }
 
-void http_ota_update(void)
+void http_app_ota_update(void)
 {
 #ifdef CONFIG_ENABLE_OTA
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     ESP_LOGI(TAG, "checking for firmware update...");
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
-        HTTP_OTA_RUN_BIT,
-        HTTP_OTA_READY_BIT,
+        HTTP_APP_OTA_RUN_BIT,
+        HTTP_APP_OTA_READY_BIT,
         60000 / portTICK_RATE_MS
     );
-    if ((uxBits & HTTP_OTA_READY_BIT) == 0) {
-        xEventGroupClearBits(user_event_group, HTTP_OTA_RUN_BIT);
+    if ((uxBits & HTTP_APP_OTA_READY_BIT) == 0) {
+        xEventGroupClearBits(user_event_group, HTTP_APP_OTA_RUN_BIT);
     }
     first_time = 1;
     xEventGroupSetBits(os_event_group, INPUT_READY_BIT);

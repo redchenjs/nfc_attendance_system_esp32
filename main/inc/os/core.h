@@ -27,13 +27,13 @@ typedef enum user_event_group_bits {
     AUDIO_MP3_RUN_BIT  = BIT5,
     AUDIO_MP3_IDLE_BIT = BIT6,
 
-    HTTP_OTA_RUN_BIT    = BIT7,
-    HTTP_OTA_READY_BIT  = BIT8,
-    HTTP_OTA_FAILED_BIT = BIT9,
+    HTTP_APP_OTA_RUN_BIT    = BIT7,
+    HTTP_APP_OTA_READY_BIT  = BIT8,
+    HTTP_APP_OTA_FAILED_BIT = BIT9,
 
-    HTTP_TOKEN_RUN_BIT    = BIT10,
-    HTTP_TOKEN_READY_BIT  = BIT11,
-    HTTP_TOKEN_FAILED_BIT = BIT12
+    HTTP_APP_TOKEN_RUN_BIT    = BIT10,
+    HTTP_APP_TOKEN_READY_BIT  = BIT11,
+    HTTP_APP_TOKEN_FAILED_BIT = BIT12
 } user_event_group_bits_t;
 
 extern EventGroupHandle_t os_event_group;

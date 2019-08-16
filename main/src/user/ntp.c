@@ -15,7 +15,7 @@
 #include "user/nfc_app.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/http_ota.h"
+#include "user/http_app_ota.h"
 
 #define TAG "ntp"
 
@@ -77,7 +77,7 @@ static void ntp_task_handle(void *pvParameter)
             localtime_r(&now, &timeinfo);
             if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
                 nfc_app_set_mode(0);
-                http_ota_update();
+                http_app_ota_update();
                 nfc_app_set_mode(1);
             }
         }

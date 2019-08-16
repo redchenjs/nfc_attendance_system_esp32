@@ -22,8 +22,8 @@
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/ntp.h"
-#include "user/http_ota.h"
 #include "user/audio_mp3.h"
+#include "user/http_app_ota.h"
 
 #define OS_CORE_TAG "os_core"
 #define OS_SC_TAG   "os_sc"
@@ -67,7 +67,7 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
             xEventGroupSetBits(os_event_group, WIFI_READY_BIT);
             xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
             ntp_sync_time();
-            http_ota_update();
+            http_app_ota_update();
             gui_show_image(3);
             led_set_mode(1);
             nfc_app_set_mode(1);

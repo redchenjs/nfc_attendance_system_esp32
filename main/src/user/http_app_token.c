@@ -1,5 +1,5 @@
 /*
- * http_token.c
+ * http_app_token.c
  *
  *  Created on: 2018-04-06 15:09
  *      Author: Jack Chen <redchenjs@live.com>
@@ -20,11 +20,11 @@
 #include "user/led.h"
 #include "user/audio_mp3.h"
 
-#define TAG "http_token"
+#define TAG "http_app_token"
 
 static char *data_ptr = NULL;
 
-esp_err_t http_token_event_handler(esp_http_client_event_t *evt)
+esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
 {
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
@@ -53,7 +53,7 @@ esp_err_t http_token_event_handler(esp_http_client_event_t *evt)
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
-                xEventGroupSetBits(user_event_group, HTTP_TOKEN_FAILED_BIT);
+                xEventGroupSetBits(user_event_group, HTTP_APP_TOKEN_FAILED_BIT);
             }
             cJSON_Delete(root);
         }
@@ -61,7 +61,7 @@ esp_err_t http_token_event_handler(esp_http_client_event_t *evt)
     }
     case HTTP_EVENT_ON_FINISH: {
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-        if (uxBits & HTTP_TOKEN_FAILED_BIT) {
+        if (uxBits & HTTP_APP_TOKEN_FAILED_BIT) {
             gui_show_image(6);
             audio_mp3_play(6);
         }
@@ -75,7 +75,7 @@ esp_err_t http_token_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-void http_token_prepare_data(char *buf, int len)
+void http_app_token_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();
@@ -86,18 +86,18 @@ void http_token_prepare_data(char *buf, int len)
     cJSON_Delete(root);
 }
 
-void http_token_verify(char *token)
+void http_app_token_verify(char *token)
 {
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     data_ptr = token;
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
-        HTTP_TOKEN_RUN_BIT,
-        HTTP_TOKEN_READY_BIT,
+        HTTP_APP_TOKEN_RUN_BIT,
+        HTTP_APP_TOKEN_READY_BIT,
         30000 / portTICK_RATE_MS
     );
-    if ((uxBits & HTTP_TOKEN_READY_BIT) == 0) {
-        xEventGroupClearBits(user_event_group, HTTP_TOKEN_RUN_BIT);
+    if ((uxBits & HTTP_APP_TOKEN_READY_BIT) == 0) {
+        xEventGroupClearBits(user_event_group, HTTP_APP_TOKEN_RUN_BIT);
     }
     xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 }
