@@ -5,7 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include "os/event.h"
+#include "os/core.h"
 
 #include "chip/nvs.h"
 #include "chip/spi.h"
@@ -18,15 +18,15 @@
 
 #include "user/nfc_app.h"
 #include "user/gui.h"
-#include "user/key.h"
 #include "user/ntp.h"
 #include "user/led.h"
-#include "user/http.h"
-#include "user/audio.h"
+#include "user/key_scan.h"
+#include "user/http_app.h"
+#include "user/audio_mp3.h"
 
 void os_init(void)
 {
-    event_init();
+    core_init();
 }
 
 void chip_init(void)
@@ -61,10 +61,10 @@ void user_init(void)
 
     ntp_init();
 
-    http_init();
+    http_app_init();
 
 #ifdef CONFIG_ENABLE_SMARTCONFIG
-    key_init();
+    key_scan_init();
 #endif
 
 #ifdef CONFIG_ENABLE_LED
@@ -76,6 +76,6 @@ void user_init(void)
 #endif
 
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
-    audio_init();
+    audio_mp3_init();
 #endif
 }

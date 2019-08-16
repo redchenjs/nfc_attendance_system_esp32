@@ -1,5 +1,5 @@
 /*
- * ota.c
+ * http_ota.c
  *
  *  Created on: 2018-04-06 15:12
  *      Author: Jack Chen <redchenjs@live.com>
@@ -14,18 +14,18 @@
 
 #include "cJSON.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "os/firmware.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/audio.h"
+#include "user/audio_mp3.h"
 
-#define TAG "ota"
+#define TAG "http_ota"
 
 static uint8_t first_time = 1;
 
-esp_err_t ota_event_handler(esp_http_client_event_t *evt)
+esp_err_t http_ota_event_handler(esp_http_client_event_t *evt)
 {
     static const esp_partition_t *update_partition = NULL;
     static esp_ota_handle_t update_handle = 0;
@@ -101,7 +101,7 @@ exit:
     return ESP_OK;
 }
 
-void ota_prepare_data(char *buf, int len)
+void http_ota_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();
@@ -112,7 +112,7 @@ void ota_prepare_data(char *buf, int len)
     cJSON_Delete(root);
 }
 
-void ota_update(void)
+void http_ota_update(void)
 {
 #ifdef CONFIG_ENABLE_OTA
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);

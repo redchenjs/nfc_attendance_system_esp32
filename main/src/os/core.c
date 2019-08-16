@@ -1,5 +1,5 @@
 /*
- * os.c
+ * core.c
  *
  *  Created on: 2018-03-04 20:07
  *      Author: Jack Chen <redchenjs@live.com>
@@ -14,16 +14,16 @@
 
 #include "freertos/event_groups.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "chip/wifi.h"
 #include "user/nfc_app.h"
-#include "user/ota.h"
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/ntp.h"
-#include "user/audio.h"
+#include "user/http_ota.h"
+#include "user/audio_mp3.h"
 
-#define TAG "event"
+#define TAG "os_core"
 
 EventGroupHandle_t os_event_group;
 EventGroupHandle_t user_event_group;
@@ -62,7 +62,7 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
         case IP_EVENT_STA_GOT_IP: {
             xEventGroupSetBits(os_event_group, WIFI_READY_BIT);
             ntp_sync_time();
-            ota_update();
+            http_ota_update();
             gui_show_image(3);
             led_set_mode(1);
             nfc_app_set_mode(1);
@@ -113,14 +113,14 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
             ESP_LOGI(TAG, "ack done");
             esp_smartconfig_stop();
             xEventGroupClearBits(os_event_group, WIFI_CONFIG_BIT);
-            xEventGroupSetBits(user_event_group, KEY_SCAN_BIT);
+            xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
             break;
         default:
             break;
     }
 }
 
-void event_init(void)
+void core_init(void)
 {
     os_event_group   = xEventGroupCreate();
     user_event_group = xEventGroupCreate();

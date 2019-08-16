@@ -1,5 +1,5 @@
 /*
- * http.c
+ * http_app.c
  *
  *  Created on: 2018-02-17 18:51
  *      Author: Jack Chen <redchenjs@live.com>
@@ -10,19 +10,19 @@
 #include "esp_log.h"
 #include "esp_http_client.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "os/firmware.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/ota.h"
-#include "user/http.h"
-#include "user/token.h"
-#include "user/audio.h"
+#include "user/http_app.h"
+#include "user/http_ota.h"
+#include "user/http_token.h"
+#include "user/audio_mp3.h"
 
-#define TAG "http"
+#define TAG "http_app"
 
-static void http_task_handle(void *pvParameter)
+static void http_app_task_handle(void *pvParameter)
 {
     char post_data[128] = {0};
     char server_url[80] = {0};
@@ -56,15 +56,15 @@ static void http_task_handle(void *pvParameter)
 #endif
 
         if (uxBits & HTTP_TOKEN_RUN_BIT) {
-            config.event_handler = token_event_handler;
-            token_prepare_data(post_data, sizeof(post_data));
+            config.event_handler = http_token_event_handler;
+            http_token_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 user_event_group,
                 HTTP_TOKEN_FAILED_BIT | HTTP_TOKEN_READY_BIT
             );
         } else {
-            config.event_handler = ota_event_handler;
-            ota_prepare_data(post_data, sizeof(post_data));
+            config.event_handler = http_ota_event_handler;
+            http_ota_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 user_event_group,
                 HTTP_OTA_FAILED_BIT | HTTP_OTA_READY_BIT
@@ -78,9 +78,9 @@ static void http_task_handle(void *pvParameter)
         esp_err_t err = esp_http_client_perform(client);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "error perform http(s) request %s", esp_err_to_name(err));
-            if (config.event_handler != ota_event_handler) {
+            if (config.event_handler != http_ota_event_handler) {
                 gui_show_image(6);
-                audio_play_file(5);
+                audio_mp3_play(5);
             }
         }
         esp_http_client_cleanup(client);
@@ -100,7 +100,7 @@ static void http_task_handle(void *pvParameter)
     }
 }
 
-void http_init(void)
+void http_app_init(void)
 {
-    xTaskCreate(http_task_handle, "httpT", 5120, NULL, 7, NULL);
+    xTaskCreate(http_app_task_handle, "HttpAppT", 5120, NULL, 7, NULL);
 }

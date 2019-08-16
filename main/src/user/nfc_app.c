@@ -12,13 +12,13 @@
 
 #include "nfc/nfc.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "board/pn532.h"
 #include "user/gui.h"
 #include "user/ntp.h"
 #include "user/led.h"
-#include "user/audio.h"
-#include "user/token.h"
+#include "user/audio_mp3.h"
+#include "user/http_token.h"
 
 #define TAG "nfc_app"
 
@@ -53,7 +53,7 @@ static void nfc_app_task_handle(void *pvParameter)
     while (1) {
         xEventGroupWaitBits(
             user_event_group,
-            NFC_RUN_BIT,
+            NFC_APP_RUN_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY
@@ -94,8 +94,8 @@ static void nfc_app_task_handle(void *pvParameter)
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL &&
                 strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                 ESP_LOGW(TAG, "token %32s", (char *)(abtRx + RX_FRAME_PRFX_LEN));
-                audio_play_file(0);
-                token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
+                audio_mp3_play(0);
+                http_token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
             } else {
                 ESP_LOGW(TAG, "unexpected frame");
             }
@@ -114,14 +114,14 @@ void nfc_app_set_mode(uint8_t mode)
     if (mode != 0) {
         pn532_setpin_reset(1);
         vTaskDelay(100 / portTICK_RATE_MS);
-        xEventGroupSetBits(user_event_group, NFC_RUN_BIT);
+        xEventGroupSetBits(user_event_group, NFC_APP_RUN_BIT);
     } else {
-        xEventGroupClearBits(user_event_group, NFC_RUN_BIT);
+        xEventGroupClearBits(user_event_group, NFC_APP_RUN_BIT);
         pn532_setpin_reset(0);
     }
 }
 
 void nfc_app_init(void)
 {
-    xTaskCreate(nfc_app_task_handle, "nfcAppT", 5120, NULL, 5, NULL);
+    xTaskCreate(nfc_app_task_handle, "NfcAppT", 5120, NULL, 5, NULL);
 }

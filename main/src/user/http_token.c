@@ -1,5 +1,5 @@
 /*
- * token.c
+ * http_token.c
  *
  *  Created on: 2018-04-06 15:09
  *      Author: Jack Chen <redchenjs@live.com>
@@ -13,18 +13,18 @@
 
 #include "cJSON.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "os/firmware.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/audio.h"
+#include "user/audio_mp3.h"
 
-#define TAG "token"
+#define TAG "http_token"
 
 static char *data_ptr = NULL;
 
-esp_err_t token_event_handler(esp_http_client_event_t *evt)
+esp_err_t http_token_event_handler(esp_http_client_event_t *evt)
 {
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
@@ -45,11 +45,11 @@ esp_err_t token_event_handler(esp_http_client_event_t *evt)
                 if (cJSON_IsTrue(status)) {
                     ESP_LOGW(TAG, "authentication success");
                     gui_show_image(2);
-                    audio_play_file(1);
+                    audio_mp3_play(1);
                 } else {
                     ESP_LOGE(TAG, "authentication failed");
                     gui_show_image(6);
-                    audio_play_file(2);
+                    audio_mp3_play(2);
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
@@ -63,7 +63,7 @@ esp_err_t token_event_handler(esp_http_client_event_t *evt)
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
         if (uxBits & HTTP_TOKEN_FAILED_BIT) {
             gui_show_image(6);
-            audio_play_file(6);
+            audio_mp3_play(6);
         }
         break;
     }
@@ -75,7 +75,7 @@ esp_err_t token_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-void token_prepare_data(char *buf, int len)
+void http_token_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();
@@ -86,7 +86,7 @@ void token_prepare_data(char *buf, int len)
     cJSON_Delete(root);
 }
 
-void token_verify(char *token)
+void http_token_verify(char *token)
 {
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     data_ptr = token;

@@ -11,11 +11,11 @@
 
 #include "lwip/apps/sntp.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "user/nfc_app.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/ota.h"
+#include "user/http_ota.h"
 
 #define TAG "ntp"
 
@@ -72,12 +72,12 @@ static void ntp_task_handle(void *pvParameter)
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-        if (uxBits & NFC_RUN_BIT) {
+        if (uxBits & NFC_APP_RUN_BIT) {
             time(&now);
             localtime_r(&now, &timeinfo);
             if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
                 nfc_app_set_mode(0);
-                ota_update();
+                http_ota_update();
                 nfc_app_set_mode(1);
             }
         }
@@ -101,5 +101,5 @@ void ntp_sync_time(void)
 
 void ntp_init(void)
 {
-    xTaskCreate(ntp_task_handle, "ntpT", 2048, NULL, 5, NULL);
+    xTaskCreate(ntp_task_handle, "NtpT", 2048, NULL, 5, NULL);
 }

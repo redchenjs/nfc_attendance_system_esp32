@@ -10,7 +10,7 @@
 
 #include "gfx.h"
 
-#include "os/event.h"
+#include "os/core.h"
 #include "user/gui.h"
 
 #define TAG "gui"
@@ -94,5 +94,5 @@ void gui_show_image(uint8_t filename_index)
 
 void gui_init(void)
 {
-    xTaskCreate(gui_task_handle, "guiT", 1024, NULL, 6, NULL);
+    xTaskCreate(gui_task_handle, "GuiT", 1024, NULL, 6, NULL);
 }
