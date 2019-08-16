@@ -26,7 +26,7 @@ void key_smartconfig_handle(void)
 {
     EventBits_t uxBits = xEventGroupGetBits(os_event_group);
     if (uxBits & INPUT_READY_BIT) {
-        ESP_LOGI(SC_KEY_TAG, "key pressed");
+        ESP_LOGI(SC_KEY_TAG, "enter smartconfig mode");
         xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
     } else {
         return;
@@ -39,8 +39,10 @@ void key_smartconfig_handle(void)
     gui_show_image(7);
     audio_mp3_play(7);
 
+    ESP_ERROR_CHECK(esp_wifi_disconnect());
+
     ESP_ERROR_CHECK(esp_smartconfig_set_type(SC_TYPE_ESPTOUCH));
-    smartconfig_start_config_t cfg = SMARTCONFIG_START_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_smartconfig_start(&cfg));
+    smartconfig_start_config_t sc_cfg = SMARTCONFIG_START_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_smartconfig_start(&sc_cfg));
 }
 #endif // CONFIG_ENABLE_SMARTCONFIG

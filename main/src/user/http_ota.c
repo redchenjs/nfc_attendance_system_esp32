@@ -116,7 +116,7 @@ void http_ota_update(void)
 {
 #ifdef CONFIG_ENABLE_OTA
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
-    ESP_LOGI(TAG, "check firmware update, running %s", firmware_get_version());
+    ESP_LOGI(TAG, "checking for firmware update...");
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
         HTTP_OTA_RUN_BIT,

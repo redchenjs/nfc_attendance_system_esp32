@@ -44,6 +44,7 @@ static void key_scan_task_handle(void *pvParameter)
         }
     }
 
+    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
     xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
 
     while (1) {
@@ -70,7 +71,7 @@ static void key_scan_task_handle(void *pvParameter)
 
         vTaskDelayUntil(&xLastWakeTime, 10 / portTICK_RATE_MS);
     }
-#endif // CONFIG_ENABLE_SLEEP_KEY
+#endif // CONFIG_ENABLE_SMARTCONFIG
 }
 
 void key_scan_init(void)
