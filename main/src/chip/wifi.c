@@ -37,17 +37,9 @@ void wifi_init(void)
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_stored_config));
         ESP_ERROR_CHECK(esp_wifi_start());
     } else if (strlen(CONFIG_WIFI_SSID) != 0) {
-        strncpy(
-            (char *)wifi_config.sta.ssid,
-            (char *)CONFIG_WIFI_SSID,
-            strlen(CONFIG_WIFI_SSID)
-        );
+        memcpy(wifi_config.sta.ssid, (char *)CONFIG_WIFI_SSID, strlen(CONFIG_WIFI_SSID));
         wifi_config.sta.ssid[strlen(CONFIG_WIFI_SSID)] = '\0';
-        strncpy(
-            (char *)wifi_config.sta.password,
-            (char *)CONFIG_WIFI_PASSWORD,
-            strlen(CONFIG_WIFI_PASSWORD)
-        );
+        memcpy(wifi_config.sta.password, (char *)CONFIG_WIFI_PASSWORD, strlen(CONFIG_WIFI_PASSWORD));
         wifi_config.sta.password[strlen(CONFIG_WIFI_PASSWORD)] = '\0';
         ESP_LOGI(TAG, "use default wifi configuration, ssid: %s", wifi_config.sta.ssid);
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));

@@ -18,7 +18,6 @@
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/audio.h"
-#include "user/smartconfig.h"
 
 #define TAG "key"
 
@@ -41,7 +40,8 @@ static void key_smartconfig_handle(void)
     audio_play_file(7);
 
     ESP_ERROR_CHECK(esp_smartconfig_set_type(SC_TYPE_ESPTOUCH));
-    ESP_ERROR_CHECK(esp_smartconfig_start(smartconfig_callback));
+    smartconfig_start_config_t cfg = SMARTCONFIG_START_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_smartconfig_start(&cfg));
 }
 #endif
 
