@@ -60,7 +60,7 @@ config ENABLE_SMARTCONFIG
 
 config SC_KEY_HOLD_TIME
     int "SmartConfig Key Hold Time (ms)"
-    default 1000
+    default 500
     depends on ENABLE_SMARTCONFIG
 
 choice SC_KEY_ACTIVE_LEVEL

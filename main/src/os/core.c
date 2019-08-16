@@ -65,6 +65,7 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
     switch (event_id) {
         case IP_EVENT_STA_GOT_IP: {
             xEventGroupSetBits(os_event_group, WIFI_READY_BIT);
+            xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
             ntp_sync_time();
             http_ota_update();
             gui_show_image(3);
@@ -116,7 +117,6 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
             ESP_LOGI(OS_SC_TAG, "ack done");
             esp_smartconfig_stop();
             xEventGroupClearBits(os_event_group, WIFI_CONFIG_BIT);
-            xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
             break;
         default:
             break;
