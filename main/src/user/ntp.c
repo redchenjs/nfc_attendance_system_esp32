@@ -50,7 +50,7 @@ static void ntp_task_handle(void *pvParameter)
 
     while (1) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         time(&now);
         localtime_r(&now, &timeinfo);
         if (timeinfo.tm_year >= (2018 - 1900)) {
