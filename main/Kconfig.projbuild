@@ -205,7 +205,7 @@ endmenu
 
 config FIRMWARE_VERSION
     string "Firmware Version"
-    default "v5.5.0"
+    default "v5.6.0"
     help
         Set firmware version.
 
