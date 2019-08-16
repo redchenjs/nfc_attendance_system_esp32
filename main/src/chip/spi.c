@@ -12,12 +12,12 @@
 #include "board/st7735.h"
 #include "board/st7789.h"
 
-#define TAG "spi"
+#define HSPI_TAG "hspi"
 
 #ifdef CONFIG_ENABLE_GUI
-spi_device_handle_t spi1;
+spi_device_handle_t hspi;
 
-void spi1_init(void)
+void hspi_init(void)
 {
     spi_bus_config_t buscfg={
         .miso_io_num = -1,
@@ -46,7 +46,13 @@ void spi1_init(void)
         .flags = SPI_DEVICE_3WIRE | SPI_DEVICE_HALFDUPLEX
     };
     ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &buscfg, 1));
-    ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &spi1));
-    ESP_LOGI(TAG, "spi-1 initialized.");
+    ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &hspi));
+
+    ESP_LOGI(HSPI_TAG, "initialized, sclk: %d, mosi: %d, miso: %d, cs: %d",
+             buscfg.sclk_io_num,
+             buscfg.mosi_io_num,
+             buscfg.miso_io_num,
+             devcfg.spics_io_num
+    );
 }
 #endif

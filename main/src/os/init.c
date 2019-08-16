@@ -46,7 +46,7 @@ void chip_init(void)
 #endif
 
 #ifdef CONFIG_ENABLE_GUI
-    spi1_init();
+    hspi_init();
 #endif
 }
 
