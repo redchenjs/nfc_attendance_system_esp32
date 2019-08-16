@@ -25,11 +25,10 @@ void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num
     }
 
     size_t bytes_written = 0;
-    TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
     for (int i = 0; i < num_samples; i++) {
         /* low - high / low - high */
         const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]}; // ESP32 CPU is Little Endian
-        i2s_write(0, (const char *)&samp32, sizeof(samp32), &bytes_written, max_wait);
+        i2s_write(0, (const char *)&samp32, sizeof(samp32), &bytes_written, portMAX_DELAY);
 
         // DMA buffer full - retry
         if (bytes_written == 0) {
@@ -44,5 +43,5 @@ void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num
 /* Called by the NXP modifications of libmad. Sets the needed output sample rate. */
 void set_dac_sample_rate(int rate)
 {
-    i2s0_set_sample_rate(rate);
+    i2s_set_output_sample_rate(rate);
 }

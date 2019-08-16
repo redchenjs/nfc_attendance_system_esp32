@@ -9,6 +9,9 @@
 #define INC_CHIP_I2S_H_
 
 extern void i2s0_init(void);
-extern void i2s0_set_sample_rate(int rate);
+
+extern void i2s_set_output_sample_rate(int rate);
+extern int i2s_get_output_sample_rate(void);
+extern int i2s_get_output_bits_per_sample(void);
 
 #endif /* INC_CHIP_I2S_H_ */
