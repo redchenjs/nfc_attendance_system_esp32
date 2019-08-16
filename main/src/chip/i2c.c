@@ -9,7 +9,7 @@
 
 #include "driver/i2c.h"
 
-#define TAG "i2c"
+#define I2C0_TAG "i2c-0"
 
 void i2c0_init(void)
 {
@@ -24,5 +24,9 @@ void i2c0_init(void)
     ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &conf));
     ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, conf.mode, 0, 0, 0));
     ESP_ERROR_CHECK(i2c_set_timeout(I2C_NUM_0, 80 * (I2C_APB_CLK_FREQ / conf.master.clk_speed)));
-    ESP_LOGI(TAG, "i2c-0 initialized.");
+
+    ESP_LOGI(I2C0_TAG, "initialized, sda: %d, scl: %d",
+             conf.sda_io_num,
+             conf.scl_io_num
+    );
 }
