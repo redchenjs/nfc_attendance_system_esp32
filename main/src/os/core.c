@@ -95,7 +95,6 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
             ESP_LOGI(TAG, "got ssid and passwd");
 
             smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
-            bzero(&wifi_config, sizeof(wifi_config_t));
             memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
             memcpy(wifi_config.sta.password, evt->password, sizeof(wifi_config.sta.password));
             wifi_config.sta.bssid_set = evt->bssid_set;
