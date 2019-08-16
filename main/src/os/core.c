@@ -48,8 +48,11 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
             break;
         case WIFI_EVENT_STA_DISCONNECTED: {
             EventBits_t uxBits = xEventGroupGetBits(os_event_group);
-            if (!(uxBits & WIFI_CONFIG_BIT) && (uxBits & WIFI_READY_BIT)) {
+            if (uxBits & WIFI_READY_BIT) {
                 esp_restart();
+            }
+            if (!(uxBits & WIFI_CONFIG_BIT)) {
+                ESP_ERROR_CHECK(esp_wifi_connect());
             }
             xEventGroupClearBits(os_event_group, WIFI_READY_BIT);
             break;
