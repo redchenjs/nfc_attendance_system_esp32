@@ -49,6 +49,8 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         case WIFI_EVENT_STA_DISCONNECTED: {
             EventBits_t uxBits = xEventGroupGetBits(os_event_group);
             if (uxBits & WIFI_READY_BIT) {
+                gui_show_image(4);
+                vTaskDelay(2000 / portTICK_RATE_MS);
                 esp_restart();
             }
             if (!(uxBits & WIFI_CONFIG_BIT)) {
