@@ -36,3 +36,7 @@ git clone --recursive https://github.com/redchenjs/nfc_attendance_system_esp32.g
 ## Board
 
 <img src="docs/board.png">
+
+## Videos Links
+
+* [智慧校园NFC考勤系统简介](https://www.bilibili.com/video/av64088862)
