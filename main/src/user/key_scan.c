@@ -1,5 +1,5 @@
 /*
- * key.c
+ * key_scan.c
  *
  *  Created on: 2018-05-31 14:07
  *      Author: Jack Chen <redchenjs@live.com>
