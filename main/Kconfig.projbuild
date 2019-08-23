@@ -203,10 +203,4 @@ config I2S_DOUT_PIN
     depends on ENABLE_AUDIO_PROMPT
 endmenu
 
-config FIRMWARE_VERSION
-    string "Firmware Version"
-    default "v5.6.0"
-    help
-        Set firmware version.
-
 endmenu

@@ -1,5 +1,5 @@
 /*
- * core.c
+ * os.c
  *
  *  Created on: 2018-03-04 20:07
  *      Author: Jack Chen <redchenjs@live.com>
@@ -15,8 +15,7 @@
 
 #include "freertos/event_groups.h"
 
-#include "os/core.h"
-#include "os/firmware.h"
+#include "core/os.h"
 #include "chip/wifi.h"
 #include "user/nfc_app.h"
 #include "user/gui.h"
@@ -25,8 +24,7 @@
 #include "user/audio_mp3.h"
 #include "user/http_app_ota.h"
 
-#define OS_CORE_TAG "os_core"
-#define OS_SC_TAG   "os_sc"
+#define OS_SC_TAG "os_sc"
 
 EventGroupHandle_t os_event_group;
 EventGroupHandle_t user_event_group;
@@ -128,10 +126,8 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-void os_core_init(void)
+void os_init(void)
 {
-    ESP_LOGW(OS_CORE_TAG, "current firmware version is %s", os_firmware_get_version());
-
     os_event_group   = xEventGroupCreate();
     user_event_group = xEventGroupCreate();
 

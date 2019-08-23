@@ -11,7 +11,7 @@
 
 #include "lwip/apps/sntp.h"
 
-#include "os/core.h"
+#include "core/os.h"
 #include "user/nfc_app.h"
 #include "user/gui.h"
 #include "user/led.h"

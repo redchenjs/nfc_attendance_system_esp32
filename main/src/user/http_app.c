@@ -10,8 +10,7 @@
 #include "esp_log.h"
 #include "esp_http_client.h"
 
-#include "os/core.h"
-#include "os/firmware.h"
+#include "core/os.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"

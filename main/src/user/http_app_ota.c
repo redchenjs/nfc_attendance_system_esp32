@@ -14,8 +14,8 @@
 
 #include "cJSON.h"
 
-#include "os/core.h"
-#include "os/firmware.h"
+#include "core/os.h"
+#include "core/app.h"
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"
@@ -106,7 +106,7 @@ void http_app_ota_prepare_data(char *buf, int len)
     cJSON *root = NULL;
     root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "request", 105);
-    cJSON_AddStringToObject(root, "version", os_firmware_get_version());
+    cJSON_AddStringToObject(root, "version", app_get_version());
     cJSON_AddStringToObject(root, "mac", wifi_mac_string);
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);

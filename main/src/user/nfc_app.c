@@ -12,7 +12,7 @@
 
 #include "nfc/nfc.h"
 
-#include "os/core.h"
+#include "core/os.h"
 #include "board/pn532.h"
 #include "user/gui.h"
 #include "user/ntp.h"

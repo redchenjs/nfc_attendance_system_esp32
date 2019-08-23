@@ -10,7 +10,7 @@
 
 #include "gfx.h"
 
-#include "os/core.h"
+#include "core/os.h"
 #include "user/gui.h"
 
 #define TAG "gui"
