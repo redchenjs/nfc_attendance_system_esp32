@@ -42,6 +42,7 @@ static uint8_t img_file_index = 0;
 
 static void gui_task_handle(void *pvParameter)
 {
+    portTickType xLastWakeTime;
     gdispImage gfx_image;
 
     gfxInit();
@@ -57,6 +58,7 @@ static void gui_task_handle(void *pvParameter)
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, Black);
             while (1) {
+                xLastWakeTime = xTaskGetTickCount();
                 if (xEventGroupGetBits(user_event_group) & GUI_RELOAD_BIT) {
                     break;
                 }
@@ -68,7 +70,7 @@ static void gui_task_handle(void *pvParameter)
                     break;
                 }
                 if (delay != TIME_IMMEDIATE) {
-                    gfxSleepMilliseconds(delay);
+                    vTaskDelayUntil(&xLastWakeTime, delay / portTICK_RATE_MS);
                 }
             }
             gdispImageClose(&gfx_image);
