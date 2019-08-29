@@ -187,6 +187,10 @@ config ENABLE_AUDIO_PROMPT
     help
         Select this to enable audio prompt.
 
+config AUDIO_OUTPUT_I2S_NUM
+    int
+    default 0
+
 config I2S_BCLK_PIN
     int "I2S BCLK Pin"
     default 22
