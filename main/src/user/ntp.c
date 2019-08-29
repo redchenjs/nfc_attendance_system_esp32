@@ -51,15 +51,19 @@ static void ntp_task_handle(void *pvParameter)
     while (1) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
         vTaskDelay(1000 / portTICK_RATE_MS);
+
         time(&now);
         localtime_r(&now, &timeinfo);
         if (timeinfo.tm_year >= (2018 - 1900)) {
             break;
         }
+
         if (++retry > retry_count) {
-            ESP_LOGE(TAG, "timeout");
+            ESP_LOGE(TAG, "timeout error");
+
             gui_show_image(4);
             vTaskDelay(2000 / portTICK_RATE_MS);
+
             esp_restart();
         }
     }
@@ -71,6 +75,7 @@ static void ntp_task_handle(void *pvParameter)
 
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
+
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
         if (uxBits & NFC_APP_RUN_BIT) {
             time(&now);

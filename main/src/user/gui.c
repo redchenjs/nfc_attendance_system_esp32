@@ -55,30 +55,39 @@ static void gui_task_handle(void *pvParameter)
             pdFALSE,
             portMAX_DELAY
         );
+
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, Black);
+
             while (1) {
                 xLastWakeTime = xTaskGetTickCount();
+
                 if (xEventGroupGetBits(user_event_group) & GUI_RELOAD_BIT) {
                     break;
                 }
+
                 if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
-                    break;
+                    goto err;
                 }
+
                 delaytime_t delay = gdispImageNext(&gfx_image);
                 if (delay == TIME_INFINITE) {
                     break;
                 }
+
                 if (delay != TIME_IMMEDIATE) {
                     vTaskDelayUntil(&xLastWakeTime, delay / portTICK_RATE_MS);
                 }
             }
+
             gdispImageClose(&gfx_image);
         } else {
-            break;
+            goto err;
         }
     }
-    ESP_LOGE(TAG, "task failed");
+
+err:
+    ESP_LOGE(TAG, "unrecoverable error");
     esp_restart();
 }
 

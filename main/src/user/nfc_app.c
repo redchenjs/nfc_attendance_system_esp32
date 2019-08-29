@@ -103,9 +103,11 @@ static void nfc_app_task_handle(void *pvParameter)
         // Task Delay
         vTaskDelayUntil(&xLastWakeTime, 500 / portTICK_RATE_MS);
     }
+
 err:
     nfc_exit(context);
-    ESP_LOGE(TAG, "task failed");
+
+    ESP_LOGE(TAG, "unrecoverable error");
     esp_restart();
 }
 
