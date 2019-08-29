@@ -125,5 +125,5 @@ void nfc_app_set_mode(uint8_t mode)
 
 void nfc_app_init(void)
 {
-    xTaskCreate(nfc_app_task_handle, "NfcAppT", 5120, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(nfc_app_task_handle, "NfcAppT", 5120, NULL, 5, NULL, 0);
 }

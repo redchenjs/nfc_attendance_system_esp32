@@ -105,5 +105,5 @@ void gui_show_image(uint8_t filename_index)
 
 void gui_init(void)
 {
-    xTaskCreate(gui_task_handle, "GuiT", 1536, NULL, 6, NULL);
+    xTaskCreatePinnedToCore(gui_task_handle, "GuiT", 1536, NULL, 6, NULL, 1);
 }
