@@ -18,6 +18,7 @@ git clone --recursive https://github.com/redchenjs/nfc_attendance_system_esp32.g
 ```
 
 * Set up the Toolchain: <https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html>
+* Tested toolchain version: `esp32-2019r1`
 
 ## Configure
 
