@@ -82,6 +82,16 @@ config SC_KEY_PIN
     depends on ENABLE_SMARTCONFIG
 endmenu
 
+menu "NTP Configuration"
+config NTP_SERVER_URL
+    string "NTP Server URL"
+    default "pool.ntp.org"
+
+config NTP_TIMEZONE
+    string "NTP Timezone"
+    default "CST-8"
+endmenu
+
 menu "NFC Configuration"
 config PN532_RST_PIN
     int "PN532 RST Pin"

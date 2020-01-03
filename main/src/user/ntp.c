@@ -8,18 +8,31 @@
 #include <time.h>
 
 #include "esp_log.h"
-
-#include "lwip/apps/sntp.h"
+#include "esp_sntp.h"
 
 #include "core/os.h"
-#include "user/nfc_app.h"
+
 #include "user/gui.h"
 #include "user/led.h"
+#include "user/nfc_app.h"
 #include "user/http_app_ota.h"
 
 #define TAG "ntp"
 
-static void ntp_task_handle(void *pvParameter)
+static time_t now = 0;
+static struct tm timeinfo = {0};
+static char strftime_buf[64];
+
+static void ntp_time_sync_notification_cb(struct timeval *tv)
+{
+    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+
+    ESP_LOGW(TAG, "the current date/time is: %s %s", CONFIG_NTP_TIMEZONE, strftime_buf);
+
+    xEventGroupSetBits(user_event_group, NTP_READY_BIT);
+}
+
+static void ntp_task(void *pvParameter)
 {
     xEventGroupWaitBits(
         user_event_group,
@@ -32,34 +45,26 @@ static void ntp_task_handle(void *pvParameter)
     led_set_mode(2);
     gui_show_image(5);
 
-    setenv("TZ", "CST-8", 1);
-    tzset();
-
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    sntp_setservername(0,"0.cn.pool.ntp.org");
-    sntp_setservername(1,"1.cn.pool.ntp.org");
-    sntp_setservername(2,"2.cn.pool.ntp.org");
-    sntp_setservername(3,"3.cn.pool.ntp.org");
+    sntp_setservername(0, CONFIG_NTP_SERVER_URL);
+    sntp_set_time_sync_notification_cb(ntp_time_sync_notification_cb);
+
     sntp_init();
 
-    time_t now = 0;
-    struct tm timeinfo = {0};
-    char strftime_buf[64];
+    setenv("TZ", CONFIG_NTP_TIMEZONE, 1);
+    tzset();
+
+    ESP_LOGI(TAG, "started.");
+
     int retry = 1;
     const int retry_count = 15;
 
-    while (1) {
+    while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) {
         ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
         vTaskDelay(1000 / portTICK_RATE_MS);
 
-        time(&now);
-        localtime_r(&now, &timeinfo);
-        if (timeinfo.tm_year >= (2018 - 1900)) {
-            break;
-        }
-
         if (++retry > retry_count) {
-            ESP_LOGE(TAG, "timeout error");
+            ESP_LOGE(TAG, "time sync timeout");
 
             gui_show_image(4);
             vTaskDelay(2000 / portTICK_RATE_MS);
@@ -67,11 +72,6 @@ static void ntp_task_handle(void *pvParameter)
             esp_restart();
         }
     }
-
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    ESP_LOGW(TAG, "the current date/time in Shanghai is: %s", strftime_buf);
-
-    xEventGroupSetBits(user_event_group, NTP_READY_BIT);
 
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
@@ -106,5 +106,5 @@ void ntp_sync_time(void)
 
 void ntp_init(void)
 {
-    xTaskCreatePinnedToCore(ntp_task_handle, "NtpT", 2048, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(ntp_task, "NtpT", 2048, NULL, 5, NULL, 0);
 }
