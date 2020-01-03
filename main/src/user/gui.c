@@ -25,7 +25,7 @@ static const char *img_file_ptr[][2] = {
     {ani5_160x80_gif_ptr, ani5_160x80_gif_end}, // "Clock"
     {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
     {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
-    {ani8_160x80_gif_ptr, ani8_160x80_gif_end}  // "Updating"
+    {ani8_160x80_gif_ptr, ani8_160x80_gif_end}, // "Updating"
 #elif defined(CONFIG_SCREEN_PANEL_ST7789)
     {ani0_240x135_gif_ptr, ani0_240x135_gif_end}, // "WiFi"
     {ani1_240x135_gif_ptr, ani1_240x135_gif_end}, // "Loading"
@@ -35,17 +35,19 @@ static const char *img_file_ptr[][2] = {
     {ani5_240x135_gif_ptr, ani5_240x135_gif_end}, // "Clock"
     {ani6_240x135_gif_ptr, ani6_240x135_gif_end}, // "Error"
     {ani7_240x135_gif_ptr, ani7_240x135_gif_end}, // "Config"
-    {ani8_240x135_gif_ptr, ani8_240x135_gif_end}  // "Updating"
+    {ani8_240x135_gif_ptr, ani8_240x135_gif_end}, // "Updating"
 #endif
 };
 static uint8_t img_file_index = 0;
 
-static void gui_task_handle(void *pvParameter)
+static void gui_task(void *pvParameter)
 {
     portTickType xLastWakeTime;
     gdispImage gfx_image;
 
     gfxInit();
+
+    ESP_LOGI(TAG, "started.");
 
     while (1) {
         xEventGroupWaitBits(
@@ -91,19 +93,19 @@ err:
     esp_restart();
 }
 
-void gui_show_image(uint8_t filename_index)
+void gui_show_image(uint8_t idx)
 {
 #ifdef CONFIG_ENABLE_GUI
-    if (filename_index >= (sizeof(img_file_ptr) / 2)) {
+    if (idx >= (sizeof(img_file_ptr) / 2)) {
         ESP_LOGE(TAG, "invalid filename index");
         return;
     }
-    img_file_index = filename_index;
+    img_file_index = idx;
     xEventGroupSetBits(user_event_group, GUI_RELOAD_BIT);
 #endif
 }
 
 void gui_init(void)
 {
-    xTaskCreatePinnedToCore(gui_task_handle, "GuiT", 1536, NULL, 6, NULL, 1);
+    xTaskCreatePinnedToCore(gui_task, "GuiT", 1536, NULL, 6, NULL, 1);
 }
