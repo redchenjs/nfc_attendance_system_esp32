@@ -136,6 +136,11 @@ config SCREEN_PANEL_DC_PIN
     default 23
     depends on ENABLE_GUI
 
+config SCREEN_PANEL_BL_PIN
+    int "Screen Panel BL Pin"
+    default 4
+    depends on ENABLE_GUI
+
 config SPI_SCLK_PIN
     int "SPI SCLK Pin"
     default 5

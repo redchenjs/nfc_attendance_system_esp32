@@ -38,6 +38,14 @@ static const char *img_file_ptr[][2] = {
     {ani8_240x135_gif_ptr, ani8_240x135_gif_end}, // "Updating"
 #endif
 };
+
+GDisplay *gui_gdisp = NULL;
+
+static coord_t gui_disp_width = 0;
+static coord_t gui_disp_height = 0;
+
+static uint8_t gui_backlight = 255;
+
 static uint8_t img_file_index = 0;
 
 static void gui_task(void *pvParameter)
@@ -46,6 +54,14 @@ static void gui_task(void *pvParameter)
     gdispImage gfx_image;
 
     gfxInit();
+
+    gui_gdisp = gdispGetDisplay(0);
+    gui_disp_width = gdispGGetWidth(gui_gdisp);
+    gui_disp_height = gdispGGetHeight(gui_gdisp);
+
+    gdispGFillArea(gui_gdisp, 0, 0, gui_disp_width, gui_disp_height, 0x000000);
+
+    gdispGSetBacklight(gui_gdisp, gui_backlight);
 
     ESP_LOGI(TAG, "started.");
 
