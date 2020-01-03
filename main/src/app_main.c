@@ -22,7 +22,7 @@
 #include "user/key.h"
 #include "user/nfc_app.h"
 #include "user/http_app.h"
-#include "user/audio_mp3.h"
+#include "user/audio_player.h"
 
 static void core_init(void)
 {
@@ -74,7 +74,7 @@ static void user_init(void)
 #endif
 
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
-    audio_mp3_init();
+    audio_player_init();
 #endif
 }
 

@@ -17,7 +17,7 @@
 #include "user/gui.h"
 #include "user/ntp.h"
 #include "user/led.h"
-#include "user/audio_mp3.h"
+#include "user/audio_player.h"
 #include "user/http_app_token.h"
 
 #define TAG "nfc_app"
@@ -94,7 +94,7 @@ static void nfc_app_task_handle(void *pvParameter)
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL &&
                 strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                 ESP_LOGW(TAG, "token %32s", (char *)(abtRx + RX_FRAME_PRFX_LEN));
-                audio_mp3_play(0);
+                audio_player_play_file(0);
                 http_app_token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
             } else {
                 ESP_LOGW(TAG, "unexpected frame");

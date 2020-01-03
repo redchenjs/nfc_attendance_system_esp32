@@ -17,7 +17,7 @@
 #include "user/nfc_app.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/audio_mp3.h"
+#include "user/audio_player.h"
 
 #define SC_KEY_TAG "sc_key"
 
@@ -37,7 +37,7 @@ void key_smartconfig_handle(void)
     nfc_app_set_mode(0);
     led_set_mode(7);
     gui_show_image(7);
-    audio_mp3_play(7);
+    audio_player_play_file(7);
 
     ESP_ERROR_CHECK(esp_wifi_disconnect());
 

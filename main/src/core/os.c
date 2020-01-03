@@ -17,11 +17,11 @@
 
 #include "core/os.h"
 #include "chip/wifi.h"
-#include "user/nfc_app.h"
+
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/ntp.h"
-#include "user/audio_mp3.h"
+#include "user/nfc_app.h"
 #include "user/http_app_ota.h"
 
 #define OS_SC_TAG "os_sc"

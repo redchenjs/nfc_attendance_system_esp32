@@ -17,7 +17,7 @@
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/audio_mp3.h"
+#include "user/audio_player.h"
 
 #define TAG "http_app_token"
 
@@ -44,11 +44,11 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
                 if (cJSON_IsTrue(status)) {
                     ESP_LOGW(TAG, "authentication success");
                     gui_show_image(2);
-                    audio_mp3_play(1);
+                    audio_player_play_file(1);
                 } else {
                     ESP_LOGE(TAG, "authentication failed");
                     gui_show_image(6);
-                    audio_mp3_play(2);
+                    audio_player_play_file(2);
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
@@ -62,7 +62,7 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
         if (uxBits & HTTP_APP_TOKEN_FAILED_BIT) {
             gui_show_image(6);
-            audio_mp3_play(6);
+            audio_player_play_file(6);
         }
         break;
     }

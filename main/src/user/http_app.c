@@ -14,7 +14,7 @@
 #include "chip/wifi.h"
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/audio_mp3.h"
+#include "user/audio_player.h"
 #include "user/http_app.h"
 #include "user/http_app_ota.h"
 #include "user/http_app_token.h"
@@ -79,7 +79,7 @@ static void http_app_task_handle(void *pvParameter)
             ESP_LOGE(TAG, "error perform http(s) request %s", esp_err_to_name(err));
             if (config.event_handler != http_app_ota_event_handler) {
                 gui_show_image(6);
-                audio_mp3_play(5);
+                audio_player_play_file(5);
             }
         }
         esp_http_client_cleanup(client);
