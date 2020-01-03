@@ -15,6 +15,7 @@
 
 #include "core/os.h"
 #include "chip/wifi.h"
+
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/audio_player.h"
@@ -85,7 +86,7 @@ void http_app_token_prepare_data(char *buf, int len)
     cJSON_Delete(root);
 }
 
-void http_app_token_verify(char *token)
+void http_app_verify_token(char *token)
 {
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     data_ptr = token;

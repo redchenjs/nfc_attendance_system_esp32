@@ -82,7 +82,7 @@ static void ntp_task_handle(void *pvParameter)
             localtime_r(&now, &timeinfo);
             if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
                 nfc_app_set_mode(0);
-                http_app_ota_update();
+                http_app_check_for_updates();
                 nfc_app_set_mode(1);
             }
         }

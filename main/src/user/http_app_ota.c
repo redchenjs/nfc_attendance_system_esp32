@@ -16,7 +16,9 @@
 
 #include "core/os.h"
 #include "core/app.h"
+
 #include "chip/wifi.h"
+
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/audio_player.h"
@@ -112,7 +114,7 @@ void http_app_ota_prepare_data(char *buf, int len)
     cJSON_Delete(root);
 }
 
-void http_app_ota_update(void)
+void http_app_check_for_updates(void)
 {
 #ifdef CONFIG_ENABLE_OTA
     xEventGroupClearBits(os_event_group, INPUT_READY_BIT);

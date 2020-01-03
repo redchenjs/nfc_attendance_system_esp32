@@ -12,16 +12,17 @@
 
 #include "core/os.h"
 #include "chip/wifi.h"
+
 #include "user/gui.h"
 #include "user/led.h"
-#include "user/audio_player.h"
 #include "user/http_app.h"
+#include "user/audio_player.h"
 #include "user/http_app_ota.h"
 #include "user/http_app_token.h"
 
 #define TAG "http_app"
 
-static void http_app_task_handle(void *pvParameter)
+static void http_app_task(void *pvParameter)
 {
     char post_data[128] = {0};
     char server_url[80] = {0};
@@ -101,5 +102,5 @@ static void http_app_task_handle(void *pvParameter)
 
 void http_app_init(void)
 {
-    xTaskCreatePinnedToCore(http_app_task_handle, "HttpAppT", 5120, NULL, 7, NULL, 0);
+    xTaskCreatePinnedToCore(http_app_task, "HttpAppT", 5120, NULL, 7, NULL, 0);
 }

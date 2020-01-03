@@ -95,7 +95,7 @@ static void nfc_app_task_handle(void *pvParameter)
                 strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
                 ESP_LOGW(TAG, "token %32s", (char *)(abtRx + RX_FRAME_PRFX_LEN));
                 audio_player_play_file(0);
-                http_app_token_verify((char *)(abtRx + RX_FRAME_PRFX_LEN));
+                http_app_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
             } else {
                 ESP_LOGW(TAG, "unexpected frame");
             }

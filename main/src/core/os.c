@@ -70,7 +70,7 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
             xEventGroupSetBits(os_event_group, WIFI_READY_BIT);
             xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
             ntp_sync_time();
-            http_app_ota_update();
+            http_app_check_for_updates();
             gui_show_image(3);
             led_set_mode(1);
             nfc_app_set_mode(1);
