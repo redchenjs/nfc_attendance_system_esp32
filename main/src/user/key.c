@@ -1,5 +1,5 @@
 /*
- * key_scan.c
+ * key.c
  *
  *  Created on: 2018-05-31 14:07
  *      Author: Jack Chen <redchenjs@live.com>
@@ -14,9 +14,9 @@
 #include "core/os.h"
 #include "user/key_handle.h"
 
-#define TAG "key_scan"
+#define TAG "key"
 
-static void key_scan_task_handle(void *pvParameter)
+static void key_task(void *pvParameter)
 {
 #ifdef CONFIG_ENABLE_SMARTCONFIG
     uint16_t count[] = {0};
@@ -44,8 +44,9 @@ static void key_scan_task_handle(void *pvParameter)
         }
     }
 
-    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
-    xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
+    ESP_LOGI(TAG, "started.");
+
+    vTaskDelay(2000 / portTICK_RATE_MS);
 
     while (1) {
         xEventGroupWaitBits(
@@ -74,7 +75,10 @@ static void key_scan_task_handle(void *pvParameter)
 #endif // CONFIG_ENABLE_SMARTCONFIG
 }
 
-void key_scan_init(void)
+void key_init(void)
 {
-   xTaskCreatePinnedToCore(key_scan_task_handle, "KeyScanT", 2048, NULL, 5, NULL, 1);
+    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
+    xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
+
+    xTaskCreatePinnedToCore(key_task, "KeyT", 2048, NULL, 5, NULL, 1);
 }

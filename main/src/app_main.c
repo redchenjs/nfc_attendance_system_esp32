@@ -19,8 +19,8 @@
 #include "user/ntp.h"
 #include "user/led.h"
 #include "user/gui.h"
+#include "user/key.h"
 #include "user/nfc_app.h"
-#include "user/key_scan.h"
 #include "user/http_app.h"
 #include "user/audio_mp3.h"
 
@@ -62,7 +62,7 @@ static void user_init(void)
     http_app_init();
 
 #ifdef CONFIG_ENABLE_SMARTCONFIG
-    key_scan_init();
+    key_init();
 #endif
 
 #ifdef CONFIG_ENABLE_LED
