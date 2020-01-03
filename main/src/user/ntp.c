@@ -25,6 +25,8 @@ static char strftime_buf[64];
 
 static void ntp_time_sync_notification_cb(struct timeval *tv)
 {
+    time(&now);
+    localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
     ESP_LOGW(TAG, "the current date/time is: %s %s", CONFIG_NTP_TIMEZONE, strftime_buf);
