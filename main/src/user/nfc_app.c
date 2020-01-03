@@ -60,11 +60,7 @@ static void nfc_app_task_handle(void *pvParameter)
         );
         xLastWakeTime = xTaskGetTickCount();
         // Open NFC device
-#ifdef CONFIG_PN532_IFCE_UART
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
-#else
-        while ((pnd = nfc_open(context, "pn532_i2c:i2c0")) == NULL) {
-#endif
             ESP_LOGE(TAG, "device reset");
             pn532_setpin_reset(0);
             vTaskDelay(100 / portTICK_RATE_MS);
