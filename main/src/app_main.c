@@ -27,7 +27,7 @@
 
 static void core_init(void)
 {
-    app_print_version();
+    app_print_info();
 
     os_init();
 }
@@ -85,10 +85,12 @@ static void user_init(void)
 
 int app_main(void)
 {
-    core_init();        // App Core
-    chip_init();        // OnChip Module
-    board_init();       // OnBoard Module
-    user_init();        // User Task
+    core_init();
+
+    chip_init();
+    board_init();
+
+    user_init();
 
     return 0;
 }
