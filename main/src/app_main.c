@@ -11,7 +11,6 @@
 #include "chip/nvs.h"
 #include "chip/spi.h"
 #include "chip/i2s.h"
-#include "chip/i2c.h"
 #include "chip/wifi.h"
 #include "chip/uart.h"
 
@@ -38,11 +37,7 @@ static void chip_init(void)
 
     wifi_init();
 
-#ifdef CONFIG_PN532_IFCE_UART
     uart1_init();
-#else
-    i2c0_init();
-#endif
 
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
     i2s0_init();

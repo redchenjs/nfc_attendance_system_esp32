@@ -25,11 +25,11 @@ void uart1_init()
     };
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
     ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0));
-    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, CONFIG_PN532_RX_SCL_PIN, CONFIG_PN532_TX_SDA_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, CONFIG_PN532_RX_PIN, CONFIG_PN532_TX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
     ESP_ERROR_CHECK(uart_flush_input(UART_NUM_1));
 
     ESP_LOGI(UART1_TAG, "initialized, txd: %d, rxd: %d",
-             CONFIG_PN532_RX_SCL_PIN,
-             CONFIG_PN532_TX_SDA_PIN
+             CONFIG_PN532_RX_PIN,
+             CONFIG_PN532_TX_PIN
     );
 }
