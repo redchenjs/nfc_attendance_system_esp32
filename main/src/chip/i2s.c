@@ -28,10 +28,6 @@ static i2s_config_t i2s_output_config = {
 
 void i2s0_init(void)
 {
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-
-    i2s_output_config.use_apll = chip_info.revision;                        // Don't use apll on rev0 chips
     ESP_ERROR_CHECK(i2s_driver_install(I2S_NUM_0, &i2s_output_config, 0, NULL));
 
     i2s_pin_config_t pin_config = {
