@@ -17,13 +17,13 @@
 #define TAG "key"
 
 #ifdef CONFIG_ENABLE_SC_KEY
-static uint8_t gpio_pin[] = {
+static const uint8_t gpio_pin[] = {
 #ifdef CONFIG_ENABLE_SC_KEY
     CONFIG_SC_KEY_PIN,
 #endif
 };
 
-static uint8_t gpio_val[] = {
+static const uint8_t gpio_val[] = {
 #ifdef CONFIG_ENABLE_SC_KEY
     0,
 #else
@@ -31,7 +31,7 @@ static uint8_t gpio_val[] = {
 #endif
 };
 
-static uint16_t gpio_hold[] = {
+static const uint16_t gpio_hold[] = {
 #ifdef CONFIG_ENABLE_SC_KEY
     CONFIG_SC_KEY_HOLD_TIME,
 #endif
