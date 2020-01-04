@@ -24,14 +24,9 @@
 #ifdef CONFIG_ENABLE_SMARTCONFIG
 void key_smartconfig_handle(void)
 {
-    EventBits_t uxBits = xEventGroupGetBits(os_event_group);
-    if (uxBits & INPUT_READY_BIT) {
-        ESP_LOGI(SC_KEY_TAG, "enter smartconfig mode");
-        xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
-    } else {
-        return;
-    }
+    xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
 
+    ESP_LOGI(SC_KEY_TAG, "start smartconfig");
     xEventGroupSetBits(os_event_group, WIFI_CONFIG_BIT);
 
     nfc_app_set_mode(0);

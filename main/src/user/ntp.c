@@ -93,7 +93,6 @@ static void ntp_task(void *pvParameter)
 
 void ntp_sync_time(void)
 {
-    xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     EventBits_t uxBits = xEventGroupGetBits(user_event_group);
     if ((uxBits & NTP_READY_BIT) == 0) {
         xEventGroupSync(
@@ -103,7 +102,6 @@ void ntp_sync_time(void)
             portMAX_DELAY
         );
     }
-    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 }
 
 void ntp_init(void)

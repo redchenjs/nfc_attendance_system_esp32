@@ -14,7 +14,6 @@
 typedef enum os_event_group_bits {
     WIFI_READY_BIT  = BIT0,
     WIFI_CONFIG_BIT = BIT1,
-    INPUT_READY_BIT = BIT2,
 } os_event_group_bits_t;
 
 typedef enum user_event_group_bits {

@@ -16,22 +16,37 @@
 
 #define TAG "key"
 
+#ifdef CONFIG_ENABLE_SMARTCONFIG
+static uint8_t gpio_pin[] = {
+#ifdef CONFIG_ENABLE_SMARTCONFIG
+    CONFIG_SC_KEY_PIN,
+#endif
+};
+
+static uint8_t gpio_val[] = {
+#ifdef CONFIG_SC_KEY_ACTIVE_LOW
+    0,
+#else
+    1,
+#endif
+};
+
+static uint16_t gpio_hold[] = {
+#ifdef CONFIG_ENABLE_SMARTCONFIG
+    CONFIG_SC_KEY_HOLD_TIME,
+#endif
+};
+
+static void (*key_handle[])(void) = {
+#ifdef CONFIG_ENABLE_SMARTCONFIG
+    key_smartconfig_handle,
+#endif
+};
+
 static void key_task(void *pvParameter)
 {
-#ifdef CONFIG_ENABLE_SMARTCONFIG
-    uint16_t count[] = {0};
-    uint8_t gpio_pin[] = {CONFIG_SC_KEY_PIN};
-    uint8_t gpio_val[] = {
-#ifdef CONFIG_SC_KEY_ACTIVE_LOW
-        0
-#else
-        1
-#endif
-    };
-    uint16_t gpio_hold[] = {CONFIG_SC_KEY_HOLD_TIME};
-    void (*key_handle[])(void) = {key_smartconfig_handle};
-
     portTickType xLastWakeTime;
+    uint16_t count[sizeof(gpio_pin)] = {0};
 
     for (int i=0; i<sizeof(gpio_pin); i++) {
         gpio_set_direction(gpio_pin[i], GPIO_MODE_INPUT);
@@ -72,13 +87,12 @@ static void key_task(void *pvParameter)
 
         vTaskDelayUntil(&xLastWakeTime, 10 / portTICK_RATE_MS);
     }
-#endif // CONFIG_ENABLE_SMARTCONFIG
 }
 
 void key_init(void)
 {
-    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
     xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
 
     xTaskCreatePinnedToCore(key_task, "KeyT", 2048, NULL, 5, NULL, 1);
 }
+#endif

@@ -88,7 +88,6 @@ void http_app_token_prepare_data(char *buf, int len)
 
 void http_app_verify_token(char *token)
 {
-    xEventGroupClearBits(os_event_group, INPUT_READY_BIT);
     data_ptr = token;
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
@@ -99,5 +98,4 @@ void http_app_verify_token(char *token)
     if ((uxBits & HTTP_APP_TOKEN_READY_BIT) == 0) {
         xEventGroupClearBits(user_event_group, HTTP_APP_TOKEN_RUN_BIT);
     }
-    xEventGroupSetBits(os_event_group, INPUT_READY_BIT);
 }
