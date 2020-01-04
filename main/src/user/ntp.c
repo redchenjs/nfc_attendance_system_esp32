@@ -29,7 +29,8 @@ static void ntp_time_sync_notification_cb(struct timeval *tv)
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
-    ESP_LOGW(TAG, "the current date/time is: %s %s", CONFIG_NTP_TIMEZONE, strftime_buf);
+    ESP_LOGW(TAG, "current timezone: %s", CONFIG_NTP_TIMEZONE);
+    ESP_LOGW(TAG, "current date/time: %s", strftime_buf);
 
     xEventGroupSetBits(user_event_group, NTP_READY_BIT);
 }
