@@ -22,7 +22,7 @@
 
 #define TAG "http_app_token"
 
-static char *data_ptr = NULL;
+static char *token_string = NULL;
 
 esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
 {
@@ -80,7 +80,7 @@ void http_app_token_prepare_data(char *buf, int len)
     cJSON *root = NULL;
     root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "request", 100);
-    cJSON_AddStringToObject(root, "token", data_ptr);
+    cJSON_AddStringToObject(root, "token", token_string);
     cJSON_AddStringToObject(root, "mac", wifi_mac_string);
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);
@@ -88,7 +88,10 @@ void http_app_token_prepare_data(char *buf, int len)
 
 void http_app_verify_token(char *token)
 {
-    data_ptr = token;
+    if (token == NULL) {
+        return;
+    }
+    token_string = token;
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
         HTTP_APP_TOKEN_RUN_BIT,
