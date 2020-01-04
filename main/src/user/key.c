@@ -25,9 +25,11 @@ static const uint8_t gpio_pin[] = {
 
 static const uint8_t gpio_val[] = {
 #ifdef CONFIG_ENABLE_SC_KEY
-    0,
-#else
-    1,
+    #ifdef CONFIG_SC_KEY_ACTIVE_LOW
+        0,
+    #else
+        1,
+    #endif
 #endif
 };
 
