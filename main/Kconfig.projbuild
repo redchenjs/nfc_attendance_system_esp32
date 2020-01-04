@@ -52,21 +52,21 @@ config WIFI_HOSTNAME_PREFIX
     help
         WiFi hostname prefix for the device to use.
 
-config ENABLE_SMARTCONFIG
-    bool "Enable SmartConfig"
+config ENABLE_SC_KEY
+    bool "Enable SmartConfig Key"
     default y
     help
-        Select this to enable smartconfig.
+        Select this to enable smartconfig key.
 
 config SC_KEY_HOLD_TIME
     int "SmartConfig Key Hold Time (ms)"
     default 500
-    depends on ENABLE_SMARTCONFIG
+    depends on ENABLE_SC_KEY
 
 choice SC_KEY_ACTIVE_LEVEL
     prompt "SmartConfig Key Active Level"
     default SC_KEY_ACTIVE_LOW
-    depends on ENABLE_SMARTCONFIG
+    depends on ENABLE_SC_KEY
     help
         Select SmartConfig Key Active Level.
 
@@ -79,7 +79,7 @@ endchoice
 config SC_KEY_PIN
     int "SmartConfig Key Pin"
     default 0
-    depends on ENABLE_SMARTCONFIG
+    depends on ENABLE_SC_KEY
 endmenu
 
 menu "NTP Configuration"

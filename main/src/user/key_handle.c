@@ -21,7 +21,7 @@
 
 #define SC_KEY_TAG "sc_key"
 
-#ifdef CONFIG_ENABLE_SMARTCONFIG
+#ifdef CONFIG_ENABLE_SC_KEY
 void key_smartconfig_handle(void)
 {
     xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
@@ -40,4 +40,4 @@ void key_smartconfig_handle(void)
     smartconfig_start_config_t sc_cfg = SMARTCONFIG_START_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_smartconfig_start(&sc_cfg));
 }
-#endif // CONFIG_ENABLE_SMARTCONFIG
+#endif // CONFIG_ENABLE_SC_KEY

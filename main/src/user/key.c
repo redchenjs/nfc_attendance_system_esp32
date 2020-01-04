@@ -16,15 +16,15 @@
 
 #define TAG "key"
 
-#ifdef CONFIG_ENABLE_SMARTCONFIG
+#ifdef CONFIG_ENABLE_SC_KEY
 static uint8_t gpio_pin[] = {
-#ifdef CONFIG_ENABLE_SMARTCONFIG
+#ifdef CONFIG_ENABLE_SC_KEY
     CONFIG_SC_KEY_PIN,
 #endif
 };
 
 static uint8_t gpio_val[] = {
-#ifdef CONFIG_SC_KEY_ACTIVE_LOW
+#ifdef CONFIG_ENABLE_SC_KEY
     0,
 #else
     1,
@@ -32,14 +32,14 @@ static uint8_t gpio_val[] = {
 };
 
 static uint16_t gpio_hold[] = {
-#ifdef CONFIG_ENABLE_SMARTCONFIG
+#ifdef CONFIG_ENABLE_SC_KEY
     CONFIG_SC_KEY_HOLD_TIME,
 #endif
 };
 
 static void (*key_handle[])(void) = {
-#ifdef CONFIG_ENABLE_SMARTCONFIG
-    key_smartconfig_handle,
+#ifdef CONFIG_ENABLE_SC_KEY
+    sc_key_handle,
 #endif
 };
 
