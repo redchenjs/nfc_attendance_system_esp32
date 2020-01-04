@@ -25,7 +25,7 @@
 
 #define TAG "http_app_ota"
 
-static uint8_t first_time = 1;
+static uint8_t ota_first_time = 1;
 
 esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 {
@@ -44,8 +44,8 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
         break;
     case HTTP_EVENT_ON_DATA: {
         if (evt->data_len) {
-            if (first_time) {
-                first_time = 0;
+            if (ota_first_time) {
+                ota_first_time = 0;
 
                 led_set_mode(3);
                 gui_show_image(8);
@@ -127,6 +127,6 @@ void http_app_check_for_updates(void)
     if ((uxBits & HTTP_APP_OTA_READY_BIT) == 0) {
         xEventGroupClearBits(user_event_group, HTTP_APP_OTA_RUN_BIT);
     }
-    first_time = 1;
+    ota_first_time = 1;
 #endif
 }
