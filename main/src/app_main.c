@@ -40,7 +40,7 @@ static void chip_init(void)
     uart1_init();
 
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
-    i2s0_init();
+    i2s_output_init();
 #endif
 
 #ifdef CONFIG_ENABLE_GUI
@@ -83,6 +83,7 @@ int app_main(void)
     core_init();
 
     chip_init();
+
     board_init();
 
     user_init();

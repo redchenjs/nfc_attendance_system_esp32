@@ -190,9 +190,24 @@ config ENABLE_AUDIO_PROMPT
     help
         Select this to enable audio prompt.
 
+choice AUDIO_OUTPUT
+    prompt "Audio Output"
+    default AUDIO_OUTPUT_I2S1
+    depends on ENABLE_AUDIO_PROMPT
+    help
+        Select Audio Output Interface.
+
+    config AUDIO_OUTPUT_I2S0
+        bool "I2S-0"
+    config AUDIO_OUTPUT_I2S1
+        bool "I2S-1"
+endchoice
+
 config AUDIO_OUTPUT_I2S_NUM
     int
-    default 0
+    default 0 if AUDIO_OUTPUT_I2S0
+    default 1 if AUDIO_OUTPUT_I2S1
+    depends on ENABLE_AUDIO_PROMPT
 
 config I2S_BCLK_PIN
     int "I2S BCLK Pin"
