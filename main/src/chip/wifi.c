@@ -9,6 +9,7 @@
 
 #include "esp_log.h"
 #include "esp_wifi.h"
+#include "esp_netif.h"
 
 char wifi_hostname[40] = {0};
 char wifi_mac_string[18] = {0};
@@ -26,7 +27,8 @@ void wifi_init(void)
         },
     };
 
-    tcpip_adapter_init();
+    ESP_ERROR_CHECK(esp_netif_init());
+    esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
