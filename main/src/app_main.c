@@ -61,7 +61,7 @@ static void user_init(void)
 
     http_app_init();
 
-#ifdef CONFIG_ENABLE_SMARTCONFIG
+#ifdef CONFIG_ENABLE_SC_KEY
     key_init();
 #endif
 
