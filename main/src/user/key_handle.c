@@ -22,7 +22,7 @@
 #define SC_KEY_TAG "sc_key"
 
 #ifdef CONFIG_ENABLE_SC_KEY
-void key_smartconfig_handle(void)
+void sc_key_handle(void)
 {
     xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
 
