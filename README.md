@@ -11,27 +11,48 @@ NFC Attendance System based on ESP32 chip.
 * Wifi SmartConfig (with External Key)
 * OTA Firmware Update (via HTTP/HTTPS)
 
-## Obtaining
+## Preparing
+
+### Obtain the Source
 
 ```
 git clone --recursive https://github.com/redchenjs/nfc_attendance_system_esp32.git
 ```
 
-* Set up the Toolchain: <https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html>
-* Tested toolchain version: `esp32-2019r1`
-
-## Configure
+### Update an existing repository
 
 ```
-./esp-idf/tools/idf.py menuconfig
+git pull
+git submodule update --init --recursive
+```
+
+### Setup the Tools
+
+```
+./esp-idf/install.sh
+```
+
+## Building
+
+### Setup the environment variables
+
+```
+export IDF_PATH=$PWD/esp-idf
+source ./esp-idf/export.sh
+```
+
+### Configure
+
+```
+idf.py menuconfig
 ```
 
 * All project configurations are under the `NFC Attendance System` menu.
 
-## Build & Flash & Monitor
+### Flash & Monitor
 
 ```
-./esp-idf/tools/idf.py flash monitor
+idf.py flash monitor
 ```
 
 ## Board
