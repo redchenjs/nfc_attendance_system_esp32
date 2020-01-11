@@ -107,5 +107,5 @@ void ntp_sync_time(void)
 
 void ntp_init(void)
 {
-    xTaskCreatePinnedToCore(ntp_task, "NtpT", 2048, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(ntp_task, "ntpT", 2048, NULL, 5, NULL, 0);
 }

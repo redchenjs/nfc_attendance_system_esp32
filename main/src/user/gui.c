@@ -123,5 +123,5 @@ void gui_show_image(uint8_t idx)
 
 void gui_init(void)
 {
-    xTaskCreatePinnedToCore(gui_task, "GuiT", 1536, NULL, 6, NULL, 1);
+    xTaskCreatePinnedToCore(gui_task, "guiT", 1536, NULL, 6, NULL, 1);
 }

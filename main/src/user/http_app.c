@@ -102,5 +102,5 @@ static void http_app_task(void *pvParameter)
 
 void http_app_init(void)
 {
-    xTaskCreatePinnedToCore(http_app_task, "HttpAppT", 5120, NULL, 7, NULL, 0);
+    xTaskCreatePinnedToCore(http_app_task, "httpAppT", 5120, NULL, 7, NULL, 0);
 }
