@@ -59,6 +59,11 @@ idf.py flash monitor
 
 <img src="docs/board.png">
 
+## Mini-Program Code
+
+<img src="docs/acode.jpg">
+
 ## Videos Links
 
 * [智慧校园NFC考勤系统简介](https://www.bilibili.com/video/av64088862)
+* [智慧校园NFC考勤系统配套微信小程序](https://www.bilibili.com/video/av83055533)
