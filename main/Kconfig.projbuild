@@ -126,18 +126,18 @@ config SCREEN_PANEL_ST7789
     bool "ST7789 135x240 LCD Panel"
 endchoice
 
-config SCREEN_PANEL_RST_PIN
-    int "Screen Panel RST Pin"
+config DEVICE_RST_PIN
+    int "Device RST Pin"
     default 14
     depends on ENABLE_GUI
 
-config SCREEN_PANEL_DC_PIN
-    int "Screen Panel DC Pin"
+config DEVICE_DC_PIN
+    int "Device DC Pin"
     default 23
     depends on ENABLE_GUI
 
-config SCREEN_PANEL_BL_PIN
-    int "Screen Panel BL Pin"
+config DEVICE_BL_PIN
+    int "Device BL Pin"
     default 4
     depends on ENABLE_GUI
 
