@@ -44,14 +44,20 @@ GDisplay *gui_gdisp = NULL;
 static coord_t gui_disp_width = 0;
 static coord_t gui_disp_height = 0;
 
+static GTimer gui_flush_timer;
 static uint8_t gui_backlight = 255;
 
 static uint8_t img_file_index = 0;
 
+static void gui_flush_task(void *pvParameter)
+{
+    gdispGFlush(gui_gdisp);
+}
+
 static void gui_task(void *pvParameter)
 {
-    portTickType xLastWakeTime;
     gdispImage gfx_image;
+    portTickType xLastWakeTime;
 
     gfxInit();
 
@@ -59,11 +65,13 @@ static void gui_task(void *pvParameter)
     gui_disp_width = gdispGGetWidth(gui_gdisp);
     gui_disp_height = gdispGGetHeight(gui_gdisp);
 
-    gdispGFillArea(gui_gdisp, 0, 0, gui_disp_width, gui_disp_height, 0x000000);
-
-    gdispGSetBacklight(gui_gdisp, gui_backlight);
+    gtimerStart(&gui_flush_timer, gui_flush_task, NULL, TRUE, TIME_INFINITE);
 
     ESP_LOGI(TAG, "started.");
+
+#ifdef CONFIG_SCREEN_PANEL_ST7789
+    gdispGSetOrientation(gui_gdisp, GDISP_ROTATE_270);
+#endif
 
     while (1) {
         xEventGroupWaitBits(
@@ -77,6 +85,8 @@ static void gui_task(void *pvParameter)
         if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
             gdispImageSetBgColor(&gfx_image, Black);
 
+            gdispGSetBacklight(gui_gdisp, gui_backlight);
+
             while (1) {
                 xLastWakeTime = xTaskGetTickCount();
 
@@ -85,8 +95,11 @@ static void gui_task(void *pvParameter)
                 }
 
                 if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
-                    goto err;
+                    ESP_LOGE(TAG, "failed to draw image: %u", img_file_index);
+                    break;
                 }
+
+                gtimerJab(&gui_flush_timer);
 
                 delaytime_t delay = gdispImageNext(&gfx_image);
                 if (delay == TIME_INFINITE) {
@@ -100,19 +113,15 @@ static void gui_task(void *pvParameter)
 
             gdispImageClose(&gfx_image);
         } else {
-            goto err;
+            ESP_LOGE(TAG, "failed to open image: %u", img_file_index);
         }
     }
-
-err:
-    ESP_LOGE(TAG, "unrecoverable error");
-    esp_restart();
 }
 
 void gui_show_image(uint8_t idx)
 {
 #ifdef CONFIG_ENABLE_GUI
-    if (idx >= (sizeof(img_file_ptr) / 2)) {
+    if (idx >= sizeof(img_file_ptr)/2) {
         ESP_LOGE(TAG, "invalid filename index");
         return;
     }
