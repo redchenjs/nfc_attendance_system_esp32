@@ -207,7 +207,7 @@ config AUDIO_OUTPUT_I2S_NUM
     int
     default 0 if AUDIO_OUTPUT_I2S0
     default 1 if AUDIO_OUTPUT_I2S1
-    depends on ENABLE_AUDIO_PROMPT
+    default 2 if !ENABLE_AUDIO_PROMPT
 
 config I2S_BCLK_PIN
     int "I2S BCLK Pin"

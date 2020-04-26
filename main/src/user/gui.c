@@ -26,7 +26,7 @@ static const char *img_file_ptr[][2] = {
     {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
     {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
     {ani8_160x80_gif_ptr, ani8_160x80_gif_end}, // "Updating"
-#elif defined(CONFIG_SCREEN_PANEL_ST7789)
+#else
     {ani0_240x135_gif_ptr, ani0_240x135_gif_end}, // "WiFi"
     {ani1_240x135_gif_ptr, ani1_240x135_gif_end}, // "Loading"
     {ani2_240x135_gif_ptr, ani2_240x135_gif_end}, // "Success"

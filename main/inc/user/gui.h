@@ -38,7 +38,7 @@ extern const char ani7_160x80_gif_end[] asm("_binary_ani7_160x80_gif_end");
 // ani8.gif
 extern const char ani8_160x80_gif_ptr[] asm("_binary_ani8_160x80_gif_start");
 extern const char ani8_160x80_gif_end[] asm("_binary_ani8_160x80_gif_end");
-#elif defined(CONFIG_SCREEN_PANEL_ST7789)
+#else
 // ani0.gif
 extern const char ani0_240x135_gif_ptr[] asm("_binary_ani0_240x135_gif_start");
 extern const char ani0_240x135_gif_end[] asm("_binary_ani0_240x135_gif_end");
