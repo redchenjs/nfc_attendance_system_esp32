@@ -19,8 +19,11 @@ void pn532_setpin_reset(uint8_t val)
 void pn532_init(void)
 {
     gpio_config_t io_conf = {
-        .mode = GPIO_MODE_OUTPUT,
         .pin_bit_mask = BIT64(CONFIG_PN532_RST_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = false,
+        .pull_down_en = false,
+        .intr_type = GPIO_INTR_DISABLE,
     };
     gpio_config(&io_conf);
 
