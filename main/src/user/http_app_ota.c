@@ -25,14 +25,13 @@
 
 #define TAG "http_app_ota"
 
-static uint8_t ota_first_time = 1;
+static uint32_t data_length = 0;
+
+static const esp_partition_t *update_partition = NULL;
+static esp_ota_handle_t update_handle = 0;
 
 esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 {
-    static const esp_partition_t *update_partition = NULL;
-    static esp_ota_handle_t update_handle = 0;
-    static long binary_file_length = 0;
-
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
         break;
@@ -44,16 +43,18 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
         break;
     case HTTP_EVENT_ON_DATA: {
         if (evt->data_len) {
-            if (ota_first_time) {
-                ota_first_time = 0;
-
-                led_set_mode(3);
+            if (!update_handle) {
+                led_set_mode(7);
                 gui_show_image(8);
 
                 update_partition = esp_ota_get_next_update_partition(NULL);
-                ESP_LOGI(TAG, "writing to partition subtype %d at offset 0x%x",
-                            update_partition->subtype, update_partition->address);
-                assert(update_partition != NULL);
+                if (update_partition != NULL) {
+                    ESP_LOGI(TAG, "writing to partition subtype %d at offset 0x%x",
+                             update_partition->subtype, update_partition->address);
+                } else {
+                    ESP_LOGE(TAG, "no ota partition to write");
+                    goto exit;
+                }
 
                 esp_err_t err = esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &update_handle);
                 if (err != ESP_OK) {
@@ -61,32 +62,37 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
                     goto exit;
                 }
 
-                binary_file_length = 0;
+                data_length = 0;
             }
+
             esp_err_t err = esp_ota_write(update_handle, (const void *)evt->data, evt->data_len);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
                 goto exit;
             }
-            binary_file_length += evt->data_len;
-            ESP_LOGD(TAG, "have written image length %ld", binary_file_length);
+
+            data_length += evt->data_len;
         }
         break;
     }
     case HTTP_EVENT_ON_FINISH: {
-        if (binary_file_length != 0) {
+        if (data_length != 0) {
             if (esp_ota_end(update_handle) != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_end failed");
                 goto exit;
             }
+
             esp_err_t err = esp_ota_set_boot_partition(update_partition);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)", esp_err_to_name(err));
                 goto exit;
             }
+
             ESP_LOGW(TAG, "prepare to restart system");
+
             gui_show_image(4);
             vTaskDelay(2000 / portTICK_RATE_MS);
+
             esp_restart();
         } else {
             ESP_LOGI(TAG, "no update found");
@@ -127,6 +133,6 @@ void http_app_check_for_updates(void)
     if ((uxBits & HTTP_APP_OTA_READY_BIT) == 0) {
         xEventGroupClearBits(user_event_group, HTTP_APP_OTA_RUN_BIT);
     }
-    ota_first_time = 1;
+    update_handle = 0;
 #endif
 }
