@@ -32,6 +32,8 @@ static esp_ota_handle_t update_handle = 0;
 
 esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 {
+    esp_err_t err = ESP_OK;
+
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
         break;
@@ -44,6 +46,8 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
     case HTTP_EVENT_ON_DATA: {
         if (evt->data_len) {
             if (!update_handle) {
+                data_length = 0;
+
                 led_set_mode(7);
                 gui_show_image(8);
 
@@ -56,16 +60,14 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
                     goto exit;
                 }
 
-                esp_err_t err = esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &update_handle);
+                err = esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &update_handle);
                 if (err != ESP_OK) {
                     ESP_LOGE(TAG, "esp_ota_begin failed (%s)", esp_err_to_name(err));
                     goto exit;
                 }
-
-                data_length = 0;
             }
 
-            esp_err_t err = esp_ota_write(update_handle, (const void *)evt->data, evt->data_len);
+            err = esp_ota_write(update_handle, (const void *)evt->data, evt->data_len);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
                 goto exit;
@@ -77,12 +79,13 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
     }
     case HTTP_EVENT_ON_FINISH: {
         if (data_length != 0) {
-            if (esp_ota_end(update_handle) != ESP_OK) {
+            err = esp_ota_end(update_handle);
+            if (err != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_end failed");
                 goto exit;
             }
 
-            esp_err_t err = esp_ota_set_boot_partition(update_partition);
+            err = esp_ota_set_boot_partition(update_partition);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)", esp_err_to_name(err));
                 goto exit;
@@ -124,6 +127,7 @@ void http_app_check_for_updates(void)
 {
 #ifdef CONFIG_ENABLE_OTA
     ESP_LOGI(TAG, "checking for firmware update...");
+
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
         HTTP_APP_OTA_RUN_BIT,
@@ -133,6 +137,12 @@ void http_app_check_for_updates(void)
     if ((uxBits & HTTP_APP_OTA_READY_BIT) == 0) {
         xEventGroupClearBits(user_event_group, HTTP_APP_OTA_RUN_BIT);
     }
-    update_handle = 0;
+
+    if (update_handle) {
+        esp_ota_end(update_handle);
+        update_handle = 0;
+
+        data_length = 0;
+    }
 #endif
 }

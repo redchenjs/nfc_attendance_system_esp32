@@ -91,7 +91,9 @@ void http_app_verify_token(char *token)
     if (token == NULL) {
         return;
     }
+
     token_string = token;
+
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
         HTTP_APP_TOKEN_RUN_BIT,
