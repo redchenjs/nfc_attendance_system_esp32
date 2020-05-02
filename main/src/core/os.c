@@ -99,7 +99,7 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
             ESP_LOGI(OS_SC_TAG, "found channel");
             break;
         case SC_EVENT_GOT_SSID_PSWD:
-            led_set_mode(5);
+            led_set_mode(7);
             ESP_LOGI(OS_SC_TAG, "got ssid and passwd");
 
             smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
@@ -128,7 +128,7 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
 
 void os_init(void)
 {
-    os_event_group   = xEventGroupCreate();
+    os_event_group = xEventGroupCreate();
     user_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());

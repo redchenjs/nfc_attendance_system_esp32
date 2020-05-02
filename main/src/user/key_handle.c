@@ -30,7 +30,7 @@ void sc_key_handle(void)
     xEventGroupSetBits(os_event_group, WIFI_CONFIG_BIT);
 
     nfc_app_set_mode(0);
-    led_set_mode(7);
+    led_set_mode(5);
     gui_show_image(7);
     audio_player_play_file(7);
 
