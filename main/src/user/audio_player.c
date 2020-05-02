@@ -102,7 +102,7 @@ err:
 void audio_player_play_file(uint8_t idx)
 {
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
-    if (idx >= (sizeof(mp3_file_ptr) / 2)) {
+    if (idx >= sizeof(mp3_file_ptr)/2) {
         ESP_LOGE(TAG, "invalid file index");
         return;
     }
