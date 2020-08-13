@@ -5,11 +5,11 @@ NFC Attendance System based on ESP32 chip.
 
 ## Main Features
 
-* NFC-Token Exchange (via PN532)
-* GUI Output (GIF Animations)
-* Audio Prompt (I2S Output)
-* Wifi SmartConfig (with External Key)
-* OTA Firmware Update (via HTTP/HTTPS)
+* NFC token exchange
+* WiFi SmartConfig support
+* Audio prompt (I2S output)
+* GUI output (GIF animations)
+* OTA firmware update (HTTP / HTTPS)
 
 ## Preparing
 
