@@ -7,7 +7,6 @@
 
 #include "esp_log.h"
 
-#include "freertos/FreeRTOS.h"
 #include "driver/i2s.h"
 
 #include "chip/i2s.h"
