@@ -15,6 +15,7 @@
 #include "driver/gpio.h"
 
 #include "core/os.h"
+#include "user/key.h"
 #include "user/key_handle.h"
 
 #define TAG "key"
