@@ -19,12 +19,12 @@
 
 #define TAG "ntp"
 
-static time_t now = 0;
-static struct tm timeinfo = {0};
-static char strftime_buf[64];
-
 static void ntp_time_sync_notification_cb(struct timeval *tv)
 {
+    time_t now = 0;
+    struct tm timeinfo = {0};
+    char strftime_buf[64] = {0};
+
     time(&now);
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
@@ -32,21 +32,21 @@ static void ntp_time_sync_notification_cb(struct timeval *tv)
     ESP_LOGW(TAG, "current timezone: %s", CONFIG_NTP_TIMEZONE);
     ESP_LOGW(TAG, "current date/time: %s", strftime_buf);
 
-    xEventGroupSetBits(user_event_group, NTP_READY_BIT);
+    xEventGroupSetBits(user_event_group, NTP_SYNC_SET_BIT);
 }
 
 static void ntp_task(void *pvParameter)
 {
     xEventGroupWaitBits(
         user_event_group,
-        NTP_RUN_BIT,
+        NTP_SYNC_RUN_BIT,
         pdFALSE,
         pdFALSE,
         portMAX_DELAY
     );
 
     led_set_mode(2);
-    gui_show_image(5);
+    gui_show_image(GUI_MODE_IDX_GIF_CLK);
 
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     sntp_setservername(0, CONFIG_NTP_SERVER_URL);
@@ -60,16 +60,16 @@ static void ntp_task(void *pvParameter)
     ESP_LOGI(TAG, "started.");
 
     int retry = 1;
-    const int retry_count = 15;
-
+    const int max_retry = 15;
     while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) {
-        ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, retry_count);
+        ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, max_retry);
+
         vTaskDelay(1000 / portTICK_RATE_MS);
 
-        if (++retry > retry_count) {
+        if (++retry > max_retry) {
             ESP_LOGE(TAG, "time sync timeout");
 
-            gui_show_image(4);
+            gui_set_mode(GUI_MODE_IDX_GIF_PWR);
             vTaskDelay(2000 / portTICK_RATE_MS);
 
             esp_restart();
@@ -79,14 +79,13 @@ static void ntp_task(void *pvParameter)
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
 
-        EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-        if (uxBits & NFC_APP_RUN_BIT) {
+        if (nfc_app_get_mode() == NFC_APP_MODE_IDX_ON) {
             time(&now);
             localtime_r(&now, &timeinfo);
             if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0) {
-                nfc_app_set_mode(0);
+                nfc_app_set_mode(NFC_APP_MODE_IDX_OFF);
                 http_app_check_for_updates();
-                nfc_app_set_mode(1);
+                nfc_app_set_mode(NFC_APP_MODE_IDX_ON);
             }
         }
     }
@@ -95,11 +94,11 @@ static void ntp_task(void *pvParameter)
 void ntp_sync_time(void)
 {
     EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-    if ((uxBits & NTP_READY_BIT) == 0) {
+    if (!(uxBits & NTP_SYNC_SET_BIT)) {
         xEventGroupSync(
             user_event_group,
-            NTP_RUN_BIT,
-            NTP_READY_BIT,
+            NTP_SYNC_RUN_BIT,
+            NTP_SYNC_SET_BIT,
             portMAX_DELAY
         );
     }
