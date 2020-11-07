@@ -11,33 +11,42 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 
-typedef enum os_event_group_bits {
-    WIFI_READY_BIT  = BIT0,
-    WIFI_CONFIG_BIT = BIT1,
-} os_event_group_bits_t;
+typedef enum wifi_event_group_bits {
+    WIFI_RDY_BIT = BIT0,
+    WIFI_CFG_BIT = BIT1
+} wifi_event_group_bits_t;
 
 typedef enum user_event_group_bits {
-    NTP_RUN_BIT   = BIT0,
-    NTP_READY_BIT = BIT1,
+    OS_PWR_DUMMY_BIT = 0x00,
+    OS_PWR_RESET_BIT = BIT0,
+    OS_PWR_SLEEP_BIT = BIT1,
 
-    GUI_RELOAD_BIT     = BIT2,
-    NFC_APP_RUN_BIT    = BIT3,
-    KEY_SCAN_RUN_BIT   = BIT4,
+    NTP_SYNC_RUN_BIT = BIT2,
+    NTP_SYNC_SET_BIT = BIT3,
 
-    AUDIO_PLAYER_RUN_BIT  = BIT5,
-    AUDIO_PLAYER_IDLE_BIT = BIT6,
+    NFC_APP_RUN_BIT  = BIT4,
+    GUI_RLD_MODE_BIT = BIT5,
 
-    HTTP_APP_OTA_RUN_BIT    = BIT7,
-    HTTP_APP_OTA_READY_BIT  = BIT8,
-    HTTP_APP_OTA_FAILED_BIT = BIT9,
+    KEY_SCAN_RUN_BIT = BIT6,
+    KEY_SCAN_CLR_BIT = BIT7,
 
-    HTTP_APP_TOKEN_RUN_BIT    = BIT10,
-    HTTP_APP_TOKEN_READY_BIT  = BIT11,
-    HTTP_APP_TOKEN_FAILED_BIT = BIT12
+    AUDIO_PLAYER_RUN_BIT  = BIT8,
+    AUDIO_PLAYER_IDLE_BIT = BIT9,
+
+    HTTP_APP_OTA_RUN_BIT  = BIT10,
+    HTTP_APP_OTA_DONE_BIT = BIT11,
+    HTTP_APP_OTA_FAIL_BIT = BIT12,
+
+    HTTP_APP_TOKEN_RUN_BIT  = BIT13,
+    HTTP_APP_TOKEN_DONE_BIT = BIT14,
+    HTTP_APP_TOKEN_FAIL_BIT = BIT15
 } user_event_group_bits_t;
 
-extern EventGroupHandle_t os_event_group;
+extern EventGroupHandle_t wifi_event_group;
 extern EventGroupHandle_t user_event_group;
+
+extern void os_pwr_reset_wait(EventBits_t bits);
+extern void os_pwr_sleep_wait(EventBits_t bits);
 
 extern void os_init(void);
 
