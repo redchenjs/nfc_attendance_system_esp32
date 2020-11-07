@@ -6,7 +6,6 @@
  */
 
 #include "esp_log.h"
-#include "esp_system.h"
 
 #include "gfx.h"
 
@@ -17,37 +16,38 @@
 
 static const char *img_file_ptr[][2] = {
 #ifdef CONFIG_SCREEN_PANEL_ST7735
-    {ani0_160x80_gif_ptr, ani0_160x80_gif_end}, // "WiFi"
-    {ani1_160x80_gif_ptr, ani1_160x80_gif_end}, // "Loading"
-    {ani2_160x80_gif_ptr, ani2_160x80_gif_end}, // "Success"
-    {ani3_160x80_gif_ptr, ani3_160x80_gif_end}, // "NFC"
-    {ani4_160x80_gif_ptr, ani4_160x80_gif_end}, // "PowerOff"
-    {ani5_160x80_gif_ptr, ani5_160x80_gif_end}, // "Clock"
-    {ani6_160x80_gif_ptr, ani6_160x80_gif_end}, // "Error"
-    {ani7_160x80_gif_ptr, ani7_160x80_gif_end}, // "Config"
-    {ani8_160x80_gif_ptr, ani8_160x80_gif_end}, // "Updating"
+    [GUI_MODE_IDX_GIF_WIFI] = {ani0_160x80_gif_ptr, ani0_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_BUSY] = {ani1_160x80_gif_ptr, ani1_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_DONE] = {ani2_160x80_gif_ptr, ani2_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_SCAN] = {ani3_160x80_gif_ptr, ani3_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_PWR]  = {ani4_160x80_gif_ptr, ani4_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_CLK]  = {ani5_160x80_gif_ptr, ani5_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_ERR]  = {ani6_160x80_gif_ptr, ani6_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_CFG]  = {ani7_160x80_gif_ptr, ani7_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_UPD]  = {ani8_160x80_gif_ptr, ani8_160x80_gif_end}
 #else
-    {ani0_240x135_gif_ptr, ani0_240x135_gif_end}, // "WiFi"
-    {ani1_240x135_gif_ptr, ani1_240x135_gif_end}, // "Loading"
-    {ani2_240x135_gif_ptr, ani2_240x135_gif_end}, // "Success"
-    {ani3_240x135_gif_ptr, ani3_240x135_gif_end}, // "NFC"
-    {ani4_240x135_gif_ptr, ani4_240x135_gif_end}, // "PowerOff"
-    {ani5_240x135_gif_ptr, ani5_240x135_gif_end}, // "Clock"
-    {ani6_240x135_gif_ptr, ani6_240x135_gif_end}, // "Error"
-    {ani7_240x135_gif_ptr, ani7_240x135_gif_end}, // "Config"
-    {ani8_240x135_gif_ptr, ani8_240x135_gif_end}, // "Updating"
+    [GUI_MODE_IDX_GIF_WIFI] = {ani0_240x135_gif_ptr, ani0_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_BUSY] = {ani1_240x135_gif_ptr, ani1_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_DONE] = {ani2_240x135_gif_ptr, ani2_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_SCAN] = {ani3_240x135_gif_ptr, ani3_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_PWR]  = {ani4_240x135_gif_ptr, ani4_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_CLK]  = {ani5_240x135_gif_ptr, ani5_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_ERR]  = {ani6_240x135_gif_ptr, ani6_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_CFG]  = {ani7_240x135_gif_ptr, ani7_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_UPD]  = {ani8_240x135_gif_ptr, ani8_240x135_gif_end}
 #endif
 };
 
 GDisplay *gui_gdisp = NULL;
 
+static uint8_t gui_backlight = 255;
+
 static coord_t gui_disp_width = 0;
 static coord_t gui_disp_height = 0;
 
 static GTimer gui_flush_timer;
-static uint8_t gui_backlight = 255;
 
-static uint8_t img_file_index = 0;
+static gui_mode_t gui_mode = GUI_MODE_IDX_GIF_WIFI;
 
 static void gui_flush_task(void *pvParameter)
 {
@@ -56,7 +56,6 @@ static void gui_flush_task(void *pvParameter)
 
 static void gui_task(void *pvParameter)
 {
-    gdispImage gfx_image;
     portTickType xLastWakeTime;
 
     gfxInit();
@@ -69,68 +68,106 @@ static void gui_task(void *pvParameter)
 
     ESP_LOGI(TAG, "started.");
 
-#ifdef CONFIG_SCREEN_PANEL_ST7789
-    gdispGSetOrientation(gui_gdisp, GDISP_ROTATE_270);
-#endif
-
     while (1) {
-        xEventGroupWaitBits(
-            user_event_group,
-            GUI_RELOAD_BIT,
-            pdTRUE,
-            pdFALSE,
-            portMAX_DELAY
-        );
+        switch (gui_mode) {
+        case GUI_MODE_IDX_GIF_WIFI:
+        case GUI_MODE_IDX_GIF_BUSY:
+        case GUI_MODE_IDX_GIF_DONE:
+        case GUI_MODE_IDX_GIF_SCAN:
+        case GUI_MODE_IDX_GIF_PWR:
+        case GUI_MODE_IDX_GIF_CLK:
+        case GUI_MODE_IDX_GIF_ERR:
+        case GUI_MODE_IDX_GIF_CFG:
+        case GUI_MODE_IDX_GIF_UPD: {
+            gdispImage gfx_image;
 
-        if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[img_file_index][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
-            gdispImageSetBgColor(&gfx_image, Black);
+            if (!(gdispImageOpenMemory(&gfx_image, img_file_ptr[gui_mode][0]) & GDISP_IMAGE_ERR_UNRECOVERABLE)) {
+                gdispImageSetBgColor(&gfx_image, Black);
 
-            gdispGSetBacklight(gui_gdisp, gui_backlight);
+                gdispGSetBacklight(gui_gdisp, gui_backlight);
 
-            while (1) {
-                xLastWakeTime = xTaskGetTickCount();
+                while (1) {
+                    xLastWakeTime = xTaskGetTickCount();
 
-                if (xEventGroupGetBits(user_event_group) & GUI_RELOAD_BIT) {
-                    break;
+                    if (xEventGroupGetBits(user_event_group) & GUI_RLD_MODE_BIT) {
+                        xEventGroupClearBits(user_event_group, GUI_RLD_MODE_BIT);
+                        break;
+                    }
+
+                    if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
+                        ESP_LOGE(TAG, "failed to draw image: %u", gui_mode);
+                        gui_mode = GUI_MODE_IDX_OFF;
+                        break;
+                    }
+
+                    gtimerJab(&gui_flush_timer);
+
+                    delaytime_t delay = gdispImageNext(&gfx_image);
+                    if (delay == TIME_INFINITE) {
+                        gui_mode = GUI_MODE_IDX_PAUSE;
+                        break;
+                    }
+
+                    if (delay != TIME_IMMEDIATE) {
+                        vTaskDelayUntil(&xLastWakeTime, delay / portTICK_RATE_MS);
+                    }
                 }
 
-                if (gdispImageDraw(&gfx_image, 0, 0, gfx_image.width, gfx_image.height, 0, 0) != GDISP_IMAGE_ERR_OK) {
-                    ESP_LOGE(TAG, "failed to draw image: %u", img_file_index);
-                    break;
-                }
-
-                gtimerJab(&gui_flush_timer);
-
-                delaytime_t delay = gdispImageNext(&gfx_image);
-                if (delay == TIME_INFINITE) {
-                    break;
-                }
-
-                if (delay != TIME_IMMEDIATE) {
-                    vTaskDelayUntil(&xLastWakeTime, delay / portTICK_RATE_MS);
-                }
+                gdispImageClose(&gfx_image);
+            } else {
+                ESP_LOGE(TAG, "failed to open image: %u", gui_mode);
+                gui_mode = GUI_MODE_IDX_OFF;
+                break;
             }
+            break;
+        }
+        case GUI_MODE_IDX_PAUSE:
+            xEventGroupWaitBits(
+                user_event_group,
+                GUI_RLD_MODE_BIT,
+                pdTRUE,
+                pdFALSE,
+                portMAX_DELAY
+            );
 
-            gdispImageClose(&gfx_image);
-        } else {
-            ESP_LOGE(TAG, "failed to open image: %u", img_file_index);
+            break;
+        case GUI_MODE_IDX_OFF:
+        default:
+            gdispGSetBacklight(gui_gdisp, 0);
+
+            vTaskDelay(500 / portTICK_RATE_MS);
+
+            gdispGClear(gui_gdisp, Black);
+            gtimerJab(&gui_flush_timer);
+
+            xEventGroupWaitBits(
+                user_event_group,
+                GUI_RLD_MODE_BIT,
+                pdTRUE,
+                pdFALSE,
+                portMAX_DELAY
+            );
+
+            break;
         }
     }
 }
 
-void gui_show_image(uint8_t idx)
+void gui_set_mode(gui_mode_t idx)
 {
-#ifdef CONFIG_ENABLE_GUI
-    if (idx >= sizeof(img_file_ptr)/2) {
-        ESP_LOGE(TAG, "invalid filename index");
-        return;
-    }
-    img_file_index = idx;
-    xEventGroupSetBits(user_event_group, GUI_RELOAD_BIT);
-#endif
+    gui_mode = idx;
+
+    xEventGroupSetBits(user_event_group, GUI_RLD_MODE_BIT);
+
+    ESP_LOGI(TAG, "mode: 0x%02X", gui_mode);
+}
+
+gui_mode_t gui_get_mode(void)
+{
+    return gui_mode;
 }
 
 void gui_init(void)
 {
-    xTaskCreatePinnedToCore(gui_task, "guiT", 1536, NULL, 6, NULL, 1);
+    xTaskCreatePinnedToCore(gui_task, "guiT", 1920, NULL, 6, NULL, 1);
 }
