@@ -8,21 +8,22 @@
 #include <string.h>
 
 #include "esp_log.h"
-#include "esp_system.h"
 
 #include "nfc/nfc.h"
 
 #include "core/os.h"
 #include "board/pn532.h"
+
 #include "user/gui.h"
 #include "user/ntp.h"
 #include "user/led.h"
+#include "user/nfc_app.h"
 #include "user/audio_player.h"
 #include "user/http_app_token.h"
 
 #define TAG "nfc_app"
 
-#define RX_FRAME_PRFX "f222222222"
+#define RX_FRAME_PRFX "FF55AA55AA"
 
 #define RX_FRAME_PRFX_LEN (10)
 #define RX_FRAME_DATA_LEN (32)
@@ -32,6 +33,8 @@
 
 static uint8_t abtRx[RX_FRAME_LEN + 1] = {0x00};
 static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05, 0xF2, 0x22, 0x22, 0x22, 0x22};
+
+static nfc_app_mode_t nfc_app_mode = NFC_APP_MODE_IDX_OFF;
 
 static void nfc_app_task_handle(void *pvParameter)
 {
@@ -53,13 +56,13 @@ static void nfc_app_task_handle(void *pvParameter)
     while (1) {
         xEventGroupWaitBits(
             user_event_group,
-            NFC_APP_RUN_BIT,
+            NFC_RUN_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY
         );
         xLastWakeTime = xTaskGetTickCount();
-        // Open NFC device
+        // open NFC device
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
             ESP_LOGE(TAG, "device reset");
             pn532_setpin_reset(0);
@@ -67,7 +70,7 @@ static void nfc_app_task_handle(void *pvParameter)
             pn532_setpin_reset(1);
             vTaskDelay(100 / portTICK_RATE_MS);
         }
-        // Transceive some bytes if target available
+        // transceive some bytes if target available
         int res = 0;
         memset(abtRx, 0, sizeof(abtRx));
         if (nfc_initiator_init(pnd) >= 0) {
@@ -83,9 +86,9 @@ static void nfc_app_task_handle(void *pvParameter)
         } else {
             ESP_LOGE(TAG, "setup device failed");
         }
-        // Close NFC device
+        // close NFC device
         nfc_close(pnd);
-        // Match received bytes and verify the token if available
+        // match received bytes and verify the token if available
         if (res > 0) {
             if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL &&
                 strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
@@ -96,7 +99,7 @@ static void nfc_app_task_handle(void *pvParameter)
                 ESP_LOGW(TAG, "unexpected frame");
             }
         }
-        // Task Delay
+        // task delay
         vTaskDelayUntil(&xLastWakeTime, 500 / portTICK_RATE_MS);
     }
 
@@ -104,12 +107,14 @@ err:
     nfc_exit(context);
 
     ESP_LOGE(TAG, "unrecoverable error");
-    esp_restart();
+    vTaskDelete(NULL);
 }
 
-void nfc_app_set_mode(uint8_t mode)
+void nfc_app_set_mode(nfc_app_mode_t idx)
 {
-    if (mode != 0) {
+    nfc_app_mode = idx;
+
+    if (nfc_app_mode == NFC_APP_MODE_IDX_ON) {
         pn532_setpin_reset(1);
         vTaskDelay(100 / portTICK_RATE_MS);
         xEventGroupSetBits(user_event_group, NFC_APP_RUN_BIT);
@@ -117,6 +122,11 @@ void nfc_app_set_mode(uint8_t mode)
         xEventGroupClearBits(user_event_group, NFC_APP_RUN_BIT);
         pn532_setpin_reset(0);
     }
+}
+
+nfc_app_mode_t nfc_app_get_mode(void)
+{
+    return nfc_app_mode;
 }
 
 void nfc_app_init(void)
