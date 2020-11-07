@@ -11,8 +11,6 @@
 #include "esp_http_client.h"
 
 #include "core/os.h"
-#include "chip/wifi.h"
-
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/http_app.h"
@@ -60,14 +58,14 @@ static void http_app_task(void *pvParameter)
             http_app_token_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 user_event_group,
-                HTTP_APP_TOKEN_FAILED_BIT | HTTP_APP_TOKEN_READY_BIT
+                HTTP_APP_TOKEN_FAIL_BIT | HTTP_APP_TOKEN_DONE_BIT
             );
         } else {
             config.event_handler = http_app_ota_event_handler;
             http_app_ota_prepare_data(post_data, sizeof(post_data));
             xEventGroupClearBits(
                 user_event_group,
-                HTTP_APP_OTA_FAILED_BIT | HTTP_APP_OTA_READY_BIT
+                HTTP_APP_OTA_FAIL_BIT | HTTP_APP_OTA_DONE_BIT
             );
         }
         esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -77,7 +75,7 @@ static void http_app_task(void *pvParameter)
 
         esp_err_t err = esp_http_client_perform(client);
         if (err != ESP_OK) {
-            ESP_LOGE(TAG, "error perform http(s) request %s", esp_err_to_name(err));
+            ESP_LOGE(TAG, "failed to perform http(s) request");
             if (config.event_handler != http_app_ota_event_handler) {
                 gui_show_image(6);
                 audio_player_play_file(5);
@@ -91,10 +89,10 @@ static void http_app_task(void *pvParameter)
         gui_show_image(3);
 
         if (uxBits & HTTP_APP_TOKEN_RUN_BIT) {
-            xEventGroupSetBits(user_event_group, HTTP_APP_TOKEN_READY_BIT);
+            xEventGroupSetBits(user_event_group, HTTP_APP_TOKEN_DONE_BIT);
             xEventGroupClearBits(user_event_group, HTTP_APP_TOKEN_RUN_BIT);
         } else {
-            xEventGroupSetBits(user_event_group, HTTP_APP_OTA_READY_BIT);
+            xEventGroupSetBits(user_event_group, HTTP_APP_OTA_DONE_BIT);
             xEventGroupClearBits(user_event_group, HTTP_APP_OTA_RUN_BIT);
         }
     }

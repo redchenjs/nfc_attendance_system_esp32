@@ -5,10 +5,7 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
-#include <string.h>
-
 #include "esp_log.h"
-#include "esp_ota_ops.h"
 #include "esp_http_client.h"
 
 #include "cJSON.h"
@@ -17,7 +14,7 @@
 #include "chip/wifi.h"
 
 #include "user/gui.h"
-#include "user/led.h"
+#include "user/http_app.h"
 #include "user/audio_player.h"
 
 #define TAG "http_app_token"
@@ -36,12 +33,11 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
     case HTTP_EVENT_ON_HEADER:
         break;
     case HTTP_EVENT_ON_DATA: {
-        cJSON *root   = NULL;
-        cJSON *status = NULL;
+        cJSON *root = NULL;
         if (evt->data_len) {
             root = cJSON_Parse(evt->data);
             if (cJSON_HasObjectItem(root, "status")) {
-                status = cJSON_GetObjectItemCaseSensitive(root, "status");
+                cJSON *status = cJSON_GetObjectItemCaseSensitive(root, "status");
                 if (cJSON_IsTrue(status)) {
                     ESP_LOGW(TAG, "authentication success");
                     gui_show_image(2);
@@ -53,7 +49,7 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
-                xEventGroupSetBits(user_event_group, HTTP_APP_TOKEN_FAILED_BIT);
+                xEventGroupSetBits(user_event_group, HTTP_APP_TOKEN_FAIL_BIT);
             }
             cJSON_Delete(root);
         }
@@ -61,7 +57,7 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
     }
     case HTTP_EVENT_ON_FINISH: {
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-        if (uxBits & HTTP_APP_TOKEN_FAILED_BIT) {
+        if (uxBits & HTTP_APP_TOKEN_FAIL_BIT) {
             gui_show_image(6);
             audio_player_play_file(6);
         }
@@ -79,9 +75,9 @@ void http_app_token_prepare_data(char *buf, int len)
 {
     cJSON *root = NULL;
     root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "request", 100);
-    cJSON_AddStringToObject(root, "token", token_string);
-    cJSON_AddStringToObject(root, "mac", wifi_mac_string);
+    cJSON_AddNumberToObject(root, "request", HTTP_REQ_CODE_DEV_VERIFY_TOKEN);
+    cJSON_AddStringToObject(root, "device_mac", wifi_mac_string);
+    cJSON_AddStringToObject(root, "user_token", token_string);
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);
 }
@@ -97,10 +93,10 @@ void http_app_verify_token(char *token)
     EventBits_t uxBits = xEventGroupSync(
         user_event_group,
         HTTP_APP_TOKEN_RUN_BIT,
-        HTTP_APP_TOKEN_READY_BIT,
+        HTTP_APP_TOKEN_DONE_BIT,
         30000 / portTICK_RATE_MS
     );
-    if ((uxBits & HTTP_APP_TOKEN_READY_BIT) == 0) {
+    if (!(uxBits & HTTP_APP_TOKEN_DONE_BIT)) {
         xEventGroupClearBits(user_event_group, HTTP_APP_TOKEN_RUN_BIT);
     }
 }
