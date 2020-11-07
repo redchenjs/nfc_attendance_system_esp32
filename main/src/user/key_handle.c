@@ -11,12 +11,13 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 #include "driver/gpio.h"
 
 #include "core/os.h"
-#include "user/nfc_app.h"
 #include "user/gui.h"
 #include "user/led.h"
+#include "user/nfc_app.h"
 #include "user/audio_player.h"
 
 #define SC_KEY_TAG "sc_key"
@@ -34,10 +35,10 @@ void sc_key_handle(void)
     gui_show_image(7);
     audio_player_play_file(7);
 
-    ESP_ERROR_CHECK(esp_wifi_disconnect());
+    esp_wifi_disconnect();
 
-    ESP_ERROR_CHECK(esp_smartconfig_set_type(SC_TYPE_ESPTOUCH));
+    esp_smartconfig_set_type(SC_TYPE_ESPTOUCH);
     smartconfig_start_config_t sc_cfg = SMARTCONFIG_START_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_smartconfig_start(&sc_cfg));
+    esp_smartconfig_start(&sc_cfg);
 }
-#endif // CONFIG_ENABLE_SC_KEY
+#endif

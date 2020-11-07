@@ -5,10 +5,13 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#include <string.h>
+
 #include "esp_log.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 #include "driver/gpio.h"
 
 #include "core/os.h"
@@ -44,16 +47,23 @@ static void (*key_handle[])(void) = {
     sc_key_handle,
 #endif
 };
+#endif
+
+static key_scan_mode_t key_scan_mode = KEY_SCAN_MODE_IDX_OFF;
 
 static void key_task(void *pvParameter)
 {
+#ifdef CONFIG_ENABLE_SC_KEY
     portTickType xLastWakeTime;
-    gpio_config_t io_conf = {0};
     uint16_t count[sizeof(gpio_pin)] = {0};
 
-    for (int i=0; i<sizeof(gpio_pin); i++) {
+    gpio_config_t io_conf = {
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+
+    for (int i = 0; i < sizeof(gpio_pin); i++) {
         io_conf.pin_bit_mask = BIT64(gpio_pin[i]);
-        io_conf.mode = GPIO_MODE_INPUT;
 
         if (gpio_val[i] == 0) {
             io_conf.pull_up_en = true;
@@ -63,8 +73,6 @@ static void key_task(void *pvParameter)
             io_conf.pull_down_en = true;
         }
 
-        io_conf.intr_type = GPIO_INTR_DISABLE;
-
         gpio_config(&io_conf);
     }
 
@@ -73,7 +81,7 @@ static void key_task(void *pvParameter)
     vTaskDelay(2000 / portTICK_RATE_MS);
 
     while (1) {
-        xEventGroupWaitBits(
+        EventBits_t uxBits = xEventGroupWaitBits(
             user_event_group,
             KEY_SCAN_RUN_BIT,
             pdFALSE,
@@ -81,9 +89,15 @@ static void key_task(void *pvParameter)
             portMAX_DELAY
         );
 
+        if (uxBits & KEY_SCAN_CLR_BIT) {
+            memset(&count, 0x00, sizeof(count));
+
+            xEventGroupClearBits(user_event_group, KEY_SCAN_CLR_BIT);
+        }
+
         xLastWakeTime = xTaskGetTickCount();
 
-        for (int i=0; i<sizeof(gpio_pin); i++) {
+        for (int i = 0; i < sizeof(gpio_pin); i++) {
             if (gpio_get_level(gpio_pin[i]) == gpio_val[i]) {
                 if (++count[i] == gpio_hold[i] / 10) {
                     count[i] = 0;
@@ -96,12 +110,28 @@ static void key_task(void *pvParameter)
 
         vTaskDelayUntil(&xLastWakeTime, 10 / portTICK_RATE_MS);
     }
+#endif
+}
+
+void key_set_scan_mode(key_scan_mode_t idx)
+{
+    key_scan_mode = idx;
+
+    if (key_scan_mode == KEY_SCAN_MODE_IDX_ON) {
+        xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT | KEY_SCAN_CLR_BIT);
+    } else {
+        xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
+    }
+}
+
+key_scan_mode_t key_get_scan_mode(void)
+{
+    return key_scan_mode;
 }
 
 void key_init(void)
 {
-    xEventGroupSetBits(user_event_group, KEY_SCAN_RUN_BIT);
+    key_set_scan_mode(KEY_SCAN_MODE_IDX_ON);
 
-    xTaskCreatePinnedToCore(key_task, "keyT", 1280, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(key_task, "keyT", 1536, NULL, 5, NULL, 1);
 }
-#endif
