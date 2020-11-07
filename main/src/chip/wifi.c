@@ -20,12 +20,13 @@ static wifi_config_t wifi_config = {
     .sta = {
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
         .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-        .threshold.authmode = WIFI_AUTH_WPA2_PSK,
-    },
+        .threshold.authmode = WIFI_AUTH_WPA2_PSK
+    }
 };
 
 void wifi_init(void)
 {
+    ESP_ERROR_CHECK(esp_netif_init());
     esp_netif_t *wifi_sta = esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();

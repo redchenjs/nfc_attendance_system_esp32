@@ -45,8 +45,12 @@ static void ntp_task(void *pvParameter)
         portMAX_DELAY
     );
 
-    led_set_mode(2);
-    gui_show_image(GUI_MODE_IDX_GIF_CLK);
+#ifdef CONFIG_ENABLE_LED
+    led_set_mode(LED_MODE_IDX_BLINK_M1);
+#endif
+#ifdef CONFIG_ENABLE_GUI
+    gui_set_mode(GUI_MODE_IDX_GIF_CLK);
+#endif
 
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     sntp_setservername(0, CONFIG_NTP_SERVER_URL);
@@ -59,23 +63,28 @@ static void ntp_task(void *pvParameter)
 
     ESP_LOGI(TAG, "started.");
 
-    int retry = 1;
+    int retry = 0;
     const int max_retry = 15;
     while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) {
-        ESP_LOGW(TAG, "waiting for system time to be set... (%d/%d)", retry, max_retry);
-
-        vTaskDelay(1000 / portTICK_RATE_MS);
-
         if (++retry > max_retry) {
             ESP_LOGE(TAG, "time sync timeout");
 
+#ifdef CONFIG_ENABLE_GUI
             gui_set_mode(GUI_MODE_IDX_GIF_PWR);
             vTaskDelay(2000 / portTICK_RATE_MS);
-
-            esp_restart();
+#endif
+            os_pwr_reset_wait(OS_PWR_DUMMY_BIT);
+            break;
         }
+
+        ESP_LOGW(TAG, "waiting for system time to be set.... (%d/%d)", retry, max_retry);
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 
+#ifdef CONFIG_ENABLE_OTA
+    time_t now = 0;
+    struct tm timeinfo = {0};
     while (1) {
         vTaskDelay(60000 / portTICK_RATE_MS);
 
@@ -89,6 +98,9 @@ static void ntp_task(void *pvParameter)
             }
         }
     }
+#else
+    vTaskDelete(NULL);
+#endif
 }
 
 void ntp_sync_time(void)

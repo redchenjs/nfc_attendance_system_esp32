@@ -9,8 +9,7 @@
 
 #include "esp_log.h"
 #include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_system.h"
+#include "esp_sleep.h"
 #include "esp_smartconfig.h"
 
 #include "freertos/event_groups.h"
@@ -21,6 +20,7 @@
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/ntp.h"
+#include "user/key.h"
 #include "user/nfc_app.h"
 #include "user/http_app_ota.h"
 
@@ -39,8 +39,10 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
     switch (event_id) {
         case WIFI_EVENT_STA_START: {
             EventBits_t uxBits = xEventGroupGetBits(wifi_event_group);
-            if (!(uxBits & WIFI_CONFIG_BIT)) {
-                gui_show_image(0);
+            if (!(uxBits & WIFI_CFG_BIT)) {
+#ifdef CONFIG_ENABLE_GUI
+                gui_set_mode(GUI_MODE_IDX_GIF_WIFI);
+#endif
                 esp_wifi_connect();
             }
             break;
@@ -49,15 +51,17 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
             break;
         case WIFI_EVENT_STA_DISCONNECTED: {
             EventBits_t uxBits = xEventGroupGetBits(wifi_event_group);
-            if (uxBits & WIFI_READY_BIT) {
-                gui_show_image(4);
+            if (uxBits & WIFI_RDY_BIT) {
+#ifdef CONFIG_ENABLE_GUI
+                gui_set_mode(GUI_MODE_IDX_GIF_PWR);
                 vTaskDelay(2000 / portTICK_RATE_MS);
-                esp_restart();
+#endif
+                os_pwr_reset_wait(OS_PWR_DUMMY_BIT);
             }
-            if (!(uxBits & WIFI_CONFIG_BIT)) {
+            if (!(uxBits & WIFI_CFG_BIT)) {
                 esp_wifi_connect();
             }
-            xEventGroupClearBits(wifi_event_group, WIFI_READY_BIT);
+            xEventGroupClearBits(wifi_event_group, WIFI_RDY_BIT);
             break;
         }
         default:
@@ -70,13 +74,22 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
 {
     switch (event_id) {
         case IP_EVENT_STA_GOT_IP: {
-            xEventGroupSetBits(wifi_event_group, WIFI_READY_BIT);
-            xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
+            xEventGroupSetBits(wifi_event_group, WIFI_RDY_BIT);
+
+            key_set_scan_mode(KEY_SCAN_MODE_IDX_OFF);
+
             ntp_sync_time();
+#ifdef CONFIG_ENABLE_OTA
             http_app_check_for_updates();
-            gui_show_image(3);
-            led_set_mode(1);
-            nfc_app_set_mode(1);
+#endif
+#ifdef CONFIG_ENABLE_GUI
+            gui_set_mode(GUI_MODE_IDX_GIF_SCAN);
+#endif
+#ifdef CONFIG_ENABLE_LED
+            led_set_mode(LED_MODE_IDX_BLINK_S0);
+#endif
+            nfc_app_set_mode(NFC_APP_MODE_IDX_ON);
+
             break;
         }
         default:
@@ -92,7 +105,7 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
             .scan_method = WIFI_ALL_CHANNEL_SCAN,
             .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
             .threshold.authmode = WIFI_AUTH_WPA2_PSK
-        },
+        }
     };
     switch (event_id) {
         case SC_EVENT_SCAN_DONE:
@@ -102,8 +115,11 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
             ESP_LOGI(OS_SC_TAG, "found channel");
             break;
         case SC_EVENT_GOT_SSID_PSWD:
-            led_set_mode(7);
             ESP_LOGI(OS_SC_TAG, "got ssid and passwd");
+
+#ifdef CONFIG_ENABLE_LED
+            led_set_mode(LED_MODE_IDX_PULSE_D1);
+#endif
 
             smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
             memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
@@ -122,7 +138,7 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
         case SC_EVENT_SEND_ACK_DONE:
             ESP_LOGI(OS_SC_TAG, "ack done");
             esp_smartconfig_stop();
-            xEventGroupClearBits(wifi_event_group, WIFI_CONFIG_BIT);
+            xEventGroupClearBits(wifi_event_group, WIFI_CFG_BIT);
             break;
         default:
             break;
@@ -198,7 +214,6 @@ void os_init(void)
     wifi_event_group = xEventGroupCreate();
     user_event_group = xEventGroupCreate();
 
-    ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));

@@ -10,12 +10,12 @@
 
 typedef enum {
     GUI_MODE_IDX_GIF_WIFI = 0x00,
-    GUI_MODE_IDX_GIF_BUSY = 0x01,
-    GUI_MODE_IDX_GIF_DONE = 0x02,
-    GUI_MODE_IDX_GIF_SCAN = 0x03,
-    GUI_MODE_IDX_GIF_PWR  = 0x04,
-    GUI_MODE_IDX_GIF_CLK  = 0x05,
-    GUI_MODE_IDX_GIF_ERR  = 0x06,
+    GUI_MODE_IDX_GIF_SCAN = 0x01,
+    GUI_MODE_IDX_GIF_BUSY = 0x02,
+    GUI_MODE_IDX_GIF_DONE = 0x03,
+    GUI_MODE_IDX_GIF_FAIL = 0x04,
+    GUI_MODE_IDX_GIF_PWR  = 0x05,
+    GUI_MODE_IDX_GIF_CLK  = 0x06,
     GUI_MODE_IDX_GIF_CFG  = 0x07,
     GUI_MODE_IDX_GIF_UPD  = 0x08,
 
@@ -25,7 +25,7 @@ typedef enum {
     GUI_MODE_IDX_OFF   = 0xFF
 } gui_mode_t;
 
-#ifdef CONFIG_SCREEN_PANEL_ST7735
+#ifdef CONFIG_LCD_TYPE_ST7735
     // ani0.gif
     extern const char ani0_160x80_gif_ptr[] asm("_binary_ani0_160x80_gif_start");
     extern const char ani0_160x80_gif_end[] asm("_binary_ani0_160x80_gif_end");

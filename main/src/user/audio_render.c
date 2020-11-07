@@ -24,9 +24,9 @@ void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num
     }
 
     size_t bytes_written = 0;
-    for (int i=0; i<num_samples; i++) {
+    for (int i = 0; i < num_samples; i++) {
         /* low - high / low - high */
-        const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]}; // ESP32 CPU is little-endian
+        const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]};
 
         i2s_write(CONFIG_AUDIO_OUTPUT_I2S_NUM, (const char *)&samp32, sizeof(samp32), &bytes_written, portMAX_DELAY);
 

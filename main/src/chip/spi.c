@@ -25,7 +25,7 @@ void hspi_init(void)
         .sclk_io_num = CONFIG_SPI_SCLK_PIN,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-#ifdef CONFIG_SCREEN_PANEL_ST7735
+#ifdef CONFIG_LCD_TYPE_ST7735
         .max_transfer_sz = ST7735_SCREEN_WIDTH * ST7735_SCREEN_HEIGHT * 2
 #else
         .max_transfer_sz = ST7789_SCREEN_WIDTH * ST7789_SCREEN_HEIGHT * 2
@@ -36,7 +36,7 @@ void hspi_init(void)
     spi_device_interface_config_t devcfg = {
         .mode = 0,                                // SPI mode 0
         .spics_io_num = CONFIG_SPI_CS_PIN,        // CS pin
-#ifdef CONFIG_SCREEN_PANEL_ST7735
+#ifdef CONFIG_LCD_TYPE_ST7735
         .clock_speed_hz = 26000000,               // clock out at 26 MHz
         .pre_cb = st7735_setpin_dc,               // specify pre-transfer callback to handle D/C line
 #else

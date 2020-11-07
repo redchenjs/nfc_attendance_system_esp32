@@ -24,13 +24,13 @@
 
 static const char *mp3_file_ptr[][2] = {
     [MP3_FILE_IDX_NOTIFY]    = {snd0_mp3_ptr, snd0_mp3_end},
-    [MP3_FILE_IDX_AUTH_DONE] = {snd1_mp3_ptr, snd1_mp3_end},
-    [MP3_FILE_IDX_AUTH_FAIL] = {snd2_mp3_ptr, snd2_mp3_end},
-    [MP3_FILE_IDX_CONN_TOUT] = {snd3_mp3_ptr, snd3_mp3_end},
-    [MP3_FILE_IDX_CONN_FAIL] = {snd4_mp3_ptr, snd4_mp3_end},
-    [MP3_FILE_IDX_WIFI_DOWN] = {snd5_mp3_ptr, snd5_mp3_end},
-    [MP3_FILE_IDX_WIFI_CFG]  = {snd6_mp3_ptr, snd6_mp3_end},
-    [MP3_FILE_IDX_SRVC_ERR]  = {snd7_mp3_ptr, snd7_mp3_end},
+    [MP3_FILE_IDX_ERROR_REQ] = {snd1_mp3_ptr, snd1_mp3_end},
+    [MP3_FILE_IDX_ERROR_RSP] = {snd2_mp3_ptr, snd2_mp3_end},
+    [MP3_FILE_IDX_AUTH_DONE] = {snd3_mp3_ptr, snd3_mp3_end},
+    [MP3_FILE_IDX_AUTH_FAIL] = {snd4_mp3_ptr, snd4_mp3_end},
+    [MP3_FILE_IDX_CONN_TOUT] = {snd5_mp3_ptr, snd5_mp3_end},
+    [MP3_FILE_IDX_CONN_FAIL] = {snd6_mp3_ptr, snd6_mp3_end},
+    [MP3_FILE_IDX_WIFI_CFG]  = {snd7_mp3_ptr, snd7_mp3_end},
 
     [MP3_FILE_IDX_MAX] = {NULL, NULL}
 };

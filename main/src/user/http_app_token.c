@@ -40,12 +40,20 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
                 cJSON *status = cJSON_GetObjectItemCaseSensitive(root, "status");
                 if (cJSON_IsTrue(status)) {
                     ESP_LOGW(TAG, "authentication success");
-                    gui_show_image(2);
-                    audio_player_play_file(1);
+#ifdef CONFIG_ENABLE_GUI
+                    gui_set_mode(GUI_MODE_IDX_GIF_DONE);
+#endif
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
+                    audio_player_play_file(MP3_FILE_IDX_AUTH_DONE);
+#endif
                 } else {
                     ESP_LOGE(TAG, "authentication failed");
-                    gui_show_image(6);
-                    audio_player_play_file(2);
+#ifdef CONFIG_ENABLE_GUI
+                    gui_set_mode(GUI_MODE_IDX_GIF_FAIL);
+#endif
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
+                    audio_player_play_file(MP3_FILE_IDX_AUTH_FAIL);
+#endif
                 }
             } else {
                 ESP_LOGE(TAG, "invalid response");
@@ -58,8 +66,12 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
     case HTTP_EVENT_ON_FINISH: {
         EventBits_t uxBits = xEventGroupGetBits(user_event_group);
         if (uxBits & HTTP_APP_TOKEN_FAIL_BIT) {
-            gui_show_image(6);
-            audio_player_play_file(6);
+#ifdef CONFIG_ENABLE_GUI
+            gui_set_mode(GUI_MODE_IDX_GIF_FAIL);
+#endif
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
+            audio_player_play_file(MP3_FILE_IDX_ERROR_RSP);
+#endif
         }
         break;
     }

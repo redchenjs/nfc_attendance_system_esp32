@@ -15,24 +15,24 @@
 #define TAG "gui"
 
 static const char *img_file_ptr[][2] = {
-#ifdef CONFIG_SCREEN_PANEL_ST7735
+#ifdef CONFIG_LCD_TYPE_ST7735
     [GUI_MODE_IDX_GIF_WIFI] = {ani0_160x80_gif_ptr, ani0_160x80_gif_end},
-    [GUI_MODE_IDX_GIF_BUSY] = {ani1_160x80_gif_ptr, ani1_160x80_gif_end},
-    [GUI_MODE_IDX_GIF_DONE] = {ani2_160x80_gif_ptr, ani2_160x80_gif_end},
-    [GUI_MODE_IDX_GIF_SCAN] = {ani3_160x80_gif_ptr, ani3_160x80_gif_end},
-    [GUI_MODE_IDX_GIF_PWR]  = {ani4_160x80_gif_ptr, ani4_160x80_gif_end},
-    [GUI_MODE_IDX_GIF_CLK]  = {ani5_160x80_gif_ptr, ani5_160x80_gif_end},
-    [GUI_MODE_IDX_GIF_ERR]  = {ani6_160x80_gif_ptr, ani6_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_SCAN] = {ani1_160x80_gif_ptr, ani1_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_BUSY] = {ani2_160x80_gif_ptr, ani2_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_DONE] = {ani3_160x80_gif_ptr, ani3_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_FAIL] = {ani4_160x80_gif_ptr, ani4_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_PWR]  = {ani5_160x80_gif_ptr, ani5_160x80_gif_end},
+    [GUI_MODE_IDX_GIF_CLK]  = {ani6_160x80_gif_ptr, ani6_160x80_gif_end},
     [GUI_MODE_IDX_GIF_CFG]  = {ani7_160x80_gif_ptr, ani7_160x80_gif_end},
     [GUI_MODE_IDX_GIF_UPD]  = {ani8_160x80_gif_ptr, ani8_160x80_gif_end}
 #else
     [GUI_MODE_IDX_GIF_WIFI] = {ani0_240x135_gif_ptr, ani0_240x135_gif_end},
-    [GUI_MODE_IDX_GIF_BUSY] = {ani1_240x135_gif_ptr, ani1_240x135_gif_end},
-    [GUI_MODE_IDX_GIF_DONE] = {ani2_240x135_gif_ptr, ani2_240x135_gif_end},
-    [GUI_MODE_IDX_GIF_SCAN] = {ani3_240x135_gif_ptr, ani3_240x135_gif_end},
-    [GUI_MODE_IDX_GIF_PWR]  = {ani4_240x135_gif_ptr, ani4_240x135_gif_end},
-    [GUI_MODE_IDX_GIF_CLK]  = {ani5_240x135_gif_ptr, ani5_240x135_gif_end},
-    [GUI_MODE_IDX_GIF_ERR]  = {ani6_240x135_gif_ptr, ani6_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_SCAN] = {ani1_240x135_gif_ptr, ani1_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_BUSY] = {ani2_240x135_gif_ptr, ani2_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_DONE] = {ani3_240x135_gif_ptr, ani3_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_FAIL] = {ani4_240x135_gif_ptr, ani4_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_PWR]  = {ani5_240x135_gif_ptr, ani5_240x135_gif_end},
+    [GUI_MODE_IDX_GIF_CLK]  = {ani6_240x135_gif_ptr, ani6_240x135_gif_end},
     [GUI_MODE_IDX_GIF_CFG]  = {ani7_240x135_gif_ptr, ani7_240x135_gif_end},
     [GUI_MODE_IDX_GIF_UPD]  = {ani8_240x135_gif_ptr, ani8_240x135_gif_end}
 #endif
@@ -68,15 +68,19 @@ static void gui_task(void *pvParameter)
 
     ESP_LOGI(TAG, "started.");
 
+#ifdef CONFIG_ENABLE_GUI
+    gdispGSetOrientation(gui_gdisp, CONFIG_LCD_ROTATION_DEGREE);
+#endif
+
     while (1) {
         switch (gui_mode) {
         case GUI_MODE_IDX_GIF_WIFI:
+        case GUI_MODE_IDX_GIF_SCAN:
         case GUI_MODE_IDX_GIF_BUSY:
         case GUI_MODE_IDX_GIF_DONE:
-        case GUI_MODE_IDX_GIF_SCAN:
+        case GUI_MODE_IDX_GIF_FAIL:
         case GUI_MODE_IDX_GIF_PWR:
         case GUI_MODE_IDX_GIF_CLK:
-        case GUI_MODE_IDX_GIF_ERR:
         case GUI_MODE_IDX_GIF_CFG:
         case GUI_MODE_IDX_GIF_UPD: {
             gdispImage gfx_image;

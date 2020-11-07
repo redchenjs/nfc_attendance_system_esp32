@@ -35,8 +35,12 @@ static void http_app_task(void *pvParameter)
             portMAX_DELAY
         );
 
-        led_set_mode(4);
-        gui_show_image(1);
+#ifdef CONFIG_ENABLE_LED
+        led_set_mode(LED_MODE_IDX_BLINK_F1);
+#endif
+#ifdef CONFIG_ENABLE_GUI
+        gui_set_mode(GUI_MODE_IDX_GIF_BUSY);
+#endif
 
         memset(&config, 0, sizeof(config));
         memset(post_data, 0, sizeof(post_data));
@@ -56,17 +60,11 @@ static void http_app_task(void *pvParameter)
         if (uxBits & HTTP_APP_TOKEN_RUN_BIT) {
             config.event_handler = http_app_token_event_handler;
             http_app_token_prepare_data(post_data, sizeof(post_data));
-            xEventGroupClearBits(
-                user_event_group,
-                HTTP_APP_TOKEN_FAIL_BIT | HTTP_APP_TOKEN_DONE_BIT
-            );
+            xEventGroupClearBits(user_event_group, HTTP_APP_TOKEN_DONE_BIT | HTTP_APP_TOKEN_FAIL_BIT);
         } else {
             config.event_handler = http_app_ota_event_handler;
             http_app_ota_prepare_data(post_data, sizeof(post_data));
-            xEventGroupClearBits(
-                user_event_group,
-                HTTP_APP_OTA_FAIL_BIT | HTTP_APP_OTA_DONE_BIT
-            );
+            xEventGroupClearBits(user_event_group, HTTP_APP_OTA_DONE_BIT | HTTP_APP_OTA_FAIL_BIT);
         }
         esp_http_client_handle_t client = esp_http_client_init(&config);
 
@@ -77,16 +75,24 @@ static void http_app_task(void *pvParameter)
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "failed to perform http(s) request");
             if (config.event_handler != http_app_ota_event_handler) {
-                gui_show_image(6);
-                audio_player_play_file(5);
+#ifdef CONFIG_ENABLE_GUI
+                gui_set_mode(GUI_MODE_IDX_GIF_FAIL);
+#endif
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
+                audio_player_play_file(MP3_FILE_IDX_ERROR_REQ);
+#endif
             }
         }
         esp_http_client_cleanup(client);
 
         vTaskDelay(2000 / portTICK_RATE_MS);
 
-        led_set_mode(1);
-        gui_show_image(3);
+#ifdef CONFIG_ENABLE_LED
+        led_set_mode(LED_MODE_IDX_BLINK_S0);
+#endif
+#ifdef CONFIG_ENABLE_GUI
+        gui_set_mode(GUI_MODE_IDX_GIF_SCAN);
+#endif
 
         if (uxBits & HTTP_APP_TOKEN_RUN_BIT) {
             xEventGroupSetBits(user_event_group, HTTP_APP_TOKEN_DONE_BIT);

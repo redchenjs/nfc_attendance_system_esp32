@@ -6,7 +6,6 @@
  */
 
 #include "esp_log.h"
-#include "esp_system.h"
 #include "esp_ota_ops.h"
 #include "esp_http_client.h"
 
@@ -20,7 +19,6 @@
 #include "user/gui.h"
 #include "user/led.h"
 #include "user/http_app.h"
-#include "user/audio_player.h"
 
 #define TAG "http_app_ota"
 
@@ -47,8 +45,12 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
             if (!update_handle) {
                 data_length = 0;
 
-                led_set_mode(7);
-                gui_show_image(8);
+#ifdef CONFIG_ENABLE_LED
+                led_set_mode(LED_MODE_IDX_PULSE_D0);
+#endif
+#ifdef CONFIG_ENABLE_GUI
+                gui_set_mode(GUI_MODE_IDX_GIF_UPD);
+#endif
 
                 update_partition = esp_ota_get_next_update_partition(NULL);
                 if (update_partition != NULL) {
@@ -93,10 +95,12 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 
             ESP_LOGI(TAG, "write done.");
 
-            gui_show_image(4);
+#ifdef CONFIG_ENABLE_GUI
+            gui_set_mode(GUI_MODE_IDX_GIF_PWR);
             vTaskDelay(2000 / portTICK_RATE_MS);
+#endif
 
-            esp_restart();
+            os_pwr_reset_wait(OS_PWR_DUMMY_BIT);
         } else {
             ESP_LOGI(TAG, "no update found");
         }

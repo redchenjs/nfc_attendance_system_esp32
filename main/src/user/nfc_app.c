@@ -31,10 +31,34 @@
 #define RX_FRAME_LEN (RX_FRAME_PRFX_LEN + RX_FRAME_DATA_LEN)
 #define TX_FRAME_LEN (10)
 
-static uint8_t abtRx[RX_FRAME_LEN + 1] = {0x00};
-static uint8_t abtTx[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05, 0xF2, 0x22, 0x22, 0x22, 0x22};
+static uint8_t rx_data[RX_FRAME_LEN + 1] = {0x00};
+static uint8_t tx_data[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05};
 
 static nfc_app_mode_t nfc_app_mode = NFC_APP_MODE_IDX_OFF;
+
+static int char2int(char input)
+{
+    int output = 0;
+
+    if (input >= '0' && input <= '9') {
+        output = input - '0';
+    }
+    if (input >= 'A' && input <= 'F') {
+        output = input - 'A' + 10;
+    }
+    if (input >= 'a' && input <= 'f'){
+        output = input - 'a' + 10;
+    }
+
+    return output;
+}
+
+static void hex2bin(const char *str, char *byte)
+{
+    for (; str[0] && str[1]; str += 2) {
+        *(byte++) = char2int(str[0]) * 16 + char2int(str[1]);
+    }
+}
 
 static void nfc_app_task_handle(void *pvParameter)
 {
@@ -47,6 +71,8 @@ static void nfc_app_task_handle(void *pvParameter)
     };
     portTickType xLastWakeTime;
 
+    hex2bin(RX_FRAME_PRFX, (char *)tx_data + 5);
+
     nfc_init(&context);
     if (context == NULL) {
         ESP_LOGE(TAG, "unable to init libnfc (malloc)");
@@ -56,7 +82,7 @@ static void nfc_app_task_handle(void *pvParameter)
     while (1) {
         xEventGroupWaitBits(
             user_event_group,
-            NFC_RUN_BIT,
+            NFC_APP_RUN_BIT,
             pdFALSE,
             pdFALSE,
             portMAX_DELAY
@@ -72,11 +98,11 @@ static void nfc_app_task_handle(void *pvParameter)
         }
         // transceive some bytes if target available
         int res = 0;
-        memset(abtRx, 0, sizeof(abtRx));
+        memset(rx_data, 0x00, sizeof(rx_data));
         if (nfc_initiator_init(pnd) >= 0) {
             if (nfc_initiator_select_passive_target(pnd, nm, NULL, 0, &nt) >= 0) {
-                if ((res = nfc_initiator_transceive_bytes(pnd, abtTx, TX_FRAME_LEN, abtRx, RX_FRAME_LEN, -1)) >= 0) {
-                    abtRx[res] = 0x00;
+                if ((res = nfc_initiator_transceive_bytes(pnd, tx_data, TX_FRAME_LEN, rx_data, RX_FRAME_LEN, -1)) >= 0) {
+                    rx_data[res] = 0x00;
                 } else {
                     ESP_LOGW(TAG, "transceive failed");
                 }
@@ -90,11 +116,11 @@ static void nfc_app_task_handle(void *pvParameter)
         nfc_close(pnd);
         // match received bytes and verify the token if available
         if (res > 0) {
-            if (strstr((char *)abtRx, RX_FRAME_PRFX) != NULL &&
-                strlen((char *)(abtRx + RX_FRAME_PRFX_LEN)) == RX_FRAME_DATA_LEN) {
-                ESP_LOGW(TAG, "token %32s", (char *)(abtRx + RX_FRAME_PRFX_LEN));
-                audio_player_play_file(0);
-                http_app_verify_token((char *)(abtRx + RX_FRAME_PRFX_LEN));
+            if (strstr((char *)rx_data, RX_FRAME_PRFX) != NULL &&
+                strlen((char *)rx_data + RX_FRAME_PRFX_LEN) == RX_FRAME_DATA_LEN) {
+                ESP_LOGW(TAG, "token is %32s", (char *)rx_data + RX_FRAME_PRFX_LEN);
+                audio_player_play_file(MP3_FILE_IDX_NOTIFY);
+                http_app_verify_token((char *)rx_data + RX_FRAME_PRFX_LEN);
             } else {
                 ESP_LOGW(TAG, "unexpected frame");
             }
@@ -107,6 +133,9 @@ err:
     nfc_exit(context);
 
     ESP_LOGE(TAG, "unrecoverable error");
+
+    os_pwr_reset_wait(OS_PWR_DUMMY_BIT);
+
     vTaskDelete(NULL);
 }
 

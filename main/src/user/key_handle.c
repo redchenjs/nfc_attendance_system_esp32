@@ -17,6 +17,7 @@
 #include "core/os.h"
 #include "user/gui.h"
 #include "user/led.h"
+#include "user/key.h"
 #include "user/nfc_app.h"
 #include "user/audio_player.h"
 
@@ -25,15 +26,21 @@
 #ifdef CONFIG_ENABLE_SC_KEY
 void sc_key_handle(void)
 {
-    xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
+    key_set_scan_mode(KEY_SCAN_MODE_IDX_OFF);
 
-    ESP_LOGI(SC_KEY_TAG, "start smartconfig");
     xEventGroupSetBits(wifi_event_group, WIFI_CFG_BIT);
+    ESP_LOGI(SC_KEY_TAG, "start smartconfig");
 
-    nfc_app_set_mode(0);
-    led_set_mode(5);
-    gui_show_image(7);
-    audio_player_play_file(7);
+    nfc_app_set_mode(NFC_APP_MODE_IDX_OFF);
+#ifdef CONFIG_ENABLE_LED
+    led_set_mode(LED_MODE_IDX_BLINK_F1);
+#endif
+#ifdef CONFIG_ENABLE_GUI
+    gui_set_mode(GUI_MODE_IDX_GIF_CFG);
+#endif
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
+    audio_player_play_file(MP3_FILE_IDX_WIFI_CFG);
+#endif
 
     esp_wifi_disconnect();
 

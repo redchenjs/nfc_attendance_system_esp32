@@ -113,31 +113,49 @@ config ENABLE_GUI
     help
         Select this to enable gui.
 
-choice SCREEN_PANEL
-    prompt "Screen Panel"
-    default SCREEN_PANEL_ST7789
+choice LCD_TYPE
+    prompt "LCD Type"
+    default LCD_TYPE_ST7789
     depends on ENABLE_GUI
     help
-        Select which screen panel to use.
+        Select which LCD type to use.
 
-config SCREEN_PANEL_ST7735
+config LCD_TYPE_ST7735
     bool "ST7735 80x160 LCD Panel"
-config SCREEN_PANEL_ST7789
+config LCD_TYPE_ST7789
     bool "ST7789 135x240 LCD Panel"
 endchoice
 
-config DEV_RST_PIN
-    int "Device RST Pin"
+choice LCD_ORIENTATION
+    prompt "LCD Orientation"
+    default LCD_ORIENTATION_NORMAL
+    depends on ENABLE_GUI
+    help
+        Select LCD orientation.
+
+config LCD_ORIENTATION_NORMAL
+    bool "Normal"
+config LCD_ORIENTATION_UPSIDE_DOWN
+    bool "Upside Down"
+endchoice
+
+config LCD_ROTATION_DEGREE
+    int
+    default  90 if LCD_ORIENTATION_NORMAL
+    default 270 if LCD_ORIENTATION_UPSIDE_DOWN
+
+config LCD_RST_PIN
+    int "LCD RST Pin"
     default 14
     depends on ENABLE_GUI
 
-config DEV_DC_PIN
-    int "Device DC Pin"
+config LCD_DC_PIN
+    int "LCD DC Pin"
     default 23
     depends on ENABLE_GUI
 
-config DEV_BL_PIN
-    int "Device BL Pin"
+config LCD_BL_PIN
+    int "LCD BL Pin"
     default 4
     depends on ENABLE_GUI
 
