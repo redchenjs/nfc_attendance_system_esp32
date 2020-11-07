@@ -28,7 +28,7 @@ void sc_key_handle(void)
     xEventGroupClearBits(user_event_group, KEY_SCAN_RUN_BIT);
 
     ESP_LOGI(SC_KEY_TAG, "start smartconfig");
-    xEventGroupSetBits(os_event_group, WIFI_CONFIG_BIT);
+    xEventGroupSetBits(wifi_event_group, WIFI_CFG_BIT);
 
     nfc_app_set_mode(0);
     led_set_mode(5);
