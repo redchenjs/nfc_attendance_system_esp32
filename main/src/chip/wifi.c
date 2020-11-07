@@ -9,30 +9,29 @@
 
 #include "esp_log.h"
 #include "esp_wifi.h"
-#include "esp_netif.h"
+
+#define TAG "wifi"
 
 char wifi_hostname[40] = {0};
 char wifi_mac_string[18] = {0};
 char wifi_mac_address[6] = {0};
 
-#define TAG "wifi"
+static wifi_config_t wifi_config = {
+    .sta = {
+        .scan_method = WIFI_ALL_CHANNEL_SCAN,
+        .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
+        .threshold.authmode = WIFI_AUTH_WPA2_PSK,
+    },
+};
 
 void wifi_init(void)
 {
-    wifi_config_t wifi_config = {
-        .sta = {
-            .scan_method = WIFI_ALL_CHANNEL_SCAN,
-            .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-            .threshold.authmode = WIFI_AUTH_WPA2_PSK
-        },
-    };
-
-    ESP_ERROR_CHECK(esp_netif_init());
-    esp_netif_create_default_wifi_sta();
+    esp_netif_t *wifi_sta = esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MIN_MODEM));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
 
     wifi_config_t wifi_stored_config;
@@ -53,14 +52,12 @@ void wifi_init(void)
         ESP_LOGW(TAG, "no wifi configuration available");
     }
 
-    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MIN_MODEM));
     ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, (uint8_t *)wifi_mac_address));
-    snprintf(wifi_hostname, sizeof(wifi_hostname), "%s_%X%X%X",
-                CONFIG_WIFI_HOSTNAME_PREFIX,
-                wifi_mac_address[3],
-                wifi_mac_address[4],
-                wifi_mac_address[5]);
     snprintf(wifi_mac_string, sizeof(wifi_mac_string), MACSTR, MAC2STR(wifi_mac_address));
+
+    snprintf(wifi_hostname, sizeof(wifi_hostname), "%s_%X%X%X", CONFIG_WIFI_HOSTNAME_PREFIX,
+             wifi_mac_address[3], wifi_mac_address[4], wifi_mac_address[5]);
+    ESP_ERROR_CHECK(esp_netif_set_hostname(wifi_sta, wifi_hostname));
 
     ESP_LOGI(TAG, "initialized.");
 }
