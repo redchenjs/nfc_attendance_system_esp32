@@ -2518,8 +2518,7 @@ pn53x_target_receive_bytes(struct nfc_device *pnd, uint8_t *pbtRx, const size_t 
             return pnd->last_error;
           }
         }
-      // NO BREAK
-      __attribute__((fallthrough));
+        /* fall through */
       case NMT_JEWEL:
       case NMT_BARCODE:
       case NMT_ISO14443B:
