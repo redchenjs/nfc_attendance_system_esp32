@@ -12,6 +12,7 @@
 #include "esp_sleep.h"
 #include "esp_smartconfig.h"
 
+#include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 
 #include "core/os.h"
