@@ -22,31 +22,23 @@
 
 #ifdef CONFIG_ENABLE_SC_KEY
 static const uint8_t gpio_pin[] = {
-#ifdef CONFIG_ENABLE_SC_KEY
-    CONFIG_SC_KEY_PIN,
-#endif
+    CONFIG_SC_KEY_PIN
 };
 
 static const uint8_t gpio_val[] = {
-#ifdef CONFIG_ENABLE_SC_KEY
-    #ifdef CONFIG_SC_KEY_ACTIVE_LOW
-        0,
-    #else
-        1,
-    #endif
+#ifdef CONFIG_SC_KEY_ACTIVE_LOW
+    0
+#else
+    1
 #endif
 };
 
 static const uint16_t gpio_hold[] = {
-#ifdef CONFIG_ENABLE_SC_KEY
-    CONFIG_SC_KEY_HOLD_TIME,
-#endif
+    CONFIG_SC_KEY_HOLD_TIME
 };
 
 static void (*key_handle[])(void) = {
-#ifdef CONFIG_ENABLE_SC_KEY
-    sc_key_handle,
-#endif
+    sc_key_handle
 };
 #endif
 
