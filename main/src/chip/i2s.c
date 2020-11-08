@@ -15,7 +15,7 @@
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
 static i2s_config_t i2s_output_config = {
     .mode = I2S_MODE_MASTER | I2S_MODE_TX,
-    .communication_format = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
     .use_apll = 1,                                                          // use APLL
     .sample_rate = 44100,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
@@ -33,10 +33,10 @@ static void i2s0_init(void)
     ESP_ERROR_CHECK(i2s_driver_install(I2S_NUM_0, &i2s_output_config, 0, NULL));
 
     i2s_pin_config_t pin_config = {
-        .bck_io_num   = CONFIG_I2S_BCLK_PIN,
-        .ws_io_num    = CONFIG_I2S_LRCK_PIN,
+        .bck_io_num = CONFIG_I2S_BCLK_PIN,
+        .ws_io_num = CONFIG_I2S_LRCK_PIN,
         .data_out_num = CONFIG_I2S_DOUT_PIN,
-        .data_in_num  = -1                                                  // not used
+        .data_in_num = -1
     };
     ESP_ERROR_CHECK(i2s_set_pin(I2S_NUM_0, &pin_config));
 
@@ -62,10 +62,10 @@ static void i2s1_init(void)
     ESP_ERROR_CHECK(i2s_driver_install(I2S_NUM_1, &i2s_output_config, 0, NULL));
 
     i2s_pin_config_t pin_config = {
-        .bck_io_num   = CONFIG_I2S_BCLK_PIN,
-        .ws_io_num    = CONFIG_I2S_LRCK_PIN,
+        .bck_io_num = CONFIG_I2S_BCLK_PIN,
+        .ws_io_num = CONFIG_I2S_LRCK_PIN,
         .data_out_num = CONFIG_I2S_DOUT_PIN,
-        .data_in_num  = -1                                                  // not used
+        .data_in_num = -1
     };
     ESP_ERROR_CHECK(i2s_set_pin(I2S_NUM_1, &pin_config));
 
