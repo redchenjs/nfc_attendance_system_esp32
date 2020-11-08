@@ -118,8 +118,10 @@ static void nfc_app_task_handle(void *pvParameter)
         if (res > 0) {
             if (strstr((char *)rx_data, RX_FRAME_PRFX) != NULL &&
                 strlen((char *)rx_data + RX_FRAME_PRFX_LEN) == RX_FRAME_DATA_LEN) {
-                ESP_LOGW(TAG, "token is %32s", (char *)rx_data + RX_FRAME_PRFX_LEN);
+                ESP_LOGW(TAG, "token: %32s", (char *)rx_data + RX_FRAME_PRFX_LEN);
+#ifdef CONFIG_ENABLE_AUDIO_PROMPT
                 audio_player_play_file(MP3_FILE_IDX_NOTIFY);
+#endif
                 http_app_verify_token((char *)rx_data + RX_FRAME_PRFX_LEN);
             } else {
                 ESP_LOGW(TAG, "unexpected frame");

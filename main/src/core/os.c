@@ -18,10 +18,10 @@
 #include "core/os.h"
 #include "chip/wifi.h"
 
-#include "user/gui.h"
-#include "user/led.h"
 #include "user/ntp.h"
 #include "user/key.h"
+#include "user/led.h"
+#include "user/gui.h"
 #include "user/nfc_app.h"
 #include "user/http_app_ota.h"
 
@@ -58,11 +58,14 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                 vTaskDelay(2000 / portTICK_RATE_MS);
 #endif
                 os_pwr_reset_wait(OS_PWR_DUMMY_BIT);
+                break;
             }
+
+            xEventGroupClearBits(wifi_event_group, WIFI_RDY_BIT);
+
             if (!(uxBits & WIFI_CFG_BIT)) {
                 esp_wifi_connect();
             }
-            xEventGroupClearBits(wifi_event_group, WIFI_RDY_BIT);
             break;
         }
         default:
@@ -74,11 +77,11 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
                              int32_t event_id, void* event_data)
 {
     switch (event_id) {
-        case IP_EVENT_STA_GOT_IP: {
+        case IP_EVENT_STA_GOT_IP:
             xEventGroupSetBits(wifi_event_group, WIFI_RDY_BIT);
-
+#ifdef CONFIG_ENABLE_SC_KEY
             key_set_scan_mode(KEY_SCAN_MODE_IDX_OFF);
-
+#endif
             ntp_sync_time();
 #ifdef CONFIG_ENABLE_OTA
             http_app_check_for_updates();
@@ -92,7 +95,6 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
             nfc_app_set_mode(NFC_APP_MODE_IDX_ON);
 
             break;
-        }
         default:
             break;
     }
@@ -121,7 +123,6 @@ static void sc_event_handler(void* arg, esp_event_base_t event_base,
 #ifdef CONFIG_ENABLE_LED
             led_set_mode(LED_MODE_IDX_PULSE_D1);
 #endif
-
             smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
             memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
             memcpy(wifi_config.sta.password, evt->password, sizeof(wifi_config.sta.password));

@@ -11,8 +11,8 @@
 #include "esp_http_client.h"
 
 #include "core/os.h"
-#include "user/gui.h"
 #include "user/led.h"
+#include "user/gui.h"
 #include "user/http_app.h"
 #include "user/audio_player.h"
 #include "user/http_app_ota.h"

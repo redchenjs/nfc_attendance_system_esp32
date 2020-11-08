@@ -24,8 +24,8 @@
 
 static uint32_t data_length = 0;
 
-static const esp_partition_t *update_partition = NULL;
 static esp_ota_handle_t update_handle = 0;
+static const esp_partition_t *update_partition = NULL;
 
 esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 {

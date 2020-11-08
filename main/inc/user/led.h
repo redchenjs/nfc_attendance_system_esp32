@@ -8,8 +8,6 @@
 #ifndef INC_USER_LED_H_
 #define INC_USER_LED_H_
 
-#include <stdint.h>
-
 typedef enum {
     LED_MODE_IDX_BLINK_S1 = 0x00,
     LED_MODE_IDX_BLINK_S0 = 0x01,

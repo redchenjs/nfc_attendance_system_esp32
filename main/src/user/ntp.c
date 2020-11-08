@@ -12,8 +12,8 @@
 
 #include "core/os.h"
 
-#include "user/gui.h"
 #include "user/led.h"
+#include "user/gui.h"
 #include "user/nfc_app.h"
 #include "user/http_app_ota.h"
 
