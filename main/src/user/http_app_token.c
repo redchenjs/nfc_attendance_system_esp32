@@ -36,9 +36,9 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
         cJSON *root = NULL;
         if (evt->data_len) {
             root = cJSON_Parse(evt->data);
-            if (cJSON_HasObjectItem(root, "status")) {
-                cJSON *status = cJSON_GetObjectItemCaseSensitive(root, "status");
-                if (cJSON_IsTrue(status)) {
+            if (cJSON_HasObjectItem(root, "result")) {
+                cJSON *result = cJSON_GetObjectItemCaseSensitive(root, "result");
+                if (cJSON_IsTrue(result)) {
                     ESP_LOGW(TAG, "authentication success");
 #ifdef CONFIG_ENABLE_GUI
                     gui_set_mode(GUI_MODE_IDX_GIF_DONE);
