@@ -11,6 +11,6 @@
 extern void i2s_output_init(void);
 extern void i2s_output_deinit(void);
 
-extern void i2s_output_set_sample_rate(int rate);
+extern void i2s_output_set_sample_rate(unsigned int sample_rate);
 
 #endif /* INC_CHIP_I2S_H_ */
