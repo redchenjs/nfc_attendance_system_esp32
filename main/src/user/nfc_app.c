@@ -36,27 +36,23 @@ static uint8_t tx_data[TX_FRAME_LEN + 1] = {0x00, 0xA4, 0x04, 0x00, 0x05};
 
 static nfc_app_mode_t nfc_app_mode = NFC_APP_MODE_IDX_OFF;
 
-static int char2int(char input)
+static int char2int(char ch)
 {
-    int output = 0;
-
-    if (input >= '0' && input <= '9') {
-        output = input - '0';
+    if (ch >= '0' && ch <= '9') {
+        return ch - '0';
+    } else if (ch >= 'A' && ch <= 'F') {
+        return ch - 'A' + 10;
+    } else if (ch >= 'a' && ch <= 'f') {
+        return ch - 'a' + 10;
+    } else {
+        return 0;
     }
-    if (input >= 'A' && input <= 'F') {
-        output = input - 'A' + 10;
-    }
-    if (input >= 'a' && input <= 'f'){
-        output = input - 'a' + 10;
-    }
-
-    return output;
 }
 
-static void hex2bin(const char *str, char *byte)
+static void str2byte(const char *str, char *byte)
 {
     for (; str[0] && str[1]; str += 2) {
-        *(byte++) = char2int(str[0]) * 16 + char2int(str[1]);
+        *byte++ = char2int(str[0]) * 16 + char2int(str[1]);
     }
 }
 
@@ -71,7 +67,7 @@ static void nfc_app_task_handle(void *pvParameter)
     };
     portTickType xLastWakeTime;
 
-    hex2bin(RX_FRAME_PRFX, (char *)tx_data + 5);
+    str2byte(RX_FRAME_PRFX, (char *)tx_data + 5);
 
     nfc_init(&context);
     if (context == NULL) {
@@ -98,7 +94,6 @@ static void nfc_app_task_handle(void *pvParameter)
         }
         // transceive some bytes if target available
         int res = 0;
-        memset(rx_data, 0x00, sizeof(rx_data));
         if (nfc_initiator_init(pnd) >= 0) {
             if (nfc_initiator_select_passive_target(pnd, nm, NULL, 0, &nt) >= 0) {
                 if ((res = nfc_initiator_transceive_bytes(pnd, tx_data, TX_FRAME_LEN, rx_data, RX_FRAME_LEN, -1)) >= 0) {
@@ -118,7 +113,7 @@ static void nfc_app_task_handle(void *pvParameter)
         if (res > 0) {
             if (strstr((char *)rx_data, RX_FRAME_PRFX) != NULL &&
                 strlen((char *)rx_data + RX_FRAME_PRFX_LEN) == RX_FRAME_DATA_LEN) {
-                ESP_LOGW(TAG, "token: %32s", (char *)rx_data + RX_FRAME_PRFX_LEN);
+                ESP_LOGW(TAG, "token: %32s", rx_data + RX_FRAME_PRFX_LEN);
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
                 audio_player_play_file(MP3_FILE_IDX_NOTIFY);
 #endif

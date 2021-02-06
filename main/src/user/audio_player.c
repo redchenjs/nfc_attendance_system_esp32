@@ -141,8 +141,7 @@ void audio_player_play_file(mp3_file_t idx)
 
     mp3_file = idx;
 
-    EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-    if (uxBits & AUDIO_PLAYER_RUN_BIT) {
+    if (xEventGroupGetBits(user_event_group) & AUDIO_PLAYER_RUN_BIT) {
         playback_pending = true;
     } else {
         xEventGroupClearBits(user_event_group, AUDIO_PLAYER_IDLE_BIT);
@@ -152,8 +151,7 @@ void audio_player_play_file(mp3_file_t idx)
 
 void audio_player_init(void)
 {
-    EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-    if (!(uxBits & AUDIO_PLAYER_RUN_BIT)) {
+    if (!(xEventGroupGetBits(user_event_group) & AUDIO_PLAYER_RUN_BIT)) {
         xEventGroupSetBits(user_event_group, AUDIO_PLAYER_IDLE_BIT);
     }
 

@@ -136,6 +136,7 @@ void http_app_check_for_updates(void)
         HTTP_APP_OTA_DONE_BIT,
         60000 / portTICK_RATE_MS
     );
+
     if (!(uxBits & HTTP_APP_OTA_DONE_BIT)) {
         xEventGroupClearBits(user_event_group, HTTP_APP_OTA_RUN_BIT);
     }

@@ -38,21 +38,18 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                                int32_t event_id, void* event_data)
 {
     switch (event_id) {
-        case WIFI_EVENT_STA_START: {
-            EventBits_t uxBits = xEventGroupGetBits(wifi_event_group);
-            if (!(uxBits & WIFI_CFG_BIT)) {
+        case WIFI_EVENT_STA_START:
+            if (!(xEventGroupGetBits(wifi_event_group) & WIFI_CFG_BIT)) {
 #ifdef CONFIG_ENABLE_GUI
                 gui_set_mode(GUI_MODE_IDX_GIF_WIFI);
 #endif
                 esp_wifi_connect();
             }
             break;
-        }
         case WIFI_EVENT_STA_CONNECTED:
             break;
-        case WIFI_EVENT_STA_DISCONNECTED: {
-            EventBits_t uxBits = xEventGroupGetBits(wifi_event_group);
-            if (uxBits & WIFI_RDY_BIT) {
+        case WIFI_EVENT_STA_DISCONNECTED:
+            if (xEventGroupGetBits(wifi_event_group) & WIFI_RDY_BIT) {
 #ifdef CONFIG_ENABLE_GUI
                 gui_set_mode(GUI_MODE_IDX_GIF_PWR);
                 vTaskDelay(2000 / portTICK_RATE_MS);
@@ -63,11 +60,10 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
 
             xEventGroupClearBits(wifi_event_group, WIFI_RDY_BIT);
 
-            if (!(uxBits & WIFI_CFG_BIT)) {
+            if (!(xEventGroupGetBits(wifi_event_group) & WIFI_CFG_BIT)) {
                 esp_wifi_connect();
             }
             break;
-        }
         default:
             break;
     }

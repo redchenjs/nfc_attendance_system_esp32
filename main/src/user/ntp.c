@@ -105,8 +105,7 @@ static void ntp_task(void *pvParameter)
 
 void ntp_sync_time(void)
 {
-    EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-    if (!(uxBits & NTP_SYNC_SET_BIT)) {
+    if (!(xEventGroupGetBits(user_event_group) & NTP_SYNC_SET_BIT)) {
         xEventGroupSync(
             user_event_group,
             NTP_SYNC_RUN_BIT,

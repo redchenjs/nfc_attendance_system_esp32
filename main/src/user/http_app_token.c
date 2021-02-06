@@ -64,8 +64,7 @@ esp_err_t http_app_token_event_handler(esp_http_client_event_t *evt)
         break;
     }
     case HTTP_EVENT_ON_FINISH: {
-        EventBits_t uxBits = xEventGroupGetBits(user_event_group);
-        if (uxBits & HTTP_APP_TOKEN_FAIL_BIT) {
+        if (xEventGroupGetBits(user_event_group) & HTTP_APP_TOKEN_FAIL_BIT) {
 #ifdef CONFIG_ENABLE_GUI
             gui_set_mode(GUI_MODE_IDX_GIF_FAIL);
 #endif
@@ -108,6 +107,7 @@ void http_app_verify_token(char *token)
         HTTP_APP_TOKEN_DONE_BIT,
         30000 / portTICK_RATE_MS
     );
+
     if (!(uxBits & HTTP_APP_TOKEN_DONE_BIT)) {
         xEventGroupClearBits(user_event_group, HTTP_APP_TOKEN_RUN_BIT);
     }

@@ -24,7 +24,7 @@ static void http_app_task(void *pvParameter)
 {
     char post_data[128] = {0};
     char server_url[80] = {0};
-    esp_http_client_config_t config;
+    esp_http_client_config_t config = {0};
 
     while (1) {
         EventBits_t uxBits = xEventGroupWaitBits(
@@ -41,10 +41,6 @@ static void http_app_task(void *pvParameter)
 #ifdef CONFIG_ENABLE_GUI
         gui_set_mode(GUI_MODE_IDX_GIF_BUSY);
 #endif
-
-        memset(&config, 0, sizeof(config));
-        memset(post_data, 0, sizeof(post_data));
-        memset(server_url, 0, sizeof(server_url));
 
 #ifdef CONFIG_TRANSFER_PROTOCOL_HTTP
         strcpy(server_url, "http://");
