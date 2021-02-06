@@ -36,66 +36,85 @@
 
 #include "uart.h"
 
-#include "nfc/nfc.h"
+#include <nfc/nfc.h>
 #include "nfc-internal.h"
-
-#include "chip/uart.h"
 
 #define LOG_GROUP    NFC_LOG_GROUP_COM
 #define LOG_CATEGORY "libnfc.bus.uart"
 
-void
-uart_open(uart_port_t port)
+serial_port
+uart_open(const char *pcPortName)
 {
+  serial_port sp = UART_NUM_0;
 
+  sscanf(pcPortName, "uart%1u", (unsigned int *)&sp);
+  if ((uart_port_t)sp >= UART_NUM_MAX) {
+    return INVALID_SERIAL_PORT;
+  }
+
+  return sp;
 }
 
 void
-uart_set_speed(uart_port_t port, const uint32_t uiPortSpeed)
+uart_set_speed(serial_port sp, const uint32_t uiPortSpeed)
 {
   log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Serial port speed requested to be set to %d baud.", uiPortSpeed);
 
-  // Set port speed
-  if (uart_set_baudrate(port, uiPortSpeed) != ESP_OK) {
+  if (uart_set_baudrate((uart_port_t)sp, uiPortSpeed)) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Unable to apply new speed settings.");
   }
 }
 
 uint32_t
-uart_get_speed(uart_port_t port)
+uart_get_speed(serial_port sp)
 {
   uint32_t uiPortSpeed = 0;
-
-  uart_get_baudrate(port, &uiPortSpeed);
+  uart_get_baudrate((uart_port_t)sp, &uiPortSpeed);
 
   return uiPortSpeed;
 }
 
 void
-uart_close(const uart_port_t port)
-{
-
-}
+uart_close(const serial_port sp) {}
 
 int
-uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout)
+uart_receive(serial_port sp, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout)
 {
-  int res = uart_read_bytes(port, pbtRx, szRx, timeout / portTICK_RATE_MS);
-  LOG_HEX(LOG_GROUP, "RX", pbtRx, szRx);
-  if (res == szRx)
+  if (szRx == uart_read_bytes((uart_port_t)sp, pbtRx, szRx, timeout / portTICK_RATE_MS)) {
+    LOG_HEX(LOG_GROUP, "RX", pbtRx, szRx);
     return NFC_SUCCESS;
-  else
+  } else {
     return NFC_EIO;
+  }
 }
 
 int
-uart_send(uart_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout)
+uart_send(serial_port sp, const uint8_t *pbtTx, const size_t szTx, int timeout)
 {
-  (void) timeout;
   LOG_HEX(LOG_GROUP, "TX", pbtTx, szTx);
-  int res = uart_write_bytes(port, (const char *)pbtTx, szTx);
-  if (res == szTx)
+  if (szTx == uart_write_bytes((uart_port_t)sp, (const char *)pbtTx, szTx)) {
     return NFC_SUCCESS;
-  else
+  } else {
     return NFC_EIO;
+  }
+}
+
+char **
+uart_list_ports(void)
+{
+  char **res = calloc(UART_NUM_MAX + 1, sizeof(char *));
+  if (!res) {
+    perror("malloc");
+    return res;
+  }
+
+  for (int i = 0; i < UART_NUM_MAX; i++) {
+    if (!(res[i] = calloc(6, sizeof(char)))) {
+      perror("malloc");
+      return res;
+    }
+    sprintf(res[i], "uart%1u", i);
+  }
+
+  return res;
 }

@@ -5,6 +5,6 @@
  *      Author: Jack Chen <redchenjs@live.com>
  */
 
+#define WIN32
+#define PACKAGE_VERSION "1.8.0"
 #define DRIVER_PN532_UART_ENABLED
-
-#define PACKAGE_VERSION "libnfc-1.7.1"

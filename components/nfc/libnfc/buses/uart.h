@@ -39,18 +39,26 @@
 #  include <string.h>
 #  include <stdlib.h>
 
+
 #  include <nfc/nfc-types.h>
 
-#  include "freertos/FreeRTOS.h"
 #  include "driver/uart.h"
 
-void     uart_open(uart_port_t port);
-void     uart_close(uart_port_t port);
+// Define shortcut to types to make code more readable
+typedef void *serial_port;
+#  define INVALID_SERIAL_PORT (void*)(~1)
+#  define CLAIMED_SERIAL_PORT (void*)(~2)
 
-void     uart_set_speed(uart_port_t port, const uint32_t uiPortSpeed);
-uint32_t uart_get_speed(const uart_port_t port);
+serial_port uart_open(const char *pcPortName);
+void    uart_close(const serial_port sp);
+#define uart_flush_input(sp, wait) uart_flush_input((uart_port_t)sp)
 
-int      uart_receive(uart_port_t port, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout);
-int      uart_send(uart_port_t port, const uint8_t *pbtTx, const size_t szTx, int timeout);
+void    uart_set_speed(serial_port sp, const uint32_t uiPortSpeed);
+uint32_t uart_get_speed(const serial_port sp);
+
+int     uart_receive(serial_port sp, uint8_t *pbtRx, const size_t szRx, void *abort_p, int timeout);
+int     uart_send(serial_port sp, const uint8_t *pbtTx, const size_t szTx, int timeout);
+
+char  **uart_list_ports(void);
 
 #endif // __NFC_BUS_UART_H__

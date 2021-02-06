@@ -48,8 +48,6 @@
 #include "chips/pn53x-internal.h"
 #include "uart.h"
 
-#include "driver/uart.h"
-
 #define PN532_UART_DEFAULT_SPEED 115200
 #define PN532_UART_DRIVER_NAME "pn532_uart"
 
@@ -58,10 +56,13 @@
 
 // Internal data structs
 const struct pn53x_io pn532_uart_io;
-
 struct pn532_uart_data {
-  uart_port_t port;
+  serial_port port;
+#ifndef WIN32
+  int     iAbortFds[2];
+#else
   volatile bool abort_flag;
+#endif
 };
 
 // Prototypes
@@ -69,6 +70,117 @@ int     pn532_uart_ack(nfc_device *pnd);
 int     pn532_uart_wakeup(nfc_device *pnd);
 
 #define DRIVER_DATA(pnd) ((struct pn532_uart_data*)(pnd->driver_data))
+
+static size_t
+pn532_uart_scan(const nfc_context *context, nfc_connstring connstrings[], const size_t connstrings_len)
+{
+  size_t device_found = 0;
+  serial_port sp;
+  char **acPorts = uart_list_ports();
+  const char *acPort;
+  int     iDevice = 0;
+
+  while ((acPort = acPorts[iDevice++])) {
+    sp = uart_open(acPort);
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Trying to find PN532 device on serial port: %s at %d baud.", acPort, PN532_UART_DEFAULT_SPEED);
+
+    if ((sp != INVALID_SERIAL_PORT) && (sp != CLAIMED_SERIAL_PORT)) {
+      // We need to flush input to be sure first reply does not comes from older byte transceive
+      uart_flush_input(sp, true);
+      // Serial port claimed but we need to check if a PN532_UART is opened.
+      uart_set_speed(sp, PN532_UART_DEFAULT_SPEED);
+
+      nfc_connstring connstring;
+      snprintf(connstring, sizeof(nfc_connstring), "%s:%s:%"PRIu32, PN532_UART_DRIVER_NAME, acPort, PN532_UART_DEFAULT_SPEED);
+      nfc_device *pnd = nfc_device_new(context, connstring);
+      if (!pnd) {
+        perror("malloc");
+        uart_close(sp);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
+        return 0;
+      }
+      pnd->driver = &pn532_uart_driver;
+      pnd->driver_data = malloc(sizeof(struct pn532_uart_data));
+      if (!pnd->driver_data) {
+        perror("malloc");
+        uart_close(sp);
+        nfc_device_free(pnd);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
+        return 0;
+      }
+      DRIVER_DATA(pnd)->port = sp;
+
+      // Alloc and init chip's data
+      if (pn53x_data_new(pnd, &pn532_uart_io) == NULL) {
+        perror("malloc");
+        uart_close(DRIVER_DATA(pnd)->port);
+        nfc_device_free(pnd);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
+        return 0;
+      }
+      // SAMConfiguration command if needed to wakeup the chip and pn53x_SAMConfiguration check if the chip is a PN532
+      CHIP_DATA(pnd)->type = PN532;
+      // This device starts in LowVBat power mode
+      CHIP_DATA(pnd)->power_mode = LOWVBAT;
+
+#ifndef WIN32
+      // pipe-based abort mecanism
+      if (pipe(DRIVER_DATA(pnd)->iAbortFds) < 0) {
+        uart_close(DRIVER_DATA(pnd)->port);
+        pn53x_data_free(pnd);
+        nfc_device_free(pnd);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
+        return 0;
+      }
+#else
+      DRIVER_DATA(pnd)->abort_flag = false;
+#endif
+
+      // Check communication using "Diagnose" command, with "Communication test" (0x00)
+      int res = pn53x_check_communication(pnd);
+      uart_close(DRIVER_DATA(pnd)->port);
+      pn53x_data_free(pnd);
+      nfc_device_free(pnd);
+      if (res < 0) {
+        continue;
+      }
+
+      memcpy(connstrings[device_found], connstring, sizeof(nfc_connstring));
+      device_found++;
+
+      // Test if we reach the maximum "wanted" devices
+      if (device_found >= connstrings_len)
+        break;
+    }
+  }
+  iDevice = 0;
+  while ((acPort = acPorts[iDevice++])) {
+    free((void *)acPort);
+  }
+  free(acPorts);
+  return device_found;
+}
+
+struct pn532_uart_descriptor {
+  char *port;
+  uint32_t speed;
+};
 
 static void
 pn532_uart_close(nfc_device *pnd)
@@ -78,6 +190,12 @@ pn532_uart_close(nfc_device *pnd)
   // Release UART port
   uart_close(DRIVER_DATA(pnd)->port);
 
+#ifndef WIN32
+  // Release file descriptors used for abort mecanism
+  close(DRIVER_DATA(pnd)->iAbortFds[0]);
+  close(DRIVER_DATA(pnd)->iAbortFds[1]);
+#endif
+
   pn53x_data_free(pnd);
   nfc_device_free(pnd);
 }
@@ -85,76 +203,70 @@ pn532_uart_close(nfc_device *pnd)
 static nfc_device *
 pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
 {
-  char *port_s;
+  struct pn532_uart_descriptor ndd;
   char *speed_s;
-  uint32_t speed;
-  nfc_device *pnd;
-
-  int connstring_decode_level = connstring_decode(connstring, PN532_UART_DRIVER_NAME, NULL, &port_s, &speed_s);
-
-  switch (connstring_decode_level) {
-    case 3:
-      speed = 0;
-      if (sscanf(speed_s, "%10"PRIu32, &speed) != 1) {
-        // speed_s is not a number
-        free(port_s);
-        free(speed_s);
-        return NULL;
-      }
+  int connstring_decode_level = connstring_decode(connstring, PN532_UART_DRIVER_NAME, NULL, &ndd.port, &speed_s);
+  if (connstring_decode_level == 3) {
+    ndd.speed = 0;
+    if (sscanf(speed_s, "%10"PRIu32, &ndd.speed) != 1) {
+      // speed_s is not a number
+      free(ndd.port);
       free(speed_s);
-      break;
-    case 2:
-      speed = PN532_UART_DEFAULT_SPEED;
-      break;
-    case 1:
       return NULL;
-      break;
-    case 0:
-      return NULL;
+    }
+    free(speed_s);
   }
-
-  uart_port_t port;
-
-  if (sscanf(port_s, "uart%1u", &port) != 1) {
-    free(port_s);
+  if (connstring_decode_level < 2) {
     return NULL;
   }
+  if (connstring_decode_level < 3) {
+    ndd.speed = PN532_UART_DEFAULT_SPEED;
+  }
+  serial_port sp;
+  nfc_device *pnd = NULL;
 
-  log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Attempt to open: %s at %d baud.", port_s, speed);
-  uart_open(port);
+  log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Attempt to open: %s at %d baud.", ndd.port, ndd.speed);
+  sp = uart_open(ndd.port);
 
+  if (sp == INVALID_SERIAL_PORT)
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Invalid serial port: %s", ndd.port);
+  if (sp == CLAIMED_SERIAL_PORT)
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Serial port already claimed: %s", ndd.port);
+  if ((sp == CLAIMED_SERIAL_PORT) || (sp == INVALID_SERIAL_PORT)) {
+    free(ndd.port);
+    return NULL;
+  }
   // We need to flush input to be sure first reply does not comes from older byte transceive
-  uart_flush_input(port);
-  uart_set_speed(port, speed);
+  uart_flush_input(sp, true);
+  uart_set_speed(sp, ndd.speed);
 
   // We have a connection
   pnd = nfc_device_new(context, connstring);
   if (!pnd) {
     perror("malloc");
-    free(port_s);
-    uart_close(port);
+    free(ndd.port);
+    uart_close(sp);
     return NULL;
   }
-  snprintf(pnd->name, sizeof(pnd->name), "%s:%s", PN532_UART_DRIVER_NAME, port_s);
-  free(port_s);
+  snprintf(pnd->name, sizeof(pnd->name), "%s:%s", PN532_UART_DRIVER_NAME, ndd.port);
+  free(ndd.port);
 
   pnd->driver_data = malloc(sizeof(struct pn532_uart_data));
   if (!pnd->driver_data) {
     perror("malloc");
-    uart_close(port);
+    uart_close(sp);
     nfc_device_free(pnd);
     return NULL;
   }
-  DRIVER_DATA(pnd)->port = port;
+  DRIVER_DATA(pnd)->port = sp;
 
   // Alloc and init chip's data
   if (pn53x_data_new(pnd, &pn532_uart_io) == NULL) {
     perror("malloc");
-    uart_close(port);
+    uart_close(DRIVER_DATA(pnd)->port);
     nfc_device_free(pnd);
     return NULL;
   }
-
   // SAMConfiguration command if needed to wakeup the chip and pn53x_SAMConfiguration check if the chip is a PN532
   CHIP_DATA(pnd)->type = PN532;
   // This device starts in LowVBat mode
@@ -164,7 +276,17 @@ pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
   CHIP_DATA(pnd)->timer_correction = 48;
   pnd->driver = &pn532_uart_driver;
 
+#ifndef WIN32
+  // pipe-based abort mecanism
+  if (pipe(DRIVER_DATA(pnd)->iAbortFds) < 0) {
+    uart_close(DRIVER_DATA(pnd)->port);
+    pn53x_data_free(pnd);
+    nfc_device_free(pnd);
+    return NULL;
+  }
+#else
   DRIVER_DATA(pnd)->abort_flag = false;
+#endif
 
   // Check communication using "Diagnose" command, with "Communication test" (0x00)
   if (pn53x_check_communication(pnd) < 0) {
@@ -192,9 +314,8 @@ static int
 pn532_uart_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, int timeout)
 {
   int res = 0;
-
   // Before sending anything, we need to discard from any junk bytes
-  uart_flush_input(DRIVER_DATA(pnd)->port);
+  uart_flush_input(DRIVER_DATA(pnd)->port, false);
 
   switch (CHIP_DATA(pnd)->power_mode) {
     case LOWVBAT: {
@@ -257,7 +378,11 @@ pn532_uart_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, in
   size_t len;
   void *abort_p = NULL;
 
+#ifndef WIN32
+  abort_p = &(DRIVER_DATA(pnd)->iAbortFds[1]);
+#else
   abort_p = (void *) & (DRIVER_DATA(pnd)->abort_flag);
+#endif
 
   pnd->last_error = uart_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 5, abort_p, timeout);
 
@@ -369,7 +494,7 @@ pn532_uart_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, in
   // The PN53x command is done and we successfully received the reply
   return len;
 error:
-  uart_flush_input(DRIVER_DATA(pnd)->port);
+  uart_flush_input(DRIVER_DATA(pnd)->port, true);
   return pnd->last_error;
 }
 
@@ -389,7 +514,14 @@ static int
 pn532_uart_abort_command(nfc_device *pnd)
 {
   if (pnd) {
+#ifndef WIN32
+    close(DRIVER_DATA(pnd)->iAbortFds[0]);
+    if (pipe(DRIVER_DATA(pnd)->iAbortFds) < 0) {
+      return NFC_ESOFT;
+    }
+#else
     DRIVER_DATA(pnd)->abort_flag = true;
+#endif
   }
   return NFC_SUCCESS;
 }
@@ -402,7 +534,7 @@ const struct pn53x_io pn532_uart_io = {
 const struct nfc_driver pn532_uart_driver = {
   .name                             = PN532_UART_DRIVER_NAME,
   .scan_type                        = INTRUSIVE,
-  .scan                             = NULL,
+  .scan                             = pn532_uart_scan,
   .open                             = pn532_uart_open,
   .close                            = pn532_uart_close,
   .strerror                         = pn53x_strerror,
@@ -435,3 +567,4 @@ const struct nfc_driver pn532_uart_driver = {
   .idle           = pn53x_idle,
   .powerdown      = pn53x_PowerDown,
 };
+
