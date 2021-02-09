@@ -29,7 +29,7 @@ void sc_key_handle(void)
     key_set_scan_mode(KEY_SCAN_MODE_IDX_OFF);
 
     xEventGroupSetBits(wifi_event_group, WIFI_CFG_BIT);
-    ESP_LOGI(SC_KEY_TAG, "start smartconfig");
+    ESP_LOGI(SC_KEY_TAG, "smartconfig started.");
 
     nfc_app_set_mode(NFC_APP_MODE_IDX_OFF);
 #ifdef CONFIG_ENABLE_LED

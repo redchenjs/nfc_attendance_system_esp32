@@ -83,13 +83,13 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
         if (data_length != 0) {
             err = esp_ota_end(update_handle);
             if (err != ESP_OK) {
-                ESP_LOGE(TAG, "image data error.");
+                ESP_LOGE(TAG, "image data error");
                 goto exit;
             }
 
             err = esp_ota_set_boot_partition(update_partition);
             if (err != ESP_OK) {
-                ESP_LOGE(TAG, "set boot partition failed.");
+                ESP_LOGE(TAG, "failed to set boot partition");
                 goto exit;
             }
 
@@ -102,7 +102,7 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
 
             os_pwr_reset_wait(OS_PWR_DUMMY_BIT);
         } else {
-            ESP_LOGI(TAG, "no update found");
+            ESP_LOGI(TAG, "no update found.");
         }
         break;
     case HTTP_EVENT_DISCONNECTED:

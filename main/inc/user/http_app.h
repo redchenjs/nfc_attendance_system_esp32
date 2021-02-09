@@ -9,8 +9,8 @@
 #define INC_USER_HTTP_APP_H_
 
 typedef enum {
-    HTTP_REQ_CODE_DEV_VERIFY_TOKEN = 100, // 设备端请求口令验证
-    HTTP_REQ_CODE_DEV_UPDATE_FW    = 101  // 设备端请求固件更新
+    HTTP_REQ_CODE_DEV_VERIFY_TOKEN = 210, // 设备端请求口令验证
+    HTTP_REQ_CODE_DEV_UPDATE_FW    = 211  // 设备端请求固件更新
 } req_code_t;
 
 // cert0.pem

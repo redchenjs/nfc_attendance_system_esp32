@@ -71,7 +71,7 @@ static void nfc_app_task_handle(void *pvParameter)
 
     nfc_init(&context);
     if (context == NULL) {
-        ESP_LOGE(TAG, "unable to init libnfc (malloc)");
+        ESP_LOGE(TAG, "failed to init libnfc");
         goto err;
     }
 
@@ -86,7 +86,7 @@ static void nfc_app_task_handle(void *pvParameter)
         xLastWakeTime = xTaskGetTickCount();
         // open NFC device
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
-            ESP_LOGE(TAG, "device reset");
+            ESP_LOGE(TAG, "device hard reset");
             pn532_setpin_reset(0);
             vTaskDelay(100 / portTICK_RATE_MS);
             pn532_setpin_reset(1);
@@ -99,13 +99,13 @@ static void nfc_app_task_handle(void *pvParameter)
                 if ((res = nfc_initiator_transceive_bytes(pnd, tx_data, TX_FRAME_LEN, rx_data, RX_FRAME_LEN, -1)) >= 0) {
                     rx_data[res] = 0x00;
                 } else {
-                    ESP_LOGW(TAG, "transceive failed");
+                    ESP_LOGW(TAG, "failed to transceive bytes");
                 }
             } else {
                 ESP_LOGI(TAG, "%u bytes mem left", heap_caps_get_free_size(MALLOC_CAP_32BIT));
             }
         } else {
-            ESP_LOGE(TAG, "setup device failed");
+            ESP_LOGE(TAG, "failed to init device");
         }
         // close NFC device
         nfc_close(pnd);
