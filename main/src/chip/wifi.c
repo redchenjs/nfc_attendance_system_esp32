@@ -12,17 +12,39 @@
 
 #define TAG "wifi"
 
-char wifi_hostname[40] = {0};
-char wifi_mac_string[18] = {0};
-char wifi_mac_address[6] = {0};
+static char wifi_hostname[40] = {0};
+static char wifi_mac_string[18] = {0};
+static uint8_t wifi_mac_address[6] = {0};
 
 static wifi_config_t wifi_config = {
     .sta = {
+        .ssid = CONFIG_WIFI_SSID,
+        .password = CONFIG_WIFI_PASSWORD,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
         .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
         .threshold.authmode = WIFI_AUTH_WPA2_PSK
     }
 };
+
+char *wifi_get_hostname(void)
+{
+    return wifi_hostname;
+}
+
+char *wifi_get_mac_string(void)
+{
+    return wifi_mac_string;
+}
+
+uint8_t *wifi_get_mac_address(void)
+{
+    return wifi_mac_address;
+}
+
+wifi_config_t *wifi_get_config(void)
+{
+    return &wifi_config;
+}
 
 void wifi_init(void)
 {
@@ -33,24 +55,18 @@ void wifi_init(void)
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MIN_MODEM));
-    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
 
-    wifi_config_t wifi_stored_config;
-    ESP_ERROR_CHECK(esp_wifi_get_config(ESP_IF_WIFI_STA, &wifi_stored_config));
-    if (strlen((char *)wifi_stored_config.sta.ssid) != 0) {
-        ESP_LOGI(TAG, "use stored wifi configuration, ssid: %s", wifi_stored_config.sta.ssid);
-        ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_stored_config));
-        ESP_ERROR_CHECK(esp_wifi_start());
-    } else if (strlen(CONFIG_WIFI_SSID) != 0) {
-        memcpy(wifi_config.sta.ssid, (char *)CONFIG_WIFI_SSID, strlen(CONFIG_WIFI_SSID));
-        wifi_config.sta.ssid[strlen(CONFIG_WIFI_SSID)] = '\0';
-        memcpy(wifi_config.sta.password, (char *)CONFIG_WIFI_PASSWORD, strlen(CONFIG_WIFI_PASSWORD));
-        wifi_config.sta.password[strlen(CONFIG_WIFI_PASSWORD)] = '\0';
-        ESP_LOGI(TAG, "use default wifi configuration, ssid: %s", wifi_config.sta.ssid);
+#ifdef CONFIG_ENABLE_SC_KEY
+    ESP_ERROR_CHECK(esp_wifi_get_config(ESP_IF_WIFI_STA, &wifi_config));
+#endif
+
+    if (strlen((const char *)wifi_config.sta.ssid) != 0) {
+        ESP_LOGI(TAG, "found wifi configuration, ssid: %s", wifi_config.sta.ssid);
+        ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
         ESP_ERROR_CHECK(esp_wifi_start());
     } else {
-        ESP_LOGW(TAG, "no wifi configuration available");
+        ESP_LOGW(TAG, "no wifi configuration found");
     }
 
     ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, (uint8_t *)wifi_mac_address));

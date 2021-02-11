@@ -87,7 +87,7 @@ void http_app_token_prepare_data(char *buf, int len)
     cJSON *root = NULL;
     root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "request", HTTP_REQ_CODE_DEV_VERIFY_TOKEN);
-    cJSON_AddStringToObject(root, "device_mac", wifi_mac_string);
+    cJSON_AddStringToObject(root, "device_mac", wifi_get_mac_string());
     cJSON_AddStringToObject(root, "user_token", token_string);
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);

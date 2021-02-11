@@ -70,7 +70,7 @@ esp_err_t http_app_ota_event_handler(esp_http_client_event_t *evt)
                 ESP_LOGI(TAG, "write started.");
             }
 
-            err = esp_ota_write(update_handle, (const void *)evt->data, evt->data_len);
+            err = esp_ota_write(update_handle, evt->data, evt->data_len);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "write failed.");
                 goto exit;
@@ -120,7 +120,7 @@ void http_app_ota_prepare_data(char *buf, int len)
     cJSON *root = NULL;
     root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "request", HTTP_REQ_CODE_DEV_UPDATE_FW);
-    cJSON_AddStringToObject(root, "device_mac", wifi_mac_string);
+    cJSON_AddStringToObject(root, "device_mac", wifi_get_mac_string());
     cJSON_AddStringToObject(root, "fw_version", app_get_version());
     cJSON_PrintPreallocated(root, buf, len, 0);
     cJSON_Delete(root);

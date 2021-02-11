@@ -34,8 +34,7 @@ EventGroupHandle_t user_event_group;
 static EventBits_t reset_wait_bits = OS_PWR_DUMMY_BIT;
 static EventBits_t sleep_wait_bits = OS_PWR_DUMMY_BIT;
 
-static void wifi_event_handler(void* arg, esp_event_base_t event_base,
-                               int32_t event_id, void* event_data)
+static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     switch (event_id) {
         case WIFI_EVENT_STA_START:
@@ -69,8 +68,7 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-static void ip_event_handler(void* arg, esp_event_base_t event_base,
-                             int32_t event_id, void* event_data)
+static void ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     switch (event_id) {
         case IP_EVENT_STA_GOT_IP:
@@ -96,48 +94,35 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-static void sc_event_handler(void* arg, esp_event_base_t event_base,
-                             int32_t event_id, void* event_data)
+static void sc_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    static wifi_config_t wifi_config = {
-        .sta = {
-            .scan_method = WIFI_ALL_CHANNEL_SCAN,
-            .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-            .threshold.authmode = WIFI_AUTH_WPA2_PSK
-        }
-    };
     switch (event_id) {
-        case SC_EVENT_SCAN_DONE:
-            ESP_LOGI(OS_SC_TAG, "scan done");
-            break;
-        case SC_EVENT_FOUND_CHANNEL:
-            ESP_LOGI(OS_SC_TAG, "found channel");
-            break;
-        case SC_EVENT_GOT_SSID_PSWD:
-            ESP_LOGI(OS_SC_TAG, "got ssid and passwd");
+        case SC_EVENT_GOT_SSID_PSWD: {
+            wifi_config_t *wifi_config = wifi_get_config();
+            smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
+
+            memcpy(wifi_config->sta.ssid, evt->ssid, sizeof(wifi_config->sta.ssid));
+            memcpy(wifi_config->sta.password, evt->password, sizeof(wifi_config->sta.password));
+            wifi_config->sta.bssid_set = evt->bssid_set;
+            if (wifi_config->sta.bssid_set == true) {
+                memcpy(wifi_config->sta.bssid, evt->bssid, sizeof(wifi_config->sta.bssid));
+            }
 
 #ifdef CONFIG_ENABLE_LED
             led_set_mode(LED_MODE_IDX_PULSE_D1);
 #endif
-            smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
-            memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
-            memcpy(wifi_config.sta.password, evt->password, sizeof(wifi_config.sta.password));
-            wifi_config.sta.bssid_set = evt->bssid_set;
-            if (wifi_config.sta.bssid_set == true) {
-                memcpy(wifi_config.sta.bssid, evt->bssid, sizeof(wifi_config.sta.bssid));
-            }
-            ESP_LOGI(OS_SC_TAG, "ssid: %s", wifi_config.sta.ssid);
-            ESP_LOGI(OS_SC_TAG, "password: %s", wifi_config.sta.password);
-
             esp_wifi_disconnect();
-            esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config);
+            esp_wifi_set_storage(WIFI_STORAGE_FLASH);
+            esp_wifi_set_config(ESP_IF_WIFI_STA, wifi_config);
             esp_wifi_connect();
             break;
+        }
         case SC_EVENT_SEND_ACK_DONE:
-            ESP_LOGI(OS_SC_TAG, "ack done");
             esp_smartconfig_stop();
             xEventGroupClearBits(wifi_event_group, WIFI_CFG_BIT);
             break;
+        case SC_EVENT_SCAN_DONE:
+        case SC_EVENT_FOUND_CHANNEL:
         default:
             break;
     }

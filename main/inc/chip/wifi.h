@@ -8,9 +8,14 @@
 #ifndef INC_CHIP_WIFI_H_
 #define INC_CHIP_WIFI_H_
 
-extern char wifi_hostname[40];
-extern char wifi_mac_string[18];
-extern char wifi_mac_address[6];
+#include <stdint.h>
+
+#include "esp_wifi.h"
+
+extern char *wifi_get_hostname(void);
+extern char *wifi_get_mac_string(void);
+extern uint8_t *wifi_get_mac_address(void);
+extern wifi_config_t *wifi_get_config(void);
 
 extern void wifi_init(void);
 
