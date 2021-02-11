@@ -98,14 +98,14 @@ static void sc_event_handler(void *arg, esp_event_base_t event_base, int32_t eve
 {
     switch (event_id) {
         case SC_EVENT_GOT_SSID_PSWD: {
-            wifi_config_t *wifi_config = wifi_get_config();
+            wifi_config_t *wifi_conf = wifi_get_conf();
             smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
 
-            memcpy(wifi_config->sta.ssid, evt->ssid, sizeof(wifi_config->sta.ssid));
-            memcpy(wifi_config->sta.password, evt->password, sizeof(wifi_config->sta.password));
-            wifi_config->sta.bssid_set = evt->bssid_set;
-            if (wifi_config->sta.bssid_set == true) {
-                memcpy(wifi_config->sta.bssid, evt->bssid, sizeof(wifi_config->sta.bssid));
+            memcpy(wifi_conf->sta.ssid, evt->ssid, sizeof(wifi_conf->sta.ssid));
+            memcpy(wifi_conf->sta.password, evt->password, sizeof(wifi_conf->sta.password));
+            wifi_conf->sta.bssid_set = evt->bssid_set;
+            if (wifi_conf->sta.bssid_set == true) {
+                memcpy(wifi_conf->sta.bssid, evt->bssid, sizeof(wifi_conf->sta.bssid));
             }
 
 #ifdef CONFIG_ENABLE_LED
@@ -113,7 +113,7 @@ static void sc_event_handler(void *arg, esp_event_base_t event_base, int32_t eve
 #endif
             esp_wifi_disconnect();
             esp_wifi_set_storage(WIFI_STORAGE_FLASH);
-            esp_wifi_set_config(ESP_IF_WIFI_STA, wifi_config);
+            esp_wifi_set_config(ESP_IF_WIFI_STA, wifi_conf);
             esp_wifi_connect();
             break;
         }

@@ -12,10 +12,11 @@
 
 #include "esp_wifi.h"
 
+extern wifi_config_t *wifi_get_conf(void);
+
 extern char *wifi_get_hostname(void);
 extern char *wifi_get_mac_string(void);
 extern uint8_t *wifi_get_mac_address(void);
-extern wifi_config_t *wifi_get_config(void);
 
 extern void wifi_init(void);
 
