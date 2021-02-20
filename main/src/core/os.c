@@ -203,5 +203,5 @@ void os_init(void)
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(SC_EVENT, ESP_EVENT_ANY_ID, &sc_event_handler, NULL));
 
-    xTaskCreatePinnedToCore(os_pwr_task_handle, "osPwrT", 2048, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(os_pwr_task_handle, "osPwrT", 1280, NULL, 5, NULL, 0);
 }
