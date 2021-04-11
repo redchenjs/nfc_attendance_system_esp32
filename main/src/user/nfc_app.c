@@ -52,7 +52,7 @@ static int char2int(char ch)
 static void str2byte(const char *str, char *byte)
 {
     for (; str[0] && str[1]; str += 2) {
-        *byte++ = char2int(str[0]) * 16 + char2int(str[1]);
+        *(byte++) = char2int(str[0]) * 16 + char2int(str[1]);
     }
 }
 
@@ -83,8 +83,9 @@ static void nfc_app_task_handle(void *pvParameter)
             pdFALSE,
             portMAX_DELAY
         );
+
         xLastWakeTime = xTaskGetTickCount();
-        // open NFC device
+
         while ((pnd = nfc_open(context, "pn532_uart:uart1:115200")) == NULL) {
             ESP_LOGE(TAG, "device hard reset");
             pn532_setpin_reset(0);
@@ -92,7 +93,7 @@ static void nfc_app_task_handle(void *pvParameter)
             pn532_setpin_reset(1);
             vTaskDelay(100 / portTICK_RATE_MS);
         }
-        // transceive some bytes if target available
+
         int res = 0;
         if (nfc_initiator_init(pnd) >= 0) {
             if (nfc_initiator_select_passive_target(pnd, nm, NULL, 0, &nt) >= 0) {
@@ -102,14 +103,14 @@ static void nfc_app_task_handle(void *pvParameter)
                     ESP_LOGW(TAG, "failed to transceive bytes");
                 }
             } else {
-                ESP_LOGI(TAG, "%u bytes mem left", heap_caps_get_free_size(MALLOC_CAP_32BIT));
+                ESP_LOGI(TAG, "available memory: %u bytes", heap_caps_get_free_size(MALLOC_CAP_32BIT));
             }
         } else {
             ESP_LOGE(TAG, "failed to init device");
         }
-        // close NFC device
+
         nfc_close(pnd);
-        // match received bytes and verify the token if available
+
         if (res > 0) {
             if (strstr((char *)rx_data, RX_FRAME_PRFX) != NULL &&
                 strlen((char *)rx_data + RX_FRAME_PRFX_LEN) == RX_FRAME_DATA_LEN) {
@@ -122,7 +123,7 @@ static void nfc_app_task_handle(void *pvParameter)
                 ESP_LOGW(TAG, "unexpected frame");
             }
         }
-        // task delay
+
         vTaskDelayUntil(&xLastWakeTime, 500 / portTICK_RATE_MS);
     }
 
