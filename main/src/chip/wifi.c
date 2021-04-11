@@ -64,10 +64,11 @@ void wifi_init(void)
         ESP_LOGI(TAG, "found wifi configuration, ssid: %s", wifi_conf.sta.ssid);
         ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
         ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_conf));
-        ESP_ERROR_CHECK(esp_wifi_start());
     } else {
         ESP_LOGW(TAG, "no wifi configuration found");
     }
+
+    ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_ERROR_CHECK(esp_wifi_get_mac(ESP_IF_WIFI_STA, (uint8_t *)wifi_mac_address));
     snprintf(wifi_mac_string, sizeof(wifi_mac_string), MACSTR, MAC2STR(wifi_mac_address));
