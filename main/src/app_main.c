@@ -37,14 +37,14 @@ static void chip_init(void)
 
     wifi_init();
 
-    uart1_init();
+    uart_init();
 
 #ifdef CONFIG_ENABLE_AUDIO_PROMPT
     i2s_output_init();
 #endif
 
 #ifdef CONFIG_ENABLE_GUI
-    hspi_init();
+    spi_host_init();
 #endif
 }
 

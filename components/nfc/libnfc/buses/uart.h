@@ -42,7 +42,7 @@
 
 #  include <nfc/nfc-types.h>
 
-#  include "driver/uart.h"
+#  include "chip/uart.h"
 
 // Define shortcut to types to make code more readable
 typedef void *serial_port;

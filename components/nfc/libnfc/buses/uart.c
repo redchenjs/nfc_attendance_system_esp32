@@ -45,7 +45,7 @@
 serial_port
 uart_open(const char *pcPortName)
 {
-  serial_port sp = UART_NUM_0;
+  serial_port sp = (serial_port)UART_NUM;
 
   sscanf(pcPortName, "uart%1u", (unsigned int *)&sp);
   if ((uart_port_t)sp >= UART_NUM_MAX) {

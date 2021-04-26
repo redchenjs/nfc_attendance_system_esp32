@@ -8,6 +8,11 @@
 #ifndef INC_CHIP_UART_H_
 #define INC_CHIP_UART_H_
 
-extern void uart1_init(void);
+#include "driver/uart.h"
+
+#define UART_TAG "uart-1"
+#define UART_NUM UART_NUM_1
+
+extern void uart_init(void);
 
 #endif /* INC_CHIP_UART_H_ */

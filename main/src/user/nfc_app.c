@@ -103,7 +103,7 @@ static void nfc_app_task_handle(void *pvParameter)
                     ESP_LOGW(TAG, "failed to transceive bytes");
                 }
             } else {
-                ESP_LOGI(TAG, "available memory: %u bytes", heap_caps_get_free_size(MALLOC_CAP_32BIT));
+                ESP_LOGI(TAG, "waiting for NFC target....");
             }
         } else {
             ESP_LOGE(TAG, "failed to init device");
@@ -120,7 +120,7 @@ static void nfc_app_task_handle(void *pvParameter)
 #endif
                 http_app_verify_token((char *)rx_data + RX_FRAME_PRFX_LEN);
             } else {
-                ESP_LOGW(TAG, "unexpected frame");
+                ESP_LOGW(TAG, "unexpected frame length: %d", strlen((char *)rx_data));
             }
         }
 
