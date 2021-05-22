@@ -35,14 +35,14 @@ void spi_host_init(void)
         .mode = 0,                                // SPI mode 0
         .spics_io_num = CONFIG_SPI_CS_PIN,        // CS pin
 #ifdef CONFIG_LCD_TYPE_ST7735
-        .clock_speed_hz = 26000000,               // clock out at 26 MHz
-        .pre_cb = st7735_setpin_dc,               // specify pre-transfer callback to handle D/C line
+        .clock_speed_hz = SPI_MASTER_FREQ_26M,
+        .pre_cb = st7735_setpin_dc,
 #else
-        .clock_speed_hz = 40000000,               // clock out at 40 MHz
-        .pre_cb = st7789_setpin_dc,               // specify pre-transfer callback to handle D/C line
+        .clock_speed_hz = SPI_MASTER_FREQ_40M,
+        .pre_cb = st7789_setpin_dc,
 #endif
-        .queue_size = 2,                          // we want to be able to queue 2 transactions at a time
-        .flags = SPI_DEVICE_3WIRE | SPI_DEVICE_HALFDUPLEX
+        .queue_size = 2,
+        .flags = SPI_DEVICE_NO_DUMMY
     };
     ESP_ERROR_CHECK(spi_bus_add_device(SPI_HOST_NUM, &dev_conf, &spi_host));
 
