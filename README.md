@@ -16,14 +16,14 @@ NFC Attendance System based on ESP32 chip.
 ### Obtain the source
 
 ```
-git clone --recursive https://github.com/redchenjs/nfc_attendance_system_esp32.git
+git clone --recursive --shallow-submodules https://github.com/redchenjs/nfc_attendance_system_esp32.git
 ```
 
 ### Update an existing repository
 
 ```
 git pull
-git submodule update --init --recursive
+git submodule update --init --recursive --depth 1 --recommend-shallow
 ```
 
 ### Setup the tools
